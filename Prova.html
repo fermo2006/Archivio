@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Archivio Visuale</title>
+<style>
+body { font-family: Arial, sans-serif; background: #222; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 310px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; align-items: stretch;}
+.card-title { min-height: 60px; max-height: 4.5em; padding:18px 13px 7px 13px; font-weight:bold; font-size:1.19em; text-align:center; overflow:hidden; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient: vertical; word-break:break-word; color:#2a283b; letter-spacing:0.5px;}
+.card-img { display:block; width:100%; height:174px; object-fit:cover; border-bottom:2px solid #eee; cursor:pointer; background: #ddd;}
+.btnbox { display:flex; justify-content:space-around; padding:13px 0 8px 0; gap:10px;}
+.btn { border:none; color:white; padding:5px 18px; border-radius:16px; font-size:0.93em; cursor:pointer; transition:filter .19s;}
+.btn.tags { }
+.btn:hover { filter:brightness(1.2); }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.97em; padding:8px 12px; border-radius:7px; margin:0 13px 10px 13px; text-align:center;}
+.note-toggle { color:#117; background:#d3e2fb; cursor:pointer; padding:8px 0; font-size:1em; border:none; width:100%; border-radius:5px; margin:0;}
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:8px 20px 11px 20px; font-size:1em;}
+#lightbox { display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:1000;background:rgba(22,24,27,0.93);align-items:center;justify-content:center;}
+#lightbox-img {max-width:90vw;max-height:94vh;border-radius:18px;box-shadow:0 0 24px #000a;}
+#search {width:60vw; max-width:420px; margin:40px auto 35px auto;display:block;padding:11px;font-size:1em; border-radius:20px; border:1px solid #bbb;}
+.selectbox {text-align:center;margin-bottom:20px;}
+.selectbox label { font-weight:bold; color: #bbb;}
+.selectbox select { background: #fff; color: #222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb;}
+hr {margin: 44px auto 38px auto; border:0; height:1px; background:#444;}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title').innerText.toLowerCase();
+        cards[c].style.display = (titolo.indexOf(val) >= 0) ? "" : "none";
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+</script>
+</head>
+<body>
+<div id="lightbox" onclick="hideLightbox()">
+    <img id="lightbox-img" src="">
+</div>
+<h1 style="color:white;text-align:center;padding-top:20px;">Archivio Visuale</h1>
+<input type="text" id="search" placeholder="Cerca titolo, artista...">
+<div class="selectbox">
+<label>Mostra nella scheda:</label>
+<select id="cardimgtype" onchange="refreshImgs()">
+  <option value="foto">Foto</option>
+  <option value="screenshot">Screenshot</option>
+</select>
+<label style="margin-left:21px;">Ingrandisci al click:</label>
+<select id="lightboxtype">
+  <option value="foto_grande">Foto grande</option>
+  <option value="screenshot_grande">Screenshot grande</option>
+</select>
+</div>
+<div class="grid">
+
+    <div class="card" style="border-left:7px solid #FFA652;">
+        <div class="card-title" title="Sofia Raffaeli - Clavette - (30.300) - Campionato del Mondo - Rio de Janeiro - 21-8-25.mp4">Sofia Raffaeli - Clavette - (30.300) - Campionato del Mondo - Rio de Janeiro - 21-8-25.mp4</div>
+        <img class="card-img cardimg-foto" src="Foto/Sofia Raffaeli - Clavette - (30.300) - Campionato del Mondo - Rio de Janeiro - 21-8-25.mp4_snapshot_02.32.857.jpg" style="display:none;" onclick="showLightbox(this)">
+        <img class="card-img cardimg-screenshot" src="Screenshot/Sofia Raffaeli - Clavette - (30.300) - Campionato del Mondo - Rio de Janeiro - 21-8-25.mp4.jpg" style="display:none;" onclick="showLightbox(this)">
+        <input type="hidden" class="fotogrande" value="Foto/Sofia Raffaeli - Clavette - (30.300) - Campionato del Mondo - Rio de Janeiro - 21-8-25.mp4_snapshot_02.32.857.jpg">
+        <input type="hidden" class="screenshotgrande" value="Screenshot/Sofia Raffaeli - Clavette - (30.300) - Campionato del Mondo - Rio de Janeiro - 21-8-25.mp4.jpg">
+        <div class="btnbox">
+            <button class="btn" style="background:#FFA652;" title="Cartella (Actor)">test</button>
+            <button class="btn tags" style="background:#B05CA3;" title="Disco (Tag)">Prova</button>
+        </div>
+        <div class="datiriga">1920x1080 - 18.6 Mb/s - 3m - 50 fps</div>
+        <button class="note-toggle" onclick="toggleNote('b37cebe07e')">Mostra note</button>
+        <div class="notebox" id="note_b37cebe07e">Sofia Raffaeli (Ancona, 19 gennaio 2004) è una ginnasta italiana, individualista della Nazionale di ginnastica ritmica italiana. Alle Olimpiadi di Parigi 2024 ha ottenuto la medaglia di bronzo, la prima medaglia dell'Italia nella ginnastica ritmica a livello individuale.[1] È la prima italiana nella storia a vincere un oro individuale ai Campionati del Mondo nella ginnastica ritmica, è campionessa mondiale all-around 2022, vicecampionessa nel 2023 e bronzo nel 2025.<br><br>Nel 2019 ha vinto la medaglia d'argento ai campionati mondiali juniores nelle specialità della fune e delle clavette. Ha esordito a livello senior nel 2021 e ha vinto la medaglia di bronzo nel cerchio ai campionati mondiali assoluti dello stesso anno. È la prima e unica ginnasta italiana ad aver vinto un oro nel concorso generale della Coppa del Mondo (World Cup Atene 2022).</div>
+    </div>
+    
+    <div class="card" style="border-left:7px solid #FFA652;">
+        <div class="card-title" title="Elisa - Quando - Pino è - Il viaggio del musicante - Rai 1.ts">Elisa - Quando - Pino è - Il viaggio del musicante - Rai 1.ts</div>
+        <img class="card-img cardimg-foto" src="Foto/Elisa - Quando - Pino è - Il viaggio del musicante - Rai 1.ts_snapshot_03.09.789.jpg" style="display:none;" onclick="showLightbox(this)">
+        <img class="card-img cardimg-screenshot" src="Screenshot/Elisa - Quando - Pino è - Il viaggio del musicante - Rai 1.ts.jpg" style="display:none;" onclick="showLightbox(this)">
+        <input type="hidden" class="fotogrande" value="Foto/Elisa - Quando - Pino è - Il viaggio del musicante - Rai 1.ts_snapshot_03.09.789.jpg">
+        <input type="hidden" class="screenshotgrande" value="Screenshot/Elisa - Quando - Pino è - Il viaggio del musicante - Rai 1.ts.jpg">
+        <div class="btnbox">
+            <button class="btn" style="background:#FFA652;" title="Cartella (Actor)">test</button>
+            <button class="btn tags" style="background:#B05CA3;" title="Disco (Tag)">Prova</button>
+        </div>
+        <div class="datiriga">1920x1080 - 21.0 Mb/s - 6m - 25 fps</div>
+        <button class="note-toggle" onclick="toggleNote('3f9b4d07a9')">Mostra note</button>
+        <div class="notebox" id="note_3f9b4d07a9">Elisa, pseudonimo di Elisa Toffoli (Trieste, 19 dicembre 1977[7]), è una cantautrice e produttrice discografica italiana.<br><br>È nota per essere tra i pochi artisti della scena musicale italiana a scrivere ed interpretare la maggior parte dei propri brani in lingua inglese; ha cantato anche in spagnolo (nei brani Háblame e Sentir sin embargo), francese (Pour que l'amour me quitte), sloveno (Lintver main theme), curdo (il brano Kuminist) e sardo (Anninnia con il Coro di Gavoi[8]), oltre che in italiano. Nel corso della sua carriera ha avviato anche progetti in qualità di regista di videoclip, attrice teatrale, fotografa, scrittrice e doppiatrice.<br><br>Il successo in ambito discografico arrivò a diciannove anni con l'album in studio d'esordio Pipes & Flowers (1997), sebbene la notorietà al grande pubblico sia giunta quattro anni più tardi grazie alla vittoria al Festival di Sanremo 2001 con il brano Luce (tramonti a nord est).<br><br>In venticinque anni di carriera, dopo la realizzazione di undici album in studio, sette raccolte, tre album dal vivo, settantatré singoli e altrettanti video musicali, ha venduto oltre 15 milioni di dischi in tutto il mondo, di cui oltre 5.5 milioni di copie certificate da M&D e FIMI, riscuotendo successo anche nel resto d'Europa e in Nord America.[9][10][11] Nelle classifiche di vendita italiane e internazionali, ha raggiunto dieci volte la top ten con i suoi album, conquistando quattro volte la prima posizione, mentre per quanto riguarda i singoli, ha raggiunto la top-ten sedici volte, con sei numeri uno[12], guadagnando complessivamente un disco di diamante, un disco multiplatino (come membro del gruppo Artisti Uniti per l'Abruzzo), quarantaquattro dischi di platino e nove dischi d'oro[13].</div>
+    </div>
+    
+    <div class="card" style="border-left:7px solid #FFA652;">
+        <div class="card-title" title="Carlo Macchini - Sbarra - Campionato Italiano - Quartu Sant' Elena - 28-9-25.mp4">Carlo Macchini - Sbarra - Campionato Italiano - Quartu Sant' Elena - 28-9-25.mp4</div>
+        <img class="card-img cardimg-foto" src="Foto/Carlo Macchini - Sbarra - Campionato Italiano - Quartu Sant' Elena - 28-9-25.mp4_snapshot_00.02.487.jpg" style="display:none;" onclick="showLightbox(this)">
+        <img class="card-img cardimg-screenshot" src="Screenshot/Carlo Macchini - Sbarra - Campionato Italiano - Quartu Sant' Elena - 28-9-25.mp4.jpg" style="display:none;" onclick="showLightbox(this)">
+        <input type="hidden" class="fotogrande" value="Foto/Carlo Macchini - Sbarra - Campionato Italiano - Quartu Sant' Elena - 28-9-25.mp4_snapshot_00.02.487.jpg">
+        <input type="hidden" class="screenshotgrande" value="Screenshot/Carlo Macchini - Sbarra - Campionato Italiano - Quartu Sant' Elena - 28-9-25.mp4.jpg">
+        <div class="btnbox">
+            <button class="btn" style="background:#FFA652;" title="Cartella (Actor)">test</button>
+            <button class="btn tags" style="background:#B05CA3;" title="Disco (Tag)">Prova</button>
+        </div>
+        <div class="datiriga">1920x1080 - 18.5 Mb/s - 4m - 25 fps</div>
+        <button class="note-toggle" onclick="toggleNote('2703dd76a2')">Mostra note</button>
+        <div class="notebox" id="note_2703dd76a2">Carlo Macchini (Ancona, 5 maggio 1996) è un ginnasta italiano, vice-campione europeo alla sbarra nel 2023.<br><br>Carriera<br>All'età di quattro anni è avvicinato al mondo dello sport dai genitori, precisamente nel settembre del 2000, entra nell’A.S.D. Fermo 85 come ginnasta,[1] allenato dal tecnico Luigi Peroli, diventando nel 2006 campione regionale.[2][3] Nel 2010 Carlo entra a far parte della nazionale. Dopo aver sfidato squadre tedesche,[4] russe e spagnole, a luglio del 2013 partecipa al Festival olimpico della gioventù europea (EYOF 2013) ad Utrecht, vincendo la medaglia di bronzo nel concorso a squadre e la medaglia d’oro alla sbarra, con apprezzamenti dell'amministrazione comunale di Fermo.[5] Nel 2015 la sua squadra, la Ginnastica Pro Carate è Campione d’Italia di ginnastica artistica maschile.[6]<br><br>Nel mese di novembre 2016 ha partecipato alla "Abierto Mexicano", prima gara internazionale da senior a Città del Messico.[7] Il 18 marzo 2017 viene convocato nella nazionale per disputare a Linz, Austria, l’incontro internazionale “8th TGW Austrian Team Open” ottenendo il primo posto a squadre ed il secondo nel concorso generale,[8] mentre dal 19 al 23 aprile ha partecipato con la nazionale italiana ai VII Campionati europei a Cluj-Napoca, in Romania.[9][10] Dal 12 al 14 maggio Carlo gareggia con la nazionale alla World Challenge Cup a Capodistria, in Slovenia, ottenendo il quarto posto alla sbarra,[11][12] dal 7 al 9 settembre si trova a Szombathely, in Ungheria,[13] ottenendo la finale alla sbarra in coppa del mondo col secondo punteggio[14] e il 18 Novembre si trova a Mortara, in vista del Trofeo Massucchi,[15] piazzandosi sul secondo gradino del podio.[16]</div>
+    </div>
+    
+</div>
+<hr>
+<div style="background:#181926;border-radius:12px;max-width:900px;margin:40px auto 40px auto;padding:18px 28px 20px 28px;">
+  <h2 style="color:#fff;text-align:center;font-size:1.26em;margin-bottom:17px;">
+    Elenco Completo dei File &nbsp; <span style="font-size:0.82em;color:#b3e2ff;">(3)</span>
+  </h2>
+  <ul style="list-style:none;padding:0;margin:0;font-size:1.08em;line-height:1.74;">
+<li style="border-bottom:1px solid #434366;padding:5px 0 4px 0;color:#e7eefb;">Sofia Raffaeli - Clavette - (30.300) - Campionato del Mondo - Rio de Janeiro - 21-8-25.mp4 <span style="color:#45caff;font-size:0.97em;margin-left:7px;">[H:]</span><span style="color:#ffc14d;font-size:0.96em;margin-left:6px;">[Bo]</span></li><li style="border-bottom:1px solid #434366;padding:5px 0 4px 0;color:#e7eefb;">Elisa - Quando - Pino è - Il viaggio del musicante - Rai 1.ts <span style="color:#45caff;font-size:0.97em;margin-left:7px;">[H:]</span><span style="color:#ffc14d;font-size:0.96em;margin-left:6px;">[Bo]</span></li><li style="border-bottom:1px solid #434366;padding:5px 0 4px 0;color:#e7eefb;">Carlo Macchini - Sbarra - Campionato Italiano - Quartu Sant' Elena - 28-9-25.mp4 <span style="color:#45caff;font-size:0.97em;margin-left:7px;">[H:]</span><span style="color:#ffc14d;font-size:0.96em;margin-left:6px;">[Bo]</span></li>
+  </ul>
+</div>
+</body>
+</html>
