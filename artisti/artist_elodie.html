@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Elodie</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#f5d5d0;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#CE3018; color:#fff; padding:8px 30px; border-radius:12px; margin:0;">
+  Elodie
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(61 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - 1-5-25.mkv_snapshot_10.48.780.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - 1-5-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - 1-5-25.mkv_snapshot_10.48.780.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - 1-5-25.mkv.jpg">
+  <div class="tecnici-box" id="video_2c480594b9">
+    <div class="riga1">3840x2160 - 28.1 Mb/s - 14 min 47 s</div>
+    <div>3.07 GB - 50 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_2c480594b9">MPEG Audio - 256 kb/s - det<br>MPEG Audio - 256 kb/s - det<br>MPEG Audio - 256 kb/s - det<br>MPEG Audio - 256 kb/s - det</div>
+  <div class="notebox" id="note_2c480594b9">Elodie - 1-5-25.mkv - Black Nirvana - La Coda Del Diavolo (Rkomi cover) - Mi Ami Mi Odi - Bagno a mezzanotte - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2c480594b9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2c480594b9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2c480594b9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - & Achille Lauro - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - & Achille Lauro - Sanremo - 14-2-25.ts_snapshot_05.43.023.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - & Achille Lauro - Sanremo - 14-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - & Achille Lauro - Sanremo - 14-2-25.ts_snapshot_05.43.023.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - & Achille Lauro - Sanremo - 14-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_8f40d24387">
+    <div class="riga1">3840x2160 - 19.4 Mb/s - 6 min 9 s</div>
+    <div>0.91 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8f40d24387">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_8f40d24387">Elodie - & Achille Lauro - A mano a mano - Folle citta' - Sanremo - 4 serata - 14-2-25 - Rai 4K.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8f40d24387')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8f40d24387')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8f40d24387')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - & BigMama - American woman - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - & BigMama - American woman - Sanremo - 10-2-23.ts_snapshot_03.52.249.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - & BigMama - American woman - Sanremo - 10-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - & BigMama - American woman - Sanremo - 10-2-23.ts_snapshot_03.52.249.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - & BigMama - American woman - Sanremo - 10-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_169d9d8218">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 12 s</div>
+    <div>0.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_169d9d8218">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_169d9d8218">Elodie - & BigMama - American woman - Sanremo - 10-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('169d9d8218')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('169d9d8218')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('169d9d8218')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - & Fiorello - Vattene amore - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - & Fiorello - Vattene amore - Sanremo - 3-3-21.ts_snapshot_04.49.143.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - & Fiorello - Vattene amore - Sanremo - 3-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - & Fiorello - Vattene amore - Sanremo - 3-3-21.ts_snapshot_04.49.143.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - & Fiorello - Vattene amore - Sanremo - 3-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_787900c38a">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 35 s</div>
+    <div>1.16 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_787900c38a">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_787900c38a">Elodie - & Fiorello - Vattene amore - Sanremo - 3-3-21 - 2 Serata.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('787900c38a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('787900c38a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('787900c38a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - & Marracash -  Margarita - Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - & Marracash -  Margarita - Power Hits Estate - 9-9-19.ts_snapshot_00.50.225.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - & Marracash -  Margarita - Power Hits Estate - 9-9-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - & Marracash -  Margarita - Power Hits Estate - 9-9-19.ts_snapshot_00.50.225.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - & Marracash -  Margarita - Power Hits Estate - 9-9-19.ts.jpg">
+  <div class="tecnici-box" id="video_d62c4f5355">
+    <div class="riga1">1920x1080 - 13.4 Mb/s - 4 min 25 s</div>
+    <div>0.51 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d62c4f5355">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_d62c4f5355">Elodie - & Marracash -  Margarita - Power Hits Estate - Verona - 9-9-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d62c4f5355')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d62c4f5355')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d62c4f5355')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - & The Kolors - Pensare male - Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - & The Kolors - Pensare male - Power Hits Estate - 9-9-19.ts_snapshot_06.52.645.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - & The Kolors - Pensare male - Power Hits Estate - 9-9-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - & The Kolors - Pensare male - Power Hits Estate - 9-9-19.ts_snapshot_06.52.645.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - & The Kolors - Pensare male - Power Hits Estate - 9-9-19.ts.jpg">
+  <div class="tecnici-box" id="video_2d4938be5e">
+    <div class="riga1">1920x1080 - 13.4 Mb/s - 7 min 20 s</div>
+    <div>0.85 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2d4938be5e">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_2d4938be5e">Elodie - & The Kolors - Pensare male - Power Hits Estate - Verona - 9-9-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2d4938be5e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2d4938be5e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2d4938be5e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - 1-5-2025</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - 1-5-2025.mkv_snapshot_10.55.880.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - 1-5-2025.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - 1-5-2025.mkv_snapshot_10.55.880.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - 1-5-2025.mkv.jpg">
+  <div class="tecnici-box" id="video_10872eb6ec">
+    <div class="riga1">3840x2160 - 19.5 Mb/s - 14 min 50 s</div>
+    <div>2.13 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_10872eb6ec">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_10872eb6ec">Elodie - Concerto Roma - 1-5-2025.mkv<br>Black Nirvana - La coda del diavolo - Mi ami mi odi - Bagno a mezzanotte - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('10872eb6ec')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('10872eb6ec')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('10872eb6ec')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Adesso tu - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Adesso tu - Sanremo - 6-2-20.ts_snapshot_01.45.520.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Adesso tu - Sanremo - 6-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Adesso tu - Sanremo - 6-2-20.ts_snapshot_01.45.520.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Adesso tu - Sanremo - 6-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_aea8ec1314">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 4 min 24 s</div>
+    <div>0.89 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_aea8ec1314">MPEG Audio - 256 kb/s - en<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_aea8ec1314">Elodie - Adesso tu - Sanremo - 6-2-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('aea8ec1314')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('aea8ec1314')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('aea8ec1314')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Amore avrai - Battiti Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Amore avrai - Battiti Live- 8-8-16.ts_snapshot_00.17.074.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Amore avrai - Battiti Live- 8-8-16.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Amore avrai - Battiti Live- 8-8-16.ts_snapshot_00.17.074.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Amore avrai - Battiti Live- 8-8-16.ts.jpg">
+  <div class="tecnici-box" id="video_a1e8529f00">
+    <div class="riga1">1920x1080 - 14.8 Mb/s - 4 min 19 s</div>
+    <div>0.48 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a1e8529f00">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_a1e8529f00">Elodie - Amore avrai - Battiti Live- 8-8-16.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a1e8529f00')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a1e8529f00')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a1e8529f00')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Andromeda - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Andromeda - Sanremo - 4-2-20.ts_snapshot_04.12.390.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Andromeda - Sanremo - 4-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Andromeda - Sanremo - 4-2-20.ts_snapshot_04.12.390.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Andromeda - Sanremo - 4-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_f1a0c85c53">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 4 min 32 s</div>
+    <div>0.92 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f1a0c85c53">MPEG Audio - 256 kb/s - en<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_f1a0c85c53">Elodie - Andromeda - Sanremo - 4-2-20.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f1a0c85c53')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f1a0c85c53')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f1a0c85c53')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Andromeda - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Andromeda - Sanremo - 8-2-20.ts_snapshot_01.27.803.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Andromeda - Sanremo - 8-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Andromeda - Sanremo - 8-2-20.ts_snapshot_01.27.803.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Andromeda - Sanremo - 8-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_008f6aa756">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 4 min 36 s</div>
+    <div>0.86 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_008f6aa756">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_008f6aa756">Elodie - Andromeda - Sanremo - 8-2-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('008f6aa756')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('008f6aa756')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('008f6aa756')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Andromeda - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Andromeda - Sanremo - 7-2-20.ts_snapshot_01.30.514.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Andromeda - Sanremo - 7-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Andromeda - Sanremo - 7-2-20.ts_snapshot_01.30.514.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Andromeda - Sanremo - 7-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_db74edc9ac">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 4 min 40 s</div>
+    <div>0.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_db74edc9ac">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_db74edc9ac">Elodie - Andromeda - Sanremo - 7-2-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('db74edc9ac')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('db74edc9ac')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('db74edc9ac')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Battiti live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Battiti live - 3-7-22.ts_snapshot_03.28.041.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Battiti live - 3-7-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Battiti live - 3-7-22.ts_snapshot_03.28.041.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Battiti live - 3-7-22.ts.jpg">
+  <div class="tecnici-box" id="video_497dea14f3">
+    <div class="riga1">1920x1080 - 22.6 Mb/s - 7 min 39 s</div>
+    <div>1.30 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_497dea14f3">MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_497dea14f3">Elodie - Battiti live - 3-7-22.ts - Feed - Bagno a mezzanotte - Tribale</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('497dea14f3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('497dea14f3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('497dea14f3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Black Nirvana - Power Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Black Nirvana - Power Hits - 3-9-24.ts_snapshot_03.05.292.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Black Nirvana - Power Hits - 3-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Black Nirvana - Power Hits - 3-9-24.ts_snapshot_03.05.292.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Black Nirvana - Power Hits - 3-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_835c8001b3">
+    <div class="riga1">1920x1080 - 18.1 Mb/s - 3 min 10 s</div>
+    <div>0.48 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_835c8001b3">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_835c8001b3">Elodie - Black Nirvana - Power Hits - Verona - 3-9-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('835c8001b3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('835c8001b3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('835c8001b3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Black Nirvana - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Black Nirvana - Tim Music Awards - 13-9-24.ts_snapshot_02.32.013.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Black Nirvana - Tim Music Awards - 13-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Black Nirvana - Tim Music Awards - 13-9-24.ts_snapshot_02.32.013.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Black Nirvana - Tim Music Awards - 13-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_c89d188f77">
+    <div class="riga1">1920x1080 - 29.1 Mb/s - 3 min 56 s</div>
+    <div>0.86 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_c89d188f77">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_c89d188f77">Elodie - Black Nirvana - Tim Music Awards - 13-9-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c89d188f77')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c89d188f77')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c89d188f77')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Capodanno in musica</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Capodanno in musica  - 31-12-19.ts_snapshot_04.23.680.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Capodanno in musica  - 31-12-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Capodanno in musica  - 31-12-19.ts_snapshot_04.23.680.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Capodanno in musica  - 31-12-19.ts.jpg">
+  <div class="tecnici-box" id="video_749bfb5666">
+    <div class="riga1">1920x1080 - 19.3 Mb/s - 6 min 54 s</div>
+    <div>1.02 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_749bfb5666">MPEG Audio - 256 kb/s - it<br>MPEG Audio - 256 kb/s - it<br>MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_749bfb5666">Elodie - Margarita - Rambla - Capodanno in musica - 31-12-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('749bfb5666')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('749bfb5666')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('749bfb5666')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Capodanno in musica</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Capodanno in musica -  31-12-19.ts_snapshot_02.44.880.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Capodanno in musica -  31-12-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Capodanno in musica -  31-12-19.ts_snapshot_02.44.880.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Capodanno in musica -  31-12-19.ts.jpg">
+  <div class="tecnici-box" id="video_07672e25a5">
+    <div class="riga1">1920x1080 - 19.3 Mb/s - 6 min 46 s</div>
+    <div>1.00 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_07672e25a5">MPEG Audio - 256 kb/s - it<br>MPEG Audio - 256 kb/s - it<br>MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_07672e25a5">Elodie - Pensare male - Nero Bali - Capodanno in musica - 31-12-19 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('07672e25a5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('07672e25a5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('07672e25a5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Ciclone - Battiti live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Ciclone - Battiti live - 24-8-20.ts_snapshot_02.09.398.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Ciclone - Battiti live - 24-8-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Ciclone - Battiti live - 24-8-20.ts_snapshot_02.09.398.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Ciclone - Battiti live - 24-8-20.ts.jpg">
+  <div class="tecnici-box" id="video_160eb70627">
+    <div class="riga1">1920x1080 - 6.5 Mb/s - 3 min 53 s</div>
+    <div>0.20 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_160eb70627">AC-3 - L R - 192 kb/s - it<br>MPEG Audio - 128 kb/s - en</div>
+  <div class="notebox" id="note_160eb70627">Elodie - Ciclone - Battiti Live - 24-8-20 con takagi & Ketra ft. Mariah e Gipsy Kings - Italia 1</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('160eb70627')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('160eb70627')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('160eb70627')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Dimenticarsi alle 7 - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Dimenticarsi alle 7 - Sanremo - 11-2-25.ts_snapshot_04.34.202.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo - 11-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Dimenticarsi alle 7 - Sanremo - 11-2-25.ts_snapshot_04.34.202.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo - 11-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_e45dbb6347">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 4 min 59 s</div>
+    <div>1.04 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e45dbb6347">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>PCM - 1536 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_e45dbb6347">Elodie - Dimenticarsi alle 7 - Sanremo - 1 serata - 11-2-25 - Feed.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e45dbb6347')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e45dbb6347')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e45dbb6347')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Dimenticarsi alle 7 - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Dimenticarsi alle 7 - Sanremo  - 11-2-25.mkv_snapshot_04.21.995.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo  - 11-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Dimenticarsi alle 7 - Sanremo  - 11-2-25.mkv_snapshot_04.21.995.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo  - 11-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_f1a925c669">
+    <div class="riga1">3840x2160 - 19.4 Mb/s - 5 min 18 s</div>
+    <div>0.76 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f1a925c669">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_f1a925c669">Elodie - Dimenticarsi alle 7 - Sanremo - 1 serata - 11-2-25 - Rai 4K.mkv</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f1a925c669')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f1a925c669')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f1a925c669')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Dimenticarsi alle 7 - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Dimenticarsi alle 7 - Sanremo  - 2-2-25.mkv_snapshot_02.05.860.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo  - 2-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Dimenticarsi alle 7 - Sanremo  - 2-2-25.mkv_snapshot_02.05.860.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo  - 2-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_b5c1b02fc2">
+    <div class="riga1">3840x2160 - 19.3 Mb/s - 5 min 10 s</div>
+    <div>0.74 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b5c1b02fc2">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_b5c1b02fc2">Elodie - Dimenticarsi alle 7 - Sanremo - 2 serata - 12-2-25 - Rai 4K.mkv</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b5c1b02fc2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b5c1b02fc2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b5c1b02fc2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Dimenticarsi alle 7 - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Dimenticarsi alle 7 - Sanremo  - 15-2-25.mkv_snapshot_03.08.303.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo  - 15-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Dimenticarsi alle 7 - Sanremo  - 15-2-25.mkv_snapshot_03.08.303.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo  - 15-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_2c7c20180c">
+    <div class="riga1">3840x2160 - 19.3 Mb/s - 4 min 54 s</div>
+    <div>0.70 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2c7c20180c">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_2c7c20180c">Elodie - Dimenticarsi alle 7 - Sanremo - Finale - 15-2-25- Rai 4K.mkv</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2c7c20180c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2c7c20180c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2c7c20180c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Dimenticarsi alle 7 - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Dimenticarsi alle 7 - Sanremo - 15-2-25.ts_snapshot_03.09.404.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo - 15-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Dimenticarsi alle 7 - Sanremo - 15-2-25.ts_snapshot_03.09.404.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo - 15-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_32ec379667">
+    <div class="riga1">1920x1080 - 25.7 Mb/s - 4 min 54 s</div>
+    <div>1.02 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_32ec379667">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_32ec379667">Elodie - Dimenticarsi alle 7 - Sanremo - Serata finale - 15-2-25 - Feed.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('32ec379667')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('32ec379667')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('32ec379667')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Dimenticarsi alle 7 - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Dimenticarsi alle 7 - Sanremo - 12-2-25.ts_snapshot_01.18.458.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo - 12-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Dimenticarsi alle 7 - Sanremo - 12-2-25.ts_snapshot_01.18.458.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Dimenticarsi alle 7 - Sanremo - 12-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_587c2e47c2">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 5 min 5 s</div>
+    <div>1.07 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_587c2e47c2">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_587c2e47c2">Elodie - Dimenticarsi alle 7 - Sanremo - 2 serata - 12-2-25 - Feed.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('587c2e47c2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('587c2e47c2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('587c2e47c2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Due -  Domenica In - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Due -  Domenica In - Sanremo - 12-2-23.ts_snapshot_10.32.334.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Due -  Domenica In - Sanremo - 12-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Due -  Domenica In - Sanremo - 12-2-23.ts_snapshot_10.32.334.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Due -  Domenica In - Sanremo - 12-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_a055330bff">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 11 min 22 s</div>
+    <div>2.36 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a055330bff">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_a055330bff">Elodie - Due -  Domenica In - Sanremo - 12-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a055330bff')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a055330bff')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a055330bff')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Due - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Due - Sanremo -  7-2-23.ts_snapshot_03.01.259.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Due - Sanremo -  7-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Due - Sanremo -  7-2-23.ts_snapshot_03.01.259.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Due - Sanremo -  7-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_e6e75e7237">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 4 min 50 s</div>
+    <div>0.72 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e6e75e7237">AC-3 - L R C LFE Ls Rs - 384 kb/s - it</div>
+  <div class="notebox" id="note_e6e75e7237">Elodie - Due - Sanremo - 7-2-23.ts - Rai 4k</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e6e75e7237')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e6e75e7237')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e6e75e7237')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Due - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Due - Sanremo - 7-2-23.ts_snapshot_02.18.124.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Due - Sanremo - 7-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Due - Sanremo - 7-2-23.ts_snapshot_02.18.124.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Due - Sanremo - 7-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_6af922aa86">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 25 s</div>
+    <div>1.13 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6af922aa86">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_6af922aa86">Elodie - Due - Sanremo - 7-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6af922aa86')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6af922aa86')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6af922aa86')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Due - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Due - Sanremo - 11-2-23.ts_snapshot_03.14.611.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Due - Sanremo - 11-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Due - Sanremo - 11-2-23.ts_snapshot_03.14.611.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Due - Sanremo - 11-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_656d06155f">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 48 s</div>
+    <div>1.00 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_656d06155f">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_656d06155f">Elodie - Due - Sanremo - 11-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('656d06155f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('656d06155f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('656d06155f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Due - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Due - Sanremo - 9-2-23.ts_snapshot_04.16.445.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Due - Sanremo - 9-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Due - Sanremo - 9-2-23.ts_snapshot_04.16.445.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Due - Sanremo - 9-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_a4e5385418">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 31 s</div>
+    <div>0.94 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a4e5385418">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_a4e5385418">Elodie - Due - Sanremo - 9-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a4e5385418')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a4e5385418')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a4e5385418')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Due - Una nessuna centomila</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Due - Una nessuna centomila - 8-5-24.mp4_snapshot_03.22.676.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Due - Una nessuna centomila - 8-5-24.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Due - Una nessuna centomila - 8-5-24.mp4_snapshot_03.22.676.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Due - Una nessuna centomila - 8-5-24.mp4.jpg">
+  <div class="tecnici-box" id="video_dd3ebde14e">
+    <div class="riga1">1920x1080 - 18 Mb/s - 3 min 46 s</div>
+    <div>0.48 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_dd3ebde14e">AAC - L R - 253 kb/s</div>
+  <div class="notebox" id="note_dd3ebde14e">Elodie - Due - Una nessuna centomila - 8-5-24.mp4 - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dd3ebde14e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dd3ebde14e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dd3ebde14e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Ex -Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Ex -Tim Music Awards - 13-9-25.ts_snapshot_02.42.773.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Ex -Tim Music Awards - 13-9-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Ex -Tim Music Awards - 13-9-25.ts_snapshot_02.42.773.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Ex -Tim Music Awards - 13-9-25.ts.jpg">
+  <div class="tecnici-box" id="video_b77f6b9916">
+    <div class="riga1">1920x1080 - 19.4 Mb/s - 3 min 6 s</div>
+    <div>0.45 GB - ?? fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b77f6b9916">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_b77f6b9916">Elodie - Ex con Irama- Tim Music Awards - 13-9-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b77f6b9916')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b77f6b9916')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b77f6b9916')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - intervista - Radio Italia - Il concerto</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - intervista - Radio Italia - Il concerto - 20-5-23.ts_snapshot_01.22.436.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - intervista - Radio Italia - Il concerto - 20-5-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - intervista - Radio Italia - Il concerto - 20-5-23.ts_snapshot_01.22.436.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - intervista - Radio Italia - Il concerto - 20-5-23.ts.jpg">
+  <div class="tecnici-box" id="video_a92ccc78fc">
+    <div class="riga1">1920x1080 - 27 Mb/s - 1 min 34 s</div>
+    <div>0.34 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_a92ccc78fc">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_a92ccc78fc">Elodie - intervista - Radio Italia - Il concerto - Milano - 20-5-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a92ccc78fc')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a92ccc78fc')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a92ccc78fc')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Mai cosi - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Mai cosi - Sanremo - 3-3-21.ts_snapshot_08.19.608.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Mai cosi - Sanremo - 3-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Mai cosi - Sanremo - 3-3-21.ts_snapshot_08.19.608.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Mai cosi - Sanremo - 3-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_100c34dcc5">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 10 min 43 s</div>
+    <div>2.21 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_100c34dcc5">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_100c34dcc5">Elodie - Sanremo - 3-3-2021 - Mai così -  con accompagnamento di Mauro Tre al pianoforte, Marco Girardo alla batteria e Stefano Rielli al contrabbasso - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('100c34dcc5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('100c34dcc5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('100c34dcc5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Medley - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Medley - Sanremo - 3-3-21.ts_snapshot_05.09.066.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Medley - Sanremo - 3-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Medley - Sanremo - 3-3-21.ts_snapshot_05.09.066.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Medley - Sanremo - 3-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_623966c625">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 26 s</div>
+    <div>1.13 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_623966c625">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_623966c625">Elodie - Medley - Sanremo - 3-3-21.ts  - 2 Serata - <br>Mash-up - Vogue - Guaranà - Il battito animale - Nero Bali - Could You Be Loved - E la luna bussò - Margarita - Fotoromanza - Rumore - Andromeda - Crazy in Love - Soldi - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('623966c625')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('623966c625')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('623966c625')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Nero Bali - Battiti Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Nero Bali - Battiti Live - 29-7-18.ts_snapshot_01.17.263.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Nero Bali - Battiti Live - 29-7-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Nero Bali - Battiti Live - 29-7-18.ts_snapshot_01.17.263.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Nero Bali - Battiti Live - 29-7-18.ts.jpg">
+  <div class="tecnici-box" id="video_ce40bff68e">
+    <div class="riga1">1920x1080 - 14.8 Mb/s - 3 min 50 s</div>
+    <div>0.43 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ce40bff68e">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_ce40bff68e">Elodie - & Michele Bravi - & Gue Pequeno - Nero Bali - Battitic Live - Bari - 29-7-18 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ce40bff68e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ce40bff68e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ce40bff68e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Nero Bali - Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Nero Bali - Power Hits Estate - 3-9-18.ts_snapshot_00.39.757.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Nero Bali - Power Hits Estate - 3-9-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Nero Bali - Power Hits Estate - 3-9-18.ts_snapshot_00.39.757.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Nero Bali - Power Hits Estate - 3-9-18.ts.jpg">
+  <div class="tecnici-box" id="video_6e025abf2c">
+    <div class="riga1">1920x1080 - 13.6 Mb/s - 4 min 34 s</div>
+    <div>0.52 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6e025abf2c">PCM - 1536 kb/s - it</div>
+  <div class="notebox" id="note_6e025abf2c">Elodie - & Michele Bravi - & Gue Pequeno - Nero Bali - Power Hits Estate  - 3-9-18 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6e025abf2c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6e025abf2c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6e025abf2c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Nero Bali - Wind Summer Festival</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Nero Bali - Wind Summer Festival - 16-9-18.ts_snapshot_00.42.111.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Nero Bali - Wind Summer Festival - 16-9-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Nero Bali - Wind Summer Festival - 16-9-18.ts_snapshot_00.42.111.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Nero Bali - Wind Summer Festival - 16-9-18.ts.jpg">
+  <div class="tecnici-box" id="video_7c2637845b">
+    <div class="riga1">1920x1080 - 26.8 Mb/s - 3 min 26 s</div>
+    <div>0.69 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7c2637845b">MPEG Audio - 256 kb/s - int</div>
+  <div class="notebox" id="note_7c2637845b">Elodie - & Michele Bravi - & Gue Pequeno - Nero Bali - Wind Music Festival - 16-9-18 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7c2637845b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7c2637845b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7c2637845b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Power Hits estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Power Hits estate - 9-9-20.ts_snapshot_04.09.814.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Power Hits estate - 9-9-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Power Hits estate - 9-9-20.ts_snapshot_04.09.814.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Power Hits estate - 9-9-20.ts.jpg">
+  <div class="tecnici-box" id="video_2b4dea6db8">
+    <div class="riga1">1920x1080 - 27.7 Mb/s - 7 min 1 s</div>
+    <div>1.55 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_2b4dea6db8">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_2b4dea6db8">Elodie - Ciclone - Guaranà - Power Hits estate - 9-9-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2b4dea6db8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2b4dea6db8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2b4dea6db8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Quando finisce un amore - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Quando finisce un amore - Sanremo - 9-2-17.ts_snapshot_03.30.370.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Quando finisce un amore - Sanremo - 9-2-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Quando finisce un amore - Sanremo - 9-2-17.ts_snapshot_03.30.370.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Quando finisce un amore - Sanremo - 9-2-17.ts.jpg">
+  <div class="tecnici-box" id="video_3ad646b3f2">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 34 s</div>
+    <div>0.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3ad646b3f2">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_3ad646b3f2">Elodie - Quando finisce un amore - Sanremo - 9-2-17.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3ad646b3f2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3ad646b3f2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3ad646b3f2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Radio Italia Live - 30-5-25.ts_snapshot_04.12.889.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Radio Italia Live - 30-5-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Radio Italia Live - 30-5-25.ts_snapshot_04.12.889.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Radio Italia Live - 30-5-25.ts.jpg">
+  <div class="tecnici-box" id="video_dfe7b28bfa">
+    <div class="riga1">1920x1080 - 27.2 Mb/s - 11 min 33 s</div>
+    <div>2.50 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_dfe7b28bfa">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_dfe7b28bfa">Elodie - Dimenticarsi alle 7_Mi ami mi odi_Due - Radio Italia Live - Milano - 30-5-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dfe7b28bfa')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dfe7b28bfa')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dfe7b28bfa')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Radio Italia Live  - 30-5-25.ts_snapshot_08.43.083.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Radio Italia Live  - 30-5-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Radio Italia Live  - 30-5-25.ts_snapshot_08.43.083.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Radio Italia Live  - 30-5-25.ts.jpg">
+  <div class="tecnici-box" id="video_d25a1ec61d">
+    <div class="riga1">1920x1080 - 31 Mb/s - 11 min 33 s</div>
+    <div>2.76 GB - ?? fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d25a1ec61d">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_d25a1ec61d">Elodie - Dimenticarsi alle 7_Mi ami mi odi_Due - Radio Italia Live - Milano - 30-5-25 .ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d25a1ec61d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d25a1ec61d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d25a1ec61d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Radio Italia Live - 27-6-24.ts_snapshot_06.51.461.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Radio Italia Live - 27-6-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Radio Italia Live - 27-6-24.ts_snapshot_06.51.461.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Radio Italia Live - 27-6-24.ts.jpg">
+  <div class="tecnici-box" id="video_5b92d2f064">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 10 min 43 s</div>
+    <div>2.23 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_5b92d2f064">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_5b92d2f064">Elodie - Radio Italia Live - Napoli - 27-6-24.ts - Feed  - <br>Black Nirvana - Tribale - Ciclone</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5b92d2f064')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5b92d2f064')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5b92d2f064')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Radio Italia Live - 20-5-23.ts_snapshot_11.43.386.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Radio Italia Live - 20-5-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Radio Italia Live - 20-5-23.ts_snapshot_11.43.386.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Radio Italia Live - 20-5-23.ts.jpg">
+  <div class="tecnici-box" id="video_f76780b61c">
+    <div class="riga1">1920x1080 - 27 Mb/s - 11 min 54 s</div>
+    <div>2.57 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_f76780b61c">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_f76780b61c">Elodie - Radio Italia Live - Milano - 20-5-23.ts - Ok respira - Tribale - Due - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f76780b61c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f76780b61c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f76780b61c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Radio Italia Live - 21-5-22.ts_snapshot_10.59.645.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Radio Italia Live - 21-5-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Radio Italia Live - 21-5-22.ts_snapshot_10.59.645.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Radio Italia Live - 21-5-22.ts.jpg">
+  <div class="tecnici-box" id="video_39453f334b">
+    <div class="riga1">1920x1080 - 23.2 Mb/s - 12 min 54 s</div>
+    <div>2.64 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_39453f334b">PCM - 1920 kb/s - it<br>PCM - 1920 kb/s - int</div>
+  <div class="notebox" id="note_39453f334b">Elodie - Radio Italia Live - 21-5-22.ts - Feed  - <br>Guarana - Vertigine - Bagno a mezzanotte - (errori di trasmissione dopo minuto 8)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('39453f334b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('39453f334b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('39453f334b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Radio Zeta</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Radio Zeta - 10-6-23.ts_snapshot_05.59.032.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Radio Zeta - 10-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Radio Zeta - 10-6-23.ts_snapshot_05.59.032.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Radio Zeta - 10-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_a631215b5e">
+    <div class="riga1">1920x1080 - 18.1 Mb/s - 6 min 49 s</div>
+    <div>1.03 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a631215b5e">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_a631215b5e">Elodie - Radio Zeta - 10-6-23.ts - Feed  - <br>Ok respira - Pazza musica</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a631215b5e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a631215b5e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a631215b5e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - RTL 102.5 Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - RTL 102.5 Power Hits Estate - 1-9-25.ts_snapshot_03.17.893.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - RTL 102.5 Power Hits Estate - 1-9-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - RTL 102.5 Power Hits Estate - 1-9-25.ts_snapshot_03.17.893.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - RTL 102.5 Power Hits Estate - 1-9-25.ts.jpg">
+  <div class="tecnici-box" id="video_01bbbad73a">
+    <div class="riga1">1920x1080 - 18.6 Mb/s - 6 min 59 s</div>
+    <div>1.07 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_01bbbad73a">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_01bbbad73a">Elodie - RTL 102.5 Power Hits Estate - 1-9-25.ts - Ex con Irama - Yazuka - Margarita - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('01bbbad73a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('01bbbad73a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('01bbbad73a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - San Siro</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - San Siro - 8-6-25.mkv_snapshot_00.27.54.000.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - San Siro - 8-6-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - San Siro - 8-6-25.mkv_snapshot_00.27.54.000.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - San Siro - 8-6-25.mkv.jpg">
+  <div class="tecnici-box" id="video_6a87d9e9d8">
+    <div class="riga1">1920x1080 -  - 1 h 58 min</div>
+    <div>4.36 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6a87d9e9d8">AAC - L R - it</div>
+  <div class="notebox" id="note_6a87d9e9d8">Elodie - San Siro - 8-6-25.mkv  - Infinity<br>Tribale (Dance Intro) - (contains elements of M¥SS KETA’s “PAZZESKA”)<br>Tribale<br>Black Nirvana - (contains elements of Justin Timberlake’s “SexyBack”)<br>Guaranà - (contains elements of Madonna’s “Hung Up”)<br>I Feel Love - (Donna Summer cover) (contains elements of “Guaranà”)<br>La Coda Del Diavolo - (Rkomi cover)<br>La Coda Del Diavolo - (Rkomi song) (Band Encore)<br>Atto I: AUDACE<br>MI AMI O MI ODI? (Interlude)<br>Odio Amore Chimico . (Live debut - Shortened)<br>1 Ora - (Shortened)<br>Di Nuovo - (Live debut - Shortened)<br>Mi Ami Mi Odi<br>Cuore Nero - (Live debut)<br>Anche stasera - (Sfera Ebbasta cover) (Solo)<br>Ok. Respira<br>Ok. Respira (Band Encore)<br>Folle città - (Loredana Bertè cover) (with Achille Lauro) <br>Rolls Royce - (Achille Lauro cover) (with Achille Lauro)<br>America - (Gianna Nannini cover) (with Gianna Nannini)<br>Atto II: Galattica<br>TRANSIZIONE (Interlude)<br>Andromeda - ((slowed version) with Ambrosia)<br>Vertigine<br>Niente canzoni d'amore<br>Feeling - (Live debut - contains elements of Aaliyah’s "Try Again")<br>Pensare Male<br>Purple In The Sky - (with Nina Kraviz) (Shortened)<br>Ghetto Kraviz / Bailando - NK & David Löhlein Version / Skyscrapers Hi-Lo Remix - (with Nina Kraviz) (DJ SET)<br>Atto III: Erotica<br>SONO QUI (Interlude)<br>Pop Porno - (Il Genio cover) (Snippet)<br>Red Light - (Shortened)<br>Ascendente - (Shortened)<br>Elle - (Shortened)<br>Strobo - (Shortened (contains elements of "Elle"))<br>Euphoria - (Shortened)<br>Lontano da qui - (Shortened)<br>A fari spenti<br>A fari spenti (Encore)<br>Atto IV: Magnetica<br>ESISTO (Interlude)<br>Tutta colpa mia<br>Due<br>MEGA (Make Equality Great Again Interlude) - (with La Sypario)<br>Dimenticarsi alle 7 - (with Naomi Tisdale, Amanda Lwinsky, La Sypario, Angel McQueen e Jamila Solis)<br>Dimenticarsi Alle 7 (Encore) - (with Naomi Tisdale, Amanda Lwinsky, Angel McQueen e Jamila Solis)<br>Encore:<br>Pazza Musica (Band Intro) - (contains elements of Sam and Dave’s “Hold On, I’m Coming”)<br>PAZZA MUSICA - (Solo)<br>Ciclone - (with Gaia)<br>Chiamo io chiami tu - (Gaia cover) (with Gaia)<br>Margarita / Is This Love - (Bob Marley & The Wailers cover)<br>Bagno a mezzanotte - (Extended outro)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6a87d9e9d8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6a87d9e9d8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6a87d9e9d8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Show 2023</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Show 2023.ts_snapshot_00.37.24.304.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Show 2023.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Show 2023.ts_snapshot_00.37.24.304.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Show 2023.ts.jpg">
+  <div class="tecnici-box" id="video_3da8e787de">
+    <div class="riga1">1920x1080 -  - 1 h 16 min</div>
+    <div>9.88 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3da8e787de">AAC - L R - de</div>
+  <div class="notebox" id="note_3da8e787de">Elodie - Show 2023.ts - Feed<br>La scaletta e gli ospiti di Elodie Show 2023<br>Tanti gli ospiti che hanno preso parte al concerto: Elisa, Paola e Chiara, Stash, Rkomi, Big Mama. Queste la scaletta di ‘Elodie show’ con le canzoni che ascolteremo e i duetti con le special guest.<br><br>Purple In The Sky<br>Danse La Vie<br>Strobo<br>Guaranà<br>Nero Bali<br>Ok.Respira<br>Andromeda<br>Vertigine<br>Together con Elisa<br>American Woman con BigMama<br>Pensare male con Stash dei The Kolors<br>Due<br>Tutta colpa mia – Mai così<br>Mal di testa<br>Parli Parli – Dimmi di sbagliato che c’è<br>Proiettili (Ti mangio il cuore) con Joan Thiele<br>La coda del diavolo con Rkomi<br>Mai Più<br>Boy Boy Boy<br>Tribale<br>Festival con Paola & Chiara<br>Sing It Back (cover dei Moloko)<br>Apocalisse<br>Una Come Cento<br>Margarita<br>Bis: Bagno a mezzanotte<br><br>Tutto pronto per ‘Elodie Show‘. Il concerto della cantante che si è svolto a Maggio al Mediolanum Forum di Assago, facendo registrare il sold out, andrà ora in onda in tv con alcuni contenuti inediti e scene tratte dal backstage. Vediamo insieme quale sarà la scaletta, gli ospiti e le canzoni che sentiremo.<br><br>Elodie torna in tv con il suo concerto<br>Elodie è la protagonista dello speciale ‘Elodie Show’, in onda questa alle 21.15 su Sky Uno, in simulcast su Sky Arte e in streaming su NOW. Lo spettacolo sarà trasmesso in chiaro dalle 21.30 su TV8. La cantante si racconterà in prima persona spiegando il suo percorso professionale e i suoi sentimenti. Come svelato da un video di anticipazione pubblicato da Tv8, ha intrapreso questa carriera grazie al suo amore verso Madonna.<br><br>Il concerto di Elodie di Maggio è stato trasmesso in diretta live e in esclusiva sul canale Twitch di Amazon Music Italia e su Prime Video. Inoltre è stato il primo Amazon Music Live prodotto in Italia. In tv vedremo non solo le immagini del live ma tanti contenuti inediti.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3da8e787de')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3da8e787de')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3da8e787de')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tequila e Guarana - Battiti live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tequila e Guarana - Battiti live - 11-8-20.ts_snapshot_03.30.777.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tequila e Guarana - Battiti live - 11-8-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tequila e Guarana - Battiti live - 11-8-20.ts_snapshot_03.30.777.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tequila e Guarana - Battiti live - 11-8-20.ts.jpg">
+  <div class="tecnici-box" id="video_1900c4f048">
+    <div class="riga1">1920x1080 - 7.5 Mb/s - 3 min 43 s</div>
+    <div>0.21 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1900c4f048">AC-3 - L R - 192 kb/s - it<br>MPEG Audio - 128 kb/s - en</div>
+  <div class="notebox" id="note_1900c4f048">Elodie - Tequila e Guarana - Battiti live - 11-8-20.ts - Italia Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1900c4f048')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1900c4f048')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1900c4f048')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tim Music Awards - 16-9-23.ts_snapshot_02.11.430.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tim Music Awards - 16-9-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tim Music Awards - 16-9-23.ts_snapshot_02.11.430.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tim Music Awards - 16-9-23.ts.jpg">
+  <div class="tecnici-box" id="video_84b941d685">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 7 min 25 s</div>
+    <div>1.55 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_84b941d685">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_84b941d685">Elodie - Ok respira - Due - Tim Music Awards - 16-9-23 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('84b941d685')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('84b941d685')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('84b941d685')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tim Music Awards - 13-9-24.ts_snapshot_01.32.438.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tim Music Awards - 13-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tim Music Awards - 13-9-24.ts_snapshot_01.32.438.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tim Music Awards - 13-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_55a27270d3">
+    <div class="riga1">1920x1080 - 29.1 Mb/s - 5 min 50 s</div>
+    <div>1.27 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_55a27270d3">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_55a27270d3">Elodie - Tim Music Awards - 13-9-24.ts - Bagno a mezzanotte - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('55a27270d3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('55a27270d3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('55a27270d3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tim Music Awards - 9-9-22.ts_snapshot_08.43.243.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tim Music Awards - 9-9-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tim Music Awards - 9-9-22.ts_snapshot_08.43.243.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tim Music Awards - 9-9-22.ts.jpg">
+  <div class="tecnici-box" id="video_dacc48b065">
+    <div class="riga1">1920x1080 - 8.3 Mb/s - 9 min 57 s</div>
+    <div>0.67 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_dacc48b065">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 384 kb/s - oth<br>MPEG Audio - 192 kb/s - en<br>MPEG Audio - 64 kb/s - oth</div>
+  <div class="notebox" id="note_dacc48b065">Elodie - Tim Music Awards - 9-9-22.ts<br>La coda del diavolo - con RKomi - Bagno a mezzanotte - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dacc48b065')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dacc48b065')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dacc48b065')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tim Music Awards - 13-9-25.ts_snapshot_02.15.788.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tim Music Awards - 13-9-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tim Music Awards - 13-9-25.ts_snapshot_02.15.788.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tim Music Awards - 13-9-25.ts.jpg">
+  <div class="tecnici-box" id="video_ce12848e02">
+    <div class="riga1">1920x1080 - 19.6 Mb/s - 5 min 19 s</div>
+    <div>0.79 GB - ?? fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ce12848e02">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_ce12848e02">Elodie - Tim Music Awards - 13-9-25.ts - Dimenticarsi alle 7 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ce12848e02')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ce12848e02')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ce12848e02')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tim Music Awards - (prove 2)</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tim Music Awards - (prove 2) - 13-9-24.ts_snapshot_03.22.288.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tim Music Awards - (prove 2) - 13-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tim Music Awards - (prove 2) - 13-9-24.ts_snapshot_03.22.288.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tim Music Awards - (prove 2) - 13-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_dec5190eef">
+    <div class="riga1">1920x1080 - 29.1 Mb/s - 3 min 53 s</div>
+    <div>0.85 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_dec5190eef">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_dec5190eef">Elodie - Tim Music Awards - (prove 2) - 13-9-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dec5190eef')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dec5190eef')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dec5190eef')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tim Music Awards - (prove)</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tim Music Awards - (prove) - 13-9-24.ts_snapshot_11.00.467.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tim Music Awards - (prove) - 13-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tim Music Awards - (prove) - 13-9-24.ts_snapshot_11.00.467.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tim Music Awards - (prove) - 13-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_62444e4987">
+    <div class="riga1">1920x1080 - 29.1 Mb/s - 14 min 10 s</div>
+    <div>3.08 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_62444e4987">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_62444e4987">Elodie - Tim Music Awards - (prove) - 13-9-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('62444e4987')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('62444e4987')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('62444e4987')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tim Summer Festival</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tim Summer Festival - 12-7-24.ts_snapshot_04.03.069.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tim Summer Festival - 12-7-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tim Summer Festival - 12-7-24.ts_snapshot_04.03.069.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tim Summer Festival - 12-7-24.ts.jpg">
+  <div class="tecnici-box" id="video_ce9ba61d2a">
+    <div class="riga1">1920x1080 -  - 7 min 50 s</div>
+    <div>1.03 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ce9ba61d2a">AAC - L R</div>
+  <div class="notebox" id="note_ce9ba61d2a">Elodie - Tim Summer Festival - Roma - 12-7-24.ts - Black Nirvana - Tribale - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ce9ba61d2a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ce9ba61d2a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ce9ba61d2a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tribale  - Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tribale  - Power Hits Estate - 31-8-22.mts_snapshot_01.22.392.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tribale  - Power Hits Estate - 31-8-22.mts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tribale  - Power Hits Estate - 31-8-22.mts_snapshot_01.22.392.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tribale  - Power Hits Estate - 31-8-22.mts.jpg">
+  <div class="tecnici-box" id="video_b38b84eba5">
+    <div class="riga1">1920x1080 - 19.9 Mb/s - 3 min 8 s</div>
+    <div>0.46 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b38b84eba5">AC-3 - L R - 256 kb/s</div>
+  <div class="notebox" id="note_b38b84eba5">Elodie - Tribale  - Power Hits Estate - 31-8-22.mts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b38b84eba5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b38b84eba5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b38b84eba5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tribale - Tim Summer Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tribale - Tim Summer Hits - 25-7-22.ts_snapshot_01.53.161.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tribale - Tim Summer Hits - 25-7-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tribale - Tim Summer Hits - 25-7-22.ts_snapshot_01.53.161.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tribale - Tim Summer Hits - 25-7-22.ts.jpg">
+  <div class="tecnici-box" id="video_87919ecce9">
+    <div class="riga1">1920x1080 - 8.3 Mb/s - 4 min 12 s</div>
+    <div>0.28 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_87919ecce9">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_87919ecce9">Elodie - Tribale - Tim Summer Hits - 25-7-22 - Rai Due.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('87919ecce9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('87919ecce9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('87919ecce9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tribale - Tim Summer Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tribale - Tim Summer Hits - 30-6-22.ts_snapshot_03.00.265.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tribale - Tim Summer Hits - 30-6-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tribale - Tim Summer Hits - 30-6-22.ts_snapshot_03.00.265.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tribale - Tim Summer Hits - 30-6-22.ts.jpg">
+  <div class="tecnici-box" id="video_838fe5140a">
+    <div class="riga1">1920x1080 - 7.3 Mb/s - 6 min 53 s</div>
+    <div>0.41 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_838fe5140a">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_838fe5140a">Elodie - Tribale - Tim Summer Hits - 30-6-22 - Rai Due.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('838fe5140a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('838fe5140a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('838fe5140a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - Tutta colpa mia</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - Tutta colpa mia - 7-2-17.ts_snapshot_02.46.422.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - Tutta colpa mia - 7-2-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - Tutta colpa mia - 7-2-17.ts_snapshot_02.46.422.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - Tutta colpa mia - 7-2-17.ts.jpg">
+  <div class="tecnici-box" id="video_6b925dbaa6">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 54 s</div>
+    <div>0.93 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6b925dbaa6">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_6b925dbaa6">Elodie - Tutta colpa mia - 1 Serata - 7-2-17.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6b925dbaa6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6b925dbaa6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6b925dbaa6')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #CE3018;" data-stars="0">
+  <div class="card-title" style="color:#7b1c0e;">Elodie - X Factor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elodie - X Factor - 2-11-23.ts_snapshot_03.57.463.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elodie - X Factor - 2-11-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elodie - X Factor - 2-11-23.ts_snapshot_03.57.463.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elodie - X Factor - 2-11-23.ts.jpg">
+  <div class="tecnici-box" id="video_557939db6f">
+    <div class="riga1">1920x1080 - 24.7 Mb/s - 8 min 5 s</div>
+    <div>1.61 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_557939db6f">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_557939db6f">Elodie - X Factor - 2-11-23.ts <br>Red Light - A fari spenti<br>- Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#CE3018;color:#fff;" title="Elodie">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('557939db6f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('557939db6f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('557939db6f')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

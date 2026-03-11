@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Roberto Benigni</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#eef0f4;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#AEB5CA; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Roberto Benigni
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(3 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Roberto Benigni - Il sogno</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Roberto Benigni - Il sogno - 19-3-25.mp4_snapshot_00.07.16.949.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Roberto Benigni - Il sogno - 19-3-25.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Roberto Benigni - Il sogno - 19-3-25.mp4_snapshot_00.07.16.949.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Roberto Benigni - Il sogno - 19-3-25.mp4.jpg">
+  <div class="tecnici-box" id="video_115bc0ea8b">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 2 h 33 min</div>
+    <div>21.53 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_115bc0ea8b">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_115bc0ea8b">Roberto Benigni - Il sogno - 19-3-25.ts - Feed<br>«Negli ultimi tempi ognuno dice la sua sull'Europa. Ma nessuno racconta mai quali sono le ragioni profonde per cui è nata l'Unione Europea, qual è la storia degli uomini e delle donne che l'hanno fatta. Allora ve lo racconto io. Come in un romanzo pieno di colpi di scena, dove succedono cose incredibili: non c'è un capitolo dove non ci sia un fatto clamoroso, una sorpresa. E sono sicuro che vi piacerà da morire, perché è il romanzo della nostra vita, del passato che abbiamo alle spalle e soprattutto del futuro che abbiamo davanti. State a sentire che bellezza».<br>Roberto Benigni<br><br>La versione ampliata e arricchita dello spettacolo che ha emozionato milioni di telespettatori su Rai 1. Roberto Benigni, con la sua inconfondibile voce, ci svela un'Europa inedita intrecciando poesia e realtà, memoria e speranza. Un racconto appassionato e visionario, che evocando le ferite della guerra ci accompagna, con tenerezza e coraggio, nel cammino verso la pace.<br>Il sogno è il monologo con cui Roberto Benigni ha incantato milioni di spettatori il 19 marzo 2025, in diretta su Rai 1 e in Eurovisione. Questo libro ne raccoglie il testo, ma va oltre: non è una semplice trascrizione, bensí una versione ampliata e approfondita, arricchita da nuove riflessioni, aneddoti e momenti poetici che nello spettacolo non hanno trovato spazio. È un’opera che nasce dalla tv e si fa libro per espandere il racconto, allargare lo sguardo, scavare piú a fondo nelle pieghe della storia e del presente. Con la concretezza delle argomentazioni e la profondità della poesia, Benigni ci accompagna in un viaggio travolgente attraverso l’idea di Europa, non solo come geografia o istituzione, ma come visione, come orizzonte condiviso, come casa comune. Un libro vivo, che aggiunge senso e materia allo spettacolo televisivo, e che rilancia – con nuova forza – un messaggio di speranza e responsabilità, illuminando la strada per affrontare senza paura le sfide di oggi. Perché il sogno continui.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('115bc0ea8b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('115bc0ea8b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('115bc0ea8b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Roberto Benigni - Pietro, un uomo nel vento</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Roberto Benigni - Pietro, un uomo nel vento - 11-12-25.mp4_snapshot_00.06.59.008.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Roberto Benigni - Pietro, un uomo nel vento - 11-12-25.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Roberto Benigni - Pietro, un uomo nel vento - 11-12-25.mp4_snapshot_00.06.59.008.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Roberto Benigni - Pietro, un uomo nel vento - 11-12-25.mp4.jpg">
+  <div class="tecnici-box" id="video_5ab7fc8c31">
+    <div class="riga1">1920x1080 - 20 Mb/s - 2 h 14 min</div>
+    <div>19.21 GB - 29 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5ab7fc8c31">AAC - L R - 445 kb/s</div>
+  <div class="notebox" id="note_5ab7fc8c31">Roberto Benigni - Pietro, un uomo nel vento - 11-12-25.mp4 - Rai Play<br><br>"Pietro è il migliore amico di Gesù. Vi ricordate a scuola quando ci davano il tema da comporre ‘il tuo migliore amico’. Se Gesù fosse andato alle medie, avrebbe scritto ‘Il mio migliore amico è Pietro’. E ora è diventato anche il mio perché me ne sono innamorato". Così Roberto Benigni apre il suo monologo su San Pietro dal titolo ‘Pietro - Un uomo nel vento’, in onda su Rai 1, Rai Radio3 e RaiPlay.<br><br>“Noi siamo qui come se niente fosse", ma in realtà "siamo in un posto unico al mondo dove non c’è mai stato nessuno. Siamo nei giardini segreti, dove solo i Papi possono venire a passeggiare. Probabilmente qui mezz’ora fa c’era Papa Leone XIV a raccogliere i fiori, viene qui tutti i giorni ad annaffiare”, dice Benigni scatenando una risata di un gruppo ristretto di spettatori, seduti in un piccolo anfiteatro allestito per l’occasione.<br><br>Dopo ‘I dieci comandamenti’ e il recente spettacolo ‘Il sogno’, racconta la vita dell’uomo al quale Gesù Cristo affidò la sua Chiesa. Un luogo unico, un artista e autore straordinario, amato dal pubblico, per far rivivere una vita misteriosa ed epica. "Siamo nel ‘the dark side of the Basilica di San Pietro': il lato nascosto, mai visto prima. Solo i Papi quando colgono i fiori. Ma questa sera vedremo anche il ‘the dark side of Pietro’, lo vedremo come nessuno lo ha mai visto", assicura il regista e attore. Anche se di 'dark' non ha trovato nulla: "Leggendo il Vangelo si arriva a pensare che la vita abbia un senso", dice Benigni per poi raccontare l’incredibile vicenda archeologica legata alla tomba e alle ossa di Pietro.<br><br><br>E ancora: "Cosa ci faceva Pietro a Roma? Mica era romano: era un pescatore ebreo della Galilea, in Palestina. Voleva conquistare l’Impero romano da solo. Non con le armi, ma con un’idea. La più strana che si fosse mai sentita: l’idea di un Dio che si è fatto l’ultimo degli uomini, poverissimo, morto in croce, crocifisso come un bandito perché voleva insegnarci ad amarci l’un l’altro. Con questa idea Pietro voleva convincere i romani. Era folle, ma di una follia particolare chiamata ‘fede’, che riponeva in Gesù di Nazaret. Pietro era convinto che Gesù fosse Dio, che quell’idea fosse la verità, e che alla fine tutti ci avrebbero creduto — anche i romani", racconta Benigni, definendolo “il primo follower di Gesù”.<br><br>E "voleva predicare il Vangelo senza sapere il latino. È come se un idraulico andasse a New York senza sapere l’inglese e volesse convincere gli americani non solo di aver incontrato Dio in persona, ma che sono anche amici. E poi questo suo amico è stato condannato a morte, ma prima di morire gli ha lasciato delle idee che tutti devono ascoltare. Con la differenza che Pietro rischiava la vita e lo sapeva: a New York magari ti chiudono in un manicomio".<br><br><br>Il premio Oscar, rivolgendosi alla platea, si chiede: “Ma cosa avrà visto Pietro per farsi travolgere in quel modo e buttarsi in un’avventura così folle, in un’impresa così impossibile? Quanta fede e passione ci vogliono per accettare un compito simile? E da dove viene un vento capace di soffiare così forte, rapirti in quella maniera e portarti così lontano, fino ai confini del mondo, fino alla morte e perfino oltre?". Quando si legge la storia di Pietro, "si ha l’impressione che una forza misteriosa si sia impossessata di lui, facendogli vivere avventure che un pescatore di quel tempo non si sarebbe mai sognato".<br><br>“Quando Pietro incontra Gesù - continua l'attore - sono coetanei, neanche trentenni. E non si capisce perché Pietro venga sempre rappresentato come un uomo anziano, calvo, con le rughe e la barba bianca. Anche Leonardo ne ‘L’Ultima Cena’ lo ha rappresentato così. Sembra che Pietro sia nato già vecchio”, dice. "Quando i due i sono incontrati erano giovanissimi, questa infatti è una storia di ragazzi".<br><br>La storia di Pietro, che in realtà si chiama "Simone, figlio di Giona", comincia a Cafarnao, “un villaggio della Galilea, sul lago di Tiberiade: in quella che oggi è la Palestina, che a quell’epoca era sotto il controllo dell’impero romano, praticamente Pietro viveva in un territorio occupato", racconta quindi Benigni. E sulla sponda del lago, dove Pietro aveva le sue reti a mollo per pescare, avviene “il primo incontro con Gesù”. In pochi minuti "il Messia gli dice chi era, chi è e chi sarà, cambiandogli il nome". Pietro non si oppone e rinuncia al suo nome. "È stato un colpo di fulmine", continua l'attore, sottolineando la semplicità e la naturalezza di quell’incontro. In quel momento "Gesù gli disse, seguimi e da questo momento ti farò pescatore degli uomini". E Pietro, insieme ai suoi compagni, "arriverà a pescare fino a Roma".<br><br><br>"Ne avrei tante da raccontare su Pietro tra gaffe e figuracce", continua Benigni. "La sua carriera da apostolo è iniziata con lui che quasi affogava", racconta il premio Oscar, ricordando quella volta in cui Pietro era in barca per pescare nel bel mezzo di una tempesta e, a un certo punto, lui e i suoi compagni vedono Gesù camminare sull’acqua verso di loro. "E Pietro gli dice 'Signore se sei tu comanda che io venga da te camminando sull’acqua'". Pietro ci prova, "dopo qualche passo affoga, e grida 'Signore, salvami'". Per Benigni è come "quando da bambini si impara a camminare, il babbo ci dice 'vieni, vieni' e noi facciamo due o tre passi perché ci crediamo e poi cadiamo".<br><br>E come il "babbo", Gesù lo afferra per le mani e gli dice 'uomo di poca fede, ma perché hai dubitato?'. Pietro "ha fede, ma ne ha ancora poca". Lui "è come noi, si lascia sopraffare dalla paura ed ha dei dubbi". La fede "è piena di dubbi. Chi non ha dubbi non ha fede", dice il premio Oscar. "Non si dubita sul teorema di Pitagora, ma su Dio si può dubitare. Anzi si deve. Questa è una mia opinione e io la condivido", dice con ironia.<br><br><br>La carriera di Pietro è fatta anche di momenti in cui ha fatto spazientire Gesù: "Quando lui dice una parabola e Pietro non capisce". Come quando Gesù spiegò ai discepoli di non preoccuparsi tanto di ciò che mangiano - "una cosa su cui gli ebrei erano molto rigidi" - perché a rendere l’uomo impuro non è quello che entra nella sua bocca, ma quello che ne esce: le menzogne, le ipocrisie, le cattiverie. Pietro, però, non capì di cosa stesse parlando, e gli chiese: 'Quello che esce dalla bocca? In che senso? Che vuol dire?'. Allora Gesù gli rispose: 'Oh, Pietro, quello che esce, dai. Ma possibile che non ci arrivi mai?'. Oppure quando rinnegò Gesù per tre volte. "Esiste una teoria secondo cui sono proprio le figuracce di Pietro a dimostrare che il Vangelo dice la verità. Uno che vuole inventare una storia su Gesù e gli apostoli cerca di abbellirla".<br><br>Continua Benigni: "Pietro ci somiglia nel profondo: si arrabbia, agisce di impulso, sbaglia, non capisce, piange, ride, gioisce, si lascia emozionare proprio come noi. Io mi sento molto vicino a lui, ripercorrendo la sua storia ho pensato tante volte 'io avrei fatto la stessa cosa'". "Non ci si capacità di come Pietro sia diventato l’apostolo più importante, l’eroe della Chiesa e il primo Papa nonostante i suoi sbagli e le sgridate da Gesù. Io al suo posto avrei rinunciato". Al contrario, Pietro "non si arrende mai e non si stacca mai da Gesù". Del resto "è come se un grande regista ti scegliesse per la parte principale".<br><br><br>Nella celebre ultima cena, Gesù si inginocchia e incomincia a lavare i piedi ai suoi discepoli. "È come se oggi vedessimo Macron o Merz lavare i piedi a coloro che sono in fila alla Caritas o a Trump, in diretta dallo Studio Ovale, che lava i piedi ai suoi collaboratori", dice ancora con ironia.<br><br>Nel suo monologo Benigni parla quindi della rivoluzione di Gesù: ovvero trasformare una società sull’uguaglianza di tutti gli uomini. E lo fa raccontando la schiavitù in quel periodo storico: "Mi direte 'è una cosa lontana', non è vero perché esiste ancora oggi", dice il premio Oscar. "Ma ai tempi di Gesù i figli degli schiavi venivano cresciuti nei recinti come gli animali, si potevano vendere e farne ciò che si voleva. Anche ucciderli. Nessuno ci trovava nulla di strano".<br><br>L'arrivo di Gesù cambia tutto: "Lui dice che davanti a Dio non esistono più schiavi e padroni, oppressi e liberi, uomo e donna, siamo tutti fratelli e tutti uguali". Gesù "ha rotto la piramide del potere, ha portato una legge nuova: la legge d’amore, l’amore come lo intendiamo noi oggi. Gesù ha fondato l’amore, l'ha inventato".<br><br>Gesù "amo lo straniero, lo sconosciuto, il diverso e anche il nemico", dice Benigni ricordando l'insegnamento di Gesù: 'Ama il tuo nemico'. "È la frase più sconvolgente mai pronunciata sulla Terra. Lui si lascia baciare dai nemici, rinnegare, tradire, ma non smette di amare. Questa è la vera natura del Cristianesimo: non una religione di regole, ma una rivoluzione d’amore". Per questo "lo storico delle religioni Ernest Renan ha definito Gesù 'l’uomo che ha contribuito più di ogni altro a cancellare ogni distinzione di razza nell’umanità'. Nessuno prima di lui aveva pensato che si potesse fondare una società sull’uguaglianza di tutti gli uomini. Ha trasformato il mondo".</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5ab7fc8c31')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5ab7fc8c31')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5ab7fc8c31')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Roberto Benigni - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Roberto Benigni - Sanremo - 14-2-25.ts_snapshot_07.52.454.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Roberto Benigni - Sanremo - 14-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Roberto Benigni - Sanremo - 14-2-25.ts_snapshot_07.52.454.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Roberto Benigni - Sanremo - 14-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_59fc5510fe">
+    <div class="riga1">1920x1080 - 27.2 Mb/s - 14 min 23 s</div>
+    <div>3.08 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_59fc5510fe">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_59fc5510fe">Roberto Benigni - Sanremo - 14-2-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('59fc5510fe')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('59fc5510fe')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('59fc5510fe')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

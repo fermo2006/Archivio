@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Ermal Meta</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#e7ede1;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#87A96B; color:#fff; padding:8px 30px; border-radius:12px; margin:0;">
+  Ermal Meta
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(61 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - 1-5-17.ts_snapshot_10.33.122.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - 1-5-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - 1-5-17.ts_snapshot_10.33.122.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - 1-5-17.ts.jpg">
+  <div class="tecnici-box" id="video_9c6cf731a8">
+    <div class="riga1">1920x1080 - 23.2 Mb/s - 18 min 12 s</div>
+    <div>3.73 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_9c6cf731a8">MPEG Audio - 384 kb/s - en<br>PCM - 1920 kb/s - es<br>MPEG Audio - 384 kb/s - de<br>PCM - 1920 kb/s - fr</div>
+  <div class="notebox" id="note_9c6cf731a8">Ermal Meta - 1-5-17.ts - Odio le favole - Volevo dirti - A parte te - Vietato morire - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9c6cf731a8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9c6cf731a8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9c6cf731a8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - 1-5-21.ts_snapshot_02.32.645.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - 1-5-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - 1-5-21.ts_snapshot_02.32.645.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - 1-5-21.ts.jpg">
+  <div class="tecnici-box" id="video_b898517816">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 7 min 36 s</div>
+    <div>1.07 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b898517816">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_b898517816">Ermal Meta - 1-5-21.ts - Un milione di cose da dirti - Uno - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b898517816')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b898517816')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b898517816')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - 1-5-20.ts_snapshot_00.13.921.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - 1-5-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - 1-5-20.ts_snapshot_00.13.921.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - 1-5-20.ts.jpg">
+  <div class="tecnici-box" id="video_6846c292b2">
+    <div class="riga1">1920x1080 - 8.8 Mb/s - 4 min</div>
+    <div>0.28 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6846c292b2">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth</div>
+  <div class="notebox" id="note_6846c292b2">Ermal Meta - 1-5-20.ts - Finira' bene - Rai Tre</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6846c292b2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6846c292b2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6846c292b2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - 1-5-18.ts_snapshot_11.24.326.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - 1-5-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - 1-5-18.ts_snapshot_11.24.326.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - 1-5-18.ts.jpg">
+  <div class="tecnici-box" id="video_1154e5fa7a">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 18 min 8 s</div>
+    <div>2.48 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1154e5fa7a">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_1154e5fa7a">Ermal Meta - 1-5-18.ts - Vietato morire - Dall'alba al tramonto - Non mi avete fatto niente - Mi salvi chi può - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1154e5fa7a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1154e5fa7a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1154e5fa7a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente - 11-2-18.ts_snapshot_05.14.391.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente - 11-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente - 11-2-18.ts_snapshot_05.14.391.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente - 11-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_4c9798ca8f">
+    <div class="riga1">1920x1080 - 12.8 Mb/s - 8 min 42 s</div>
+    <div>0.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4c9798ca8f">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_4c9798ca8f">Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente - Che tempo che fa - 11-2-18.ts -  Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4c9798ca8f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4c9798ca8f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4c9798ca8f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro - Amici</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Amici - 6-4-19.ts_snapshot_07.28.188.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Amici - 6-4-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Amici - 6-4-19.ts_snapshot_07.28.188.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Amici - 6-4-19.ts.jpg">
+  <div class="tecnici-box" id="video_50c13cd88c">
+    <div class="riga1">1920x1080 - 20 Mb/s - 7 min 49 s</div>
+    <div>1.18 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_50c13cd88c">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - int</div>
+  <div class="notebox" id="note_50c13cd88c">Ermal Meta - & Fabrizio Moro - Amici - 6-4-19.ts  Ermal Meta - Piccola anima con Alvis Giordana - Fabrizio Moro - Pensa - con Alberto Jefeo - Ermal Meta - Vietato morire con Alvis Giordana - Fabrizio Moro - Portami via con Alberto Jefeo - Ermal Meta & Fabrizio Moro - Non mi avete fatto niente - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('50c13cd88c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('50c13cd88c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('50c13cd88c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro - Come e' profondo il mare</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Come e' profondo il mare - 3-6-22.ts_snapshot_07.23.876.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Come e' profondo il mare - 3-6-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Come e' profondo il mare - 3-6-22.ts_snapshot_07.23.876.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Come e' profondo il mare - 3-6-22.ts.jpg">
+  <div class="tecnici-box" id="video_51de460639">
+    <div class="riga1">1920x1080 -  - 7 min 54 s</div>
+    <div>1.03 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_51de460639">AAC - L R - de</div>
+  <div class="notebox" id="note_51de460639">Ermal Meta - & Fabrizio Moro - Come e' profondo il mare - DallArenaLucio - 3-6-22 - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('51de460639')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('51de460639')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('51de460639')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-5-18.ts_snapshot_03.46.534.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-5-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-5-18.ts_snapshot_03.46.534.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-5-18.ts.jpg">
+  <div class="tecnici-box" id="video_ac7458d5e2">
+    <div class="riga1">1920x1080 - 37.9 Mb/s - 4 min</div>
+    <div>1.13 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ac7458d5e2">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_ac7458d5e2">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Eurovision - 9-5-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ac7458d5e2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ac7458d5e2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ac7458d5e2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 6-2-18.ts_snapshot_00.01.589.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 6-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 6-2-18.ts_snapshot_00.01.589.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 6-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_ce580b992d">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 3 min 48 s</div>
+    <div>0.79 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ce580b992d">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_ce580b992d">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Sanremo - 6-2-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ce580b992d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ce580b992d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ce580b992d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-2-18.ts_snapshot_00.01.322.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-2-18.ts_snapshot_00.01.322.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_da99ccacf3">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 1 s</div>
+    <div>1.04 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_da99ccacf3">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_da99ccacf3">Ermal Meta e Fabrizio Moro con Simone Cristicchi - Non mi avete fatto niente - Sanremo - 9-2-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('da99ccacf3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('da99ccacf3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('da99ccacf3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 10-2-18.ts_snapshot_02.24.654.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 10-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 10-2-18.ts_snapshot_02.24.654.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 10-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_ee7aac23d8">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 3 min 48 s</div>
+    <div>0.79 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ee7aac23d8">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_ee7aac23d8">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 10-2-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ee7aac23d8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ee7aac23d8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ee7aac23d8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 8-2-18.ts_snapshot_02.17.325.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 8-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 8-2-18.ts_snapshot_02.17.325.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 8-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_2f440cc1ea">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 3 min 53 s</div>
+    <div>0.81 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2f440cc1ea">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_2f440cc1ea">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Sanremo - 8-2-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2f440cc1ea')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2f440cc1ea')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2f440cc1ea')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 19-6-18.ts_snapshot_02.49.712.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 19-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 19-6-18.ts_snapshot_02.49.712.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 19-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_99090f3d6d">
+    <div class="riga1">1920x1080 - 28.6 Mb/s - 4 min 58 s</div>
+    <div>1.03 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_99090f3d6d">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_99090f3d6d">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Con il cuore - Assisi - 19-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('99090f3d6d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('99090f3d6d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('99090f3d6d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards - 4-6-18.ts_snapshot_03.20.291.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards - 4-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards - 4-6-18.ts_snapshot_03.20.291.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards - 4-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_71f1108118">
+    <div class="riga1">1920x1080 - 27.5 Mb/s - 4 min 54 s</div>
+    <div>1.00 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_71f1108118">MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_71f1108118">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards - 4-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('71f1108118')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('71f1108118')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('71f1108118')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 11-5-18.ts_snapshot_02.58.670.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 11-5-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 11-5-18.ts_snapshot_02.58.670.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 11-5-18.ts.jpg">
+  <div class="tecnici-box" id="video_a1efc2ef3e">
+    <div class="riga1">1920x1080 - 40.3 Mb/s - 3 min 9 s</div>
+    <div>0.95 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a1efc2ef3e">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_a1efc2ef3e">Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - Eurovision - 11-5-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a1efc2ef3e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a1efc2ef3e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a1efc2ef3e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 12-5-18.ts_snapshot_03.50.944.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 12-5-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 12-5-18.ts_snapshot_03.50.944.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 12-5-18.ts.jpg">
+  <div class="tecnici-box" id="video_49c9bf517a">
+    <div class="riga1">1920x1080 - 39.4 Mb/s - 4 min 3 s</div>
+    <div>1.19 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_49c9bf517a">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_49c9bf517a">Ermal Meta & Fabrizio Moro – Non mi avete fatto niente - Eurovision - (prova) - 12-5-18 ore 13-30.mp4 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('49c9bf517a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('49c9bf517a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('49c9bf517a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente  - 12-5-18.ts_snapshot_03.52.823.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente  - 12-5-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente  - 12-5-18.ts_snapshot_03.52.823.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente  - 12-5-18.ts.jpg">
+  <div class="tecnici-box" id="video_e2cc35dc2f">
+    <div class="riga1">1920x1080 - 38.5 Mb/s - 4 min 4 s</div>
+    <div>1.17 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e2cc35dc2f">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_e2cc35dc2f">Ermal Meta & Fabrizio Moro – Non mi avete fatto niente - Eurovision - (gara) - 12-5-18.mp4 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e2cc35dc2f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e2cc35dc2f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e2cc35dc2f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - & Simone Cristicchi - Abbi cura di me - Sanremo - 8-2-19</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Simone Cristicchi - Abbi cura di me - Sanremo - 8-2-19 .ts_snapshot_04.06.011.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Simone Cristicchi - Abbi cura di me - Sanremo - 8-2-19 .ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Simone Cristicchi - Abbi cura di me - Sanremo - 8-2-19 .ts_snapshot_04.06.011.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Simone Cristicchi - Abbi cura di me - Sanremo - 8-2-19 .ts.jpg">
+  <div class="tecnici-box" id="video_70290462a4">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 17 s</div>
+    <div>0.88 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_70290462a4">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_70290462a4">Ermal Meta - & Simone Cristicchi - Abbi cura di me - Sanremo - 8-2-19 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('70290462a4')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('70290462a4')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('70290462a4')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Amara terra mia - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Amara terra mia - Sanremo - 9-2-17.ts_snapshot_01.19.827.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Amara terra mia - Sanremo - 9-2-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Amara terra mia - Sanremo - 9-2-17.ts_snapshot_01.19.827.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Amara terra mia - Sanremo - 9-2-17.ts.jpg">
+  <div class="tecnici-box" id="video_2f82fc9ca5">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 27 s</div>
+    <div>0.84 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2f82fc9ca5">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_2f82fc9ca5">Ermal Meta - Amara terra mia - Sanremo - 9-2-17.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2f82fc9ca5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2f82fc9ca5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2f82fc9ca5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Battiti Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Battiti Live - 15-7-18.ts_snapshot_06.30.293.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Battiti Live - 15-7-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Battiti Live - 15-7-18.ts_snapshot_06.30.293.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Battiti Live - 15-7-18.ts.jpg">
+  <div class="tecnici-box" id="video_46d0517271">
+    <div class="riga1">1920x1080 - 14.8 Mb/s - 13 min 48 s</div>
+    <div>1.54 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_46d0517271">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_46d0517271">Ermal Meta - Battiti Live - 15-7-18 - Andria - Dall'alba al tramonto - Io mi innamoro ancora - Non mi avete fatto niente - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('46d0517271')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('46d0517271')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('46d0517271')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Capodanno in musica</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Capodanno in musica - 31-12-21.ts_snapshot_03.14.509.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Capodanno in musica - 31-12-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Capodanno in musica - 31-12-21.ts_snapshot_03.14.509.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Capodanno in musica - 31-12-21.ts.jpg">
+  <div class="tecnici-box" id="video_2026140ae5">
+    <div class="riga1">1920x1080 - 20.6 Mb/s - 15 min 42 s</div>
+    <div>2.38 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_2026140ae5">MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_2026140ae5">Ermal Meta - Capodanno in musica - Petruzzelli - Bari - Un milione di cose da dirti - Stelle cadenti - Piccola anima - Vietato morire - 31-12-21.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2026140ae5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2026140ae5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2026140ae5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Caruso - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Caruso - Sanremo - 4-3-21.ts_snapshot_03.03.985.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Caruso - Sanremo - 4-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Caruso - Sanremo - 4-3-21.ts_snapshot_03.03.985.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Caruso - Sanremo - 4-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_9af2ac2822">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 6 min 22 s</div>
+    <div>1.32 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_9af2ac2822">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_9af2ac2822">Ermal Meta con Napoli Mandolin Orchestra - Caruso - Sanremo - 4-3-21</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9af2ac2822')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9af2ac2822')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9af2ac2822')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Dall'alba al tramonto</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Dall'alba al tramonto.ts_snapshot_01.45.543.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Dall'alba al tramonto.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Dall'alba al tramonto.ts_snapshot_01.45.543.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Dall'alba al tramonto.ts.jpg">
+  <div class="tecnici-box" id="video_098718044b">
+    <div class="riga1">1920x1080 - 11.1 Mb/s - 3 min 23 s</div>
+    <div>0.29 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_098718044b">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_098718044b">Ermal Meta - Dall'alba al tramonto - Video originale.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('098718044b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('098718044b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('098718044b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Dall'alba al tramonto</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Dall'alba al tramonto - 19-6-18.ts_snapshot_01.32.717.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Dall'alba al tramonto - 19-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Dall'alba al tramonto - 19-6-18.ts_snapshot_01.32.717.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Dall'alba al tramonto - 19-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_623fa868d0">
+    <div class="riga1">1920x1080 - 28.6 Mb/s - 4 min 10 s</div>
+    <div>0.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_623fa868d0">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_623fa868d0">Ermal Meta - Dall'alba al tramonto - Con il cuore - Assisi - 19-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('623fa868d0')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('623fa868d0')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('623fa868d0')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Dall'alba al tramonto</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Dall'alba al tramonto - 27-5-17.ts_snapshot_00.37.427.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Dall'alba al tramonto - 27-5-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Dall'alba al tramonto - 27-5-17.ts_snapshot_00.37.427.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Dall'alba al tramonto - 27-5-17.ts.jpg">
+  <div class="tecnici-box" id="video_8bccc20548">
+    <div class="riga1">1920x1080 - 26.8 Mb/s - 3 min 51 s</div>
+    <div>0.77 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8bccc20548">AC-3 - L R - 256 kb/s - en</div>
+  <div class="notebox" id="note_8bccc20548">Ermal Meta - Dall'alba al tramonto - Amici - 27-5-17.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8bccc20548')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8bccc20548')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8bccc20548')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Dall'alba al tramonto - Wind Music Awards 12-6-18</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Dall'alba al tramonto - Wind Music Awards 12-6-18.ts_snapshot_01.20.272.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Dall'alba al tramonto - Wind Music Awards 12-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Dall'alba al tramonto - Wind Music Awards 12-6-18.ts_snapshot_01.20.272.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Dall'alba al tramonto - Wind Music Awards 12-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_df7d70da70">
+    <div class="riga1">1920x1080 - 11.5 Mb/s - 4 min 21 s</div>
+    <div>0.40 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_df7d70da70">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_df7d70da70">Ermal Meta - Dall'alba al tramonto - Wind Music Awards 12-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('df7d70da70')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('df7d70da70')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('df7d70da70')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Ercole - Seat Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Ercole - Seat Music Awards - 5-6-19.ts_snapshot_02.51.259.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Ercole - Seat Music Awards - 5-6-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Ercole - Seat Music Awards - 5-6-19.ts_snapshot_02.51.259.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Ercole - Seat Music Awards - 5-6-19.ts.jpg">
+  <div class="tecnici-box" id="video_5fcfeba1aa">
+    <div class="riga1">1920x1080 - 28.7 Mb/s - 5 min 30 s</div>
+    <div>1.14 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5fcfeba1aa">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_5fcfeba1aa">Ermal Meta - Ercole - Seat Music Awards - 5-6-19 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5fcfeba1aa')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5fcfeba1aa')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5fcfeba1aa')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Estate - Una nessuna centomila</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Estate - Una nessuna centomila - 8-5-24.mp4_snapshot_02.09.952.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Estate - Una nessuna centomila - 8-5-24.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Estate - Una nessuna centomila - 8-5-24.mp4_snapshot_02.09.952.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Estate - Una nessuna centomila - 8-5-24.mp4.jpg">
+  <div class="tecnici-box" id="video_f70aa02e39">
+    <div class="riga1">1920x1080 - 18 Mb/s - 3 min 28 s</div>
+    <div>0.44 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f70aa02e39">AAC - L R - 253 kb/s</div>
+  <div class="notebox" id="note_f70aa02e39">Ermal Meta - Estate - con Fiorella Mannoia e Giuliano Sangiorgi - Una nessuna centomila - 8-5-24.mp4 - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f70aa02e39')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f70aa02e39')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f70aa02e39')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Every breath you take</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Every breath you take - 21-10-17.ts_snapshot_02.42.529.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Every breath you take - 21-10-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Every breath you take - 21-10-17.ts_snapshot_02.42.529.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Every breath you take - 21-10-17.ts.jpg">
+  <div class="tecnici-box" id="video_c57053d0f9">
+    <div class="riga1">1920x1080 - 11.3 Mb/s - 2 min 49 s</div>
+    <div>0.24 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_c57053d0f9">MPEG Audio - 192 kb/s - it</div>
+  <div class="notebox" id="note_c57053d0f9">Ermal Meta - Every breath you take - Celebration - Quelli del Rock - 21-10-17.ts - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c57053d0f9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c57053d0f9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c57053d0f9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Finira bene - Seat Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Finira bene - Seat Music Awards - 5-9-20.ts_snapshot_02.15.710.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Finira bene - Seat Music Awards - 5-9-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Finira bene - Seat Music Awards - 5-9-20.ts_snapshot_02.15.710.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Finira bene - Seat Music Awards - 5-9-20.ts.jpg">
+  <div class="tecnici-box" id="video_5477af9742">
+    <div class="riga1">1920x1080 - 29.6 Mb/s - 5 min 14 s</div>
+    <div>1.16 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5477af9742">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_5477af9742">Ermal Meta - Finira bene - Seat Music Awards - Verona - 5-9-20 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5477af9742')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5477af9742')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5477af9742')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Hallelujah</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Hallelujah - 31-3-20.ts_snapshot_03.48.744.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Hallelujah - 31-3-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Hallelujah - 31-3-20.ts_snapshot_03.48.744.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Hallelujah - 31-3-20.ts.jpg">
+  <div class="tecnici-box" id="video_22b8303087">
+    <div class="riga1">1920x1080 - 8.5 Mb/s - 5 min 44 s</div>
+    <div>0.39 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_22b8303087">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_22b8303087">Ermal Meta - Hallelujah - 31-3-20 - Musica che unisce.ts - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('22b8303087')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('22b8303087')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('22b8303087')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Hallelujah</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Hallelujah - 21-10-17.ts_snapshot_01.37.563.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Hallelujah - 21-10-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Hallelujah - 21-10-17.ts_snapshot_01.37.563.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Hallelujah - 21-10-17.ts.jpg">
+  <div class="tecnici-box" id="video_cd16a9c37c">
+    <div class="riga1">1920x1080 - 8.6 Mb/s - 3 min 18 s</div>
+    <div>0.21 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_cd16a9c37c">MPEG Audio - 192 kb/s - it</div>
+  <div class="notebox" id="note_cd16a9c37c">Ermal Meta - Hallelujah - Celebration - Quelli del Rock - 21-10-17.ts - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('cd16a9c37c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('cd16a9c37c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('cd16a9c37c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Human</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Human - 1-5-25.mkv_snapshot_00.17.802.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Human - 1-5-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Human - 1-5-25.mkv_snapshot_00.17.802.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Human - 1-5-25.mkv.jpg">
+  <div class="tecnici-box" id="video_6af95ef9f5">
+    <div class="riga1">3840x2160 - 28.1 Mb/s - 3 min 8 s</div>
+    <div>0.65 GB - 50 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_6af95ef9f5">MPEG Audio - 256 kb/s - det<br>MPEG Audio - 256 kb/s - det<br>MPEG Audio - 256 kb/s - det<br>MPEG Audio - 256 kb/s - det</div>
+  <div class="notebox" id="note_6af95ef9f5">Ermal Meta - Human - 1-5-25 - con Noemi - Big Mama con La Municipal - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6af95ef9f5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6af95ef9f5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6af95ef9f5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Io mi innamoro ancora -  Wind Summer Festival</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Io mi innamoro ancora -  Wind Summer Festival - 16-9-18.ts_snapshot_02.44.732.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Io mi innamoro ancora -  Wind Summer Festival - 16-9-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Io mi innamoro ancora -  Wind Summer Festival - 16-9-18.ts_snapshot_02.44.732.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Io mi innamoro ancora -  Wind Summer Festival - 16-9-18.ts.jpg">
+  <div class="tecnici-box" id="video_b3598465af">
+    <div class="riga1">1920x1080 - 20 Mb/s - 4 min 42 s</div>
+    <div>0.71 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_b3598465af">MPEG Audio - 256 kb/s - int<br>MPEG Audio - 256 kb/s - int</div>
+  <div class="notebox" id="note_b3598465af">Ermal Meta - Io mi innamoro ancora -  Wind Summer Festival - 16-9-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b3598465af')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b3598465af')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b3598465af')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - La Notte della Taranta</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - La Notte della Taranta - 23-8-25.ts_snapshot_10.46.070.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - La Notte della Taranta - 23-8-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - La Notte della Taranta - 23-8-25.ts_snapshot_10.46.070.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - La Notte della Taranta - 23-8-25.ts.jpg">
+  <div class="tecnici-box" id="video_afc7240292">
+    <div class="riga1">1920x1080 - 29.1 Mb/s - 11 min 8 s</div>
+    <div>2.43 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_afc7240292">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_afc7240292">Ermal Meta - La Notte della Taranta - Melpignano - 23-8-25.ts - Mediterraneo - Lule Lule - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('afc7240292')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('afc7240292')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('afc7240292')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Nella musica di Ermal</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Nella musica di Ermal.mkv_snapshot_13.55.200.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Nella musica di Ermal.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Nella musica di Ermal.mkv_snapshot_13.55.200.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Nella musica di Ermal.mkv.jpg">
+  <div class="tecnici-box" id="video_594f0f8aba">
+    <div class="riga1">1280x720 - 10.0 Mb/s - 19 min 59 s</div>
+    <div>1.54 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_594f0f8aba">MPEG Audio - 192 kb/s - it<br>MPEG Audio - 192 kb/s - en<br>AC-3 - L R C LFE Ls Rs - 448 kb/s - it</div>
+  <div class="notebox" id="note_594f0f8aba">Ermal Meta - Nella musica di Ermal - Tsi - 15-3-19.mkv  Ermal Meta e la musica: un sodalizio ormai imprescindibile! Autore, interprete, performer tra i più amati, l´artista racconta dell´intimo e straordinario rapporto che intrattiene sin da bambino con la musica e come questa ne abbia disegnato il destino.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('594f0f8aba')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('594f0f8aba')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('594f0f8aba')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Non mi avete fatto niente - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Non mi avete fatto niente - Sanremo - 9-2-24.ts_snapshot_01.32.625.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Non mi avete fatto niente - Sanremo - 9-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Non mi avete fatto niente - Sanremo - 9-2-24.ts_snapshot_01.32.625.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Non mi avete fatto niente - Sanremo - 9-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_766b02c4ff">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 4 min 8 s</div>
+    <div>0.63 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_766b02c4ff">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_766b02c4ff">Ermal Meta - & Mannini - Non mi avete fatto niente - Sanremo - 9-2-24.ts - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('766b02c4ff')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('766b02c4ff')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('766b02c4ff')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - One</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - One - 1-5-25.mkv_snapshot_00.39.401.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - One - 1-5-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - One - 1-5-25.mkv_snapshot_00.39.401.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - One - 1-5-25.mkv.jpg">
+  <div class="tecnici-box" id="video_685942165e">
+    <div class="riga1">3840x2160 - 28.1 Mb/s - 2 min 34 s</div>
+    <div>0.53 GB - 50 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_685942165e">MPEG Audio - 256 kb/s - det<br>MPEG Audio - 256 kb/s - det<br>MPEG Audio - 256 kb/s - det<br>MPEG Audio - 256 kb/s - det</div>
+  <div class="notebox" id="note_685942165e">Ermal Meta - One - 1-5-25.mkv - con Noemi - Big Mama - La Municipal  - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('685942165e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('685942165e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('685942165e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Piccola anima</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Piccola anima - 17-11-21.ts_snapshot_00.34.148.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Piccola anima - 17-11-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Piccola anima - 17-11-21.ts_snapshot_00.34.148.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Piccola anima - 17-11-21.ts.jpg">
+  <div class="tecnici-box" id="video_98a503e19e">
+    <div class="riga1">1920x1080 - 5.6 Mb/s - 4 min 9 s</div>
+    <div>0.20 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_98a503e19e">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_98a503e19e">Ermal Meta - Piccola anima - Prodigi - La musica è vita- Rai Uno - 17-11-21.ts<br>Ermal Meta, elemento della giuria per la categoria Musica, ci regala emozioni con la sua "Piccola Anima" - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('98a503e19e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('98a503e19e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('98a503e19e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Piccola anima - Amici</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Piccola anima - Amici - 28-2-20.ts_snapshot_02.40.060.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Piccola anima - Amici - 28-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Piccola anima - Amici - 28-2-20.ts_snapshot_02.40.060.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Piccola anima - Amici - 28-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_80135d8187">
+    <div class="riga1">1920x1080 - 19.9 Mb/s - 4 min 25 s</div>
+    <div>0.67 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_80135d8187">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_80135d8187">Ermal Meta - Piccola anima con Francesco - Amici - 28-2-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('80135d8187')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('80135d8187')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('80135d8187')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Radio Bruno Yoga Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Radio Bruno Yoga Estate - 25-6-24.ts_snapshot_02.19.064.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Radio Bruno Yoga Estate - 25-6-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Radio Bruno Yoga Estate - 25-6-24.ts_snapshot_02.19.064.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Radio Bruno Yoga Estate - 25-6-24.ts.jpg">
+  <div class="tecnici-box" id="video_26759e5618">
+    <div class="riga1">1920x1080 - 10.0 Mb/s - 9 min 6 s</div>
+    <div>0.68 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_26759e5618">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_26759e5618">Ermal Meta - Radio Bruno Yoga Estate - 25-6-24 - Reggio Emilia - Ragazza paradiso - Mediterraneo - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('26759e5618')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('26759e5618')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('26759e5618')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Radio Italia Live - 27-5-19.ts_snapshot_10.40.482.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Radio Italia Live - 27-5-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Radio Italia Live - 27-5-19.ts_snapshot_10.40.482.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Radio Italia Live - 27-5-19.ts.jpg">
+  <div class="tecnici-box" id="video_8c6c4ad85d">
+    <div class="riga1">1920x1080 - 14.4 Mb/s - 14 min 4 s</div>
+    <div>1.46 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8c6c4ad85d">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_8c6c4ad85d">Ermal Meta - Radio Italia Live - Dall'alba al tramonto - Non mi avete fatto niente - Vietato morire - 27-5-19 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8c6c4ad85d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8c6c4ad85d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8c6c4ad85d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Radio Italia Live - 12-3-21.ts_snapshot_00.43.29.165.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Radio Italia Live - 12-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Radio Italia Live - 12-3-21.ts_snapshot_00.43.29.165.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Radio Italia Live - 12-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_1605b85baf">
+    <div class="riga1">1920x1080 - 19.2 Mb/s - 1 h 5 min</div>
+    <div>9.24 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1605b85baf">AC-3 - L R - 256 kb/s</div>
+  <div class="notebox" id="note_1605b85baf">Ermal Meta - Radio Italia Live - 12-3-21 <br>Un altro sole - Piccola anima - Vietato morire - Un milione di cose da dirti - Intervista - Gli invisibili - Finirà bene - Il destino universale - Non mi avete fatto niente - Intervista - Dall'alba al tramonto - A parte te - No satisfaction - Caruso<br><br>Ermal Meta sale sul palco dal Reward Music Place e, davanti a un pubblico (tamponato e mascherato), presenta dal vivo alcune canzoni del nuovo album Tribù Urbana che è uscito proprio oggi, venerdì 12 marzo. Ovviamente, canta anche i suoi più grandi successi, come Vietato Morire con il quale ha gareggiato a Sanremo 2017, classificandosi terzo. <br>Prima di esibirsi, però, Ermal Meta ha parlato del suo nuovo disco Tribù Urbana con la redazione di Radio Italia per la rubrica #atupertu. Ad esempio, ha dato qualche consiglio per goderselo al meglio. "Il modo migliore per ascoltare questo album è in cuffia, a volumi veramente elevati", ha detto. <br>Poi, Ermal Meta ha dato ulteriori dettagli sulla copertina, dove appare con un abito elegante e strisce di colore dipinte su una parte del corpo. "(I colori) Me li sono fatti dipingere addosso. Sono stato due ore immobile. Rappresentano ciò che è il concetto visivo della tribalità. Volevo fortemente creare un contrasto con la parte più bassa della copertina, il vestito, soprattutto i pantaloni. È come se (i pantaloni) fossero due grattacieli. Un qualcosa di antico, ancestrale, qualcosa di nuovo". <br>Infine, Ermal Meta ha fatto l'in bocca al lupo ai Måneskin che, come è accaduto nel 2018 a lui e a Fabrizio Moro, andranno all'Eurovision Song Contest per la vittoria al Festival. "Spaccate tutto",  ha aggiunto</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1605b85baf')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1605b85baf')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1605b85baf')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Radio Norba - Insieme nel 2024</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Radio Norba - Insieme nel 2024 - 31-12-23.ts_snapshot_00.35.28.128.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Radio Norba - Insieme nel 2024 - 31-12-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Radio Norba - Insieme nel 2024 - 31-12-23.ts_snapshot_00.35.28.128.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Radio Norba - Insieme nel 2024 - 31-12-23.ts.jpg">
+  <div class="tecnici-box" id="video_e75b56b5b1">
+    <div class="riga1">1920x1080 - 13.9 Mb/s - 1 h 16 min</div>
+    <div>8.00 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_e75b56b5b1">MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_e75b56b5b1">Ermal Meta - Radio Norba - Insieme nel 2024 - Bari - 31-12-23.ts - Feed -<br>Dall'alba al tramonto - Finirà bene - Piccola anima - Ragazza paradiso - Male piu non fare - Vietato morire - gravita con me - Un milione di cose da dirti - Una cosa più grande - Non mi avete fatto niente - Bionda - Un po' di pace - Stelle cadenti - La vita migliore - Straordinario - Lady (Hear Me Tonight) (Modjo cover)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e75b56b5b1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e75b56b5b1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e75b56b5b1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Ragazza paradiso - Festiwall show</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Ragazza paradiso - Festiwall show - 4-9-17.ts_snapshot_02.17.856.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Ragazza paradiso - Festiwall show - 4-9-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Ragazza paradiso - Festiwall show - 4-9-17.ts_snapshot_02.17.856.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Ragazza paradiso - Festiwall show - 4-9-17.ts.jpg">
+  <div class="tecnici-box" id="video_a0e9fe0ae9">
+    <div class="riga1">1920x1080 - 4.3 Mb/s - 4 min 23 s</div>
+    <div>0.15 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a0e9fe0ae9">MPEG Audio - 192 kb/s - it<br>MPEG Audio - 192 kb/s - it</div>
+  <div class="notebox" id="note_a0e9fe0ae9">Ermal Meta - Ragazza paradiso - Festiwall show - Verona - 4-9-17.ts - streaming</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a0e9fe0ae9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a0e9fe0ae9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a0e9fe0ae9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Ragazza Paradiso - Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Ragazza Paradiso - Power Hits Estate - 19-9-17.ts_snapshot_02.23.573.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Ragazza Paradiso - Power Hits Estate - 19-9-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Ragazza Paradiso - Power Hits Estate - 19-9-17.ts_snapshot_02.23.573.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Ragazza Paradiso - Power Hits Estate - 19-9-17.ts.jpg">
+  <div class="tecnici-box" id="video_b2d0a8879d">
+    <div class="riga1">1920x1080 - 13 Mb/s - 4 min 29 s</div>
+    <div>0.52 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b2d0a8879d">PCM - 2304 kb/s - en</div>
+  <div class="notebox" id="note_b2d0a8879d">Ermal Meta - Ragazza Paradiso - Power Hits Estate - Verona - 19-9-17.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b2d0a8879d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b2d0a8879d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b2d0a8879d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Sanremo Giovani</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Sanremo Giovani - 17-12-20.ts_snapshot_00.52.386.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Sanremo Giovani - 17-12-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Sanremo Giovani - 17-12-20.ts_snapshot_00.52.386.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Sanremo Giovani - 17-12-20.ts.jpg">
+  <div class="tecnici-box" id="video_1c3b09ce01">
+    <div class="riga1">1920x1080 - 27.2 Mb/s - 2 min 4 s</div>
+    <div>0.42 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1c3b09ce01">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_1c3b09ce01">Ermal Meta - Sanremo Giovani - 17-12-20.ts - presentazione Sanremo 2021 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1c3b09ce01')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1c3b09ce01')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1c3b09ce01')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - servizio Rai Tre Regione - Concerto Recanati</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - servizio Rai Tre Regione - Concerto Recanati - 1-8-18.mkv_snapshot_02.16.146.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - servizio Rai Tre Regione - Concerto Recanati - 1-8-18.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - servizio Rai Tre Regione - Concerto Recanati - 1-8-18.mkv_snapshot_02.16.146.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - servizio Rai Tre Regione - Concerto Recanati - 1-8-18.mkv.jpg">
+  <div class="tecnici-box" id="video_8c33017900">
+    <div class="riga1">1680x1050 - 9.0 Mb/s - 2 min 30 s</div>
+    <div>0.16 GB - ?? fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8c33017900">MPEG Audio - 192 kb/s</div>
+  <div class="notebox" id="note_8c33017900">Ermal Meta - servizio Rai Tre Regione - Concerto Recanati - 1-8-18 - Rai Tre Regione</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8c33017900')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8c33017900')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8c33017900')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Tirana</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Tirana - 23-10-21.mts_snapshot_01.09.14.235.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Tirana - 23-10-21.mts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Tirana - 23-10-21.mts_snapshot_01.09.14.235.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Tirana - 23-10-21.mts.jpg">
+  <div class="tecnici-box" id="video_d0f98bc4ab">
+    <div class="riga1">1920x1080 - 17.3 Mb/s - 1 h 52 min</div>
+    <div>15.45 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d0f98bc4ab">PCM - L R - 1536 kb/s</div>
+  <div class="notebox" id="note_d0f98bc4ab">Ermal Meta - Tirana - 23-10-21.mts - Un altro sole - Dall'alba al tramonto - Umano - Ragazza Paradiso - Gravita con me - Un milione di cose da dirti - Vietato morire - Stelle cadenti - Il destino universale - Non mi avete fatto niente - Non bastano le mani - Schegge - Non abbiamo armi - Volevo dirti - Uno - Piccola anima - Straordinario (Chiara Galiazzo cover)- A parte te - Jon - La vita migliora - No satisfaction - Finira' bene - Gli invisibili - Caruso - trasmesso da RTSH 1</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d0f98bc4ab')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d0f98bc4ab')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d0f98bc4ab')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Tutti a scuola</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Tutti a scuola - 18-9-17.ts_snapshot_00.57.149.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Tutti a scuola - 18-9-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Tutti a scuola - 18-9-17.ts_snapshot_00.57.149.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Tutti a scuola - 18-9-17.ts.jpg">
+  <div class="tecnici-box" id="video_b999b46fd7">
+    <div class="riga1">1920x1080 - 14.2 Mb/s - 2 min 4 s</div>
+    <div>0.23 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b999b46fd7">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_b999b46fd7">Ermal Meta - Tutti a scuola - 18-9-17.ts - intervista - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b999b46fd7')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b999b46fd7')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b999b46fd7')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Un milione di cose da dirti - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Un milione di cose da dirti - Sanremo - 3-3-21.ts_snapshot_03.34.916.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Un milione di cose da dirti - Sanremo - 3-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Un milione di cose da dirti - Sanremo - 3-3-21.ts_snapshot_03.34.916.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Un milione di cose da dirti - Sanremo - 3-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_83cf2ca256">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 48 s</div>
+    <div>1.00 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_83cf2ca256">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_83cf2ca256">Ermal Meta - Un milione di cose da dirti - Sanremo - 3-3-21.ts - 2 Serata - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('83cf2ca256')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('83cf2ca256')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('83cf2ca256')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Un milione di cose da dirti - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Un milione di cose da dirti - Sanremo - 6-3-21.ts_snapshot_03.55.243.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Un milione di cose da dirti - Sanremo - 6-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Un milione di cose da dirti - Sanremo - 6-3-21.ts_snapshot_03.55.243.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Un milione di cose da dirti - Sanremo - 6-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_33cefe9896">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 24 s</div>
+    <div>0.91 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_33cefe9896">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_33cefe9896">Ermal Meta - Un milione di cose da dirti - Sanremo - 6-3-21.ts - Serata Finale - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('33cefe9896')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('33cefe9896')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('33cefe9896')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Un milione di cose da dirti - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Un milione di cose da dirti - Sanremo - 5-3-21.ts_snapshot_01.30.338.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Un milione di cose da dirti - Sanremo - 5-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Un milione di cose da dirti - Sanremo - 5-3-21.ts_snapshot_01.30.338.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Un milione di cose da dirti - Sanremo - 5-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_f715551bc8">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 29 s</div>
+    <div>0.93 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f715551bc8">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_f715551bc8">Ermal Meta - Un milione di cose da dirti - Sanremo - 5-3-21 - 4 Serata.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f715551bc8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f715551bc8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f715551bc8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Un milione di cose da dirti - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Un milione di cose da dirti - Sanremo - 2-2-22.ts_snapshot_02.23.145.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Un milione di cose da dirti - Sanremo - 2-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Un milione di cose da dirti - Sanremo - 2-2-22.ts_snapshot_02.23.145.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Un milione di cose da dirti - Sanremo - 2-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_b6e25d2a01">
+    <div class="riga1">1920x1080 - 24.3 Mb/s - 5 min 11 s</div>
+    <div>0.95 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b6e25d2a01">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_b6e25d2a01">Ermal Meta - Un milione di cose da dirti - Sanremo - in collegamento da Costa Toscana - 2 serata - 2-2-22 -.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b6e25d2a01')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b6e25d2a01')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b6e25d2a01')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Vietato morire</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Vietato morire - 31-12-17.ts_snapshot_02.58.028.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Vietato morire - 31-12-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Vietato morire - 31-12-17.ts_snapshot_02.58.028.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Vietato morire - 31-12-17.ts.jpg">
+  <div class="tecnici-box" id="video_f3307f5e02">
+    <div class="riga1">1920x1080 - 8.5 Mb/s - 5 min 26 s</div>
+    <div>0.35 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f3307f5e02">AC-3 - L R - 192 kb/s - it</div>
+  <div class="notebox" id="note_f3307f5e02">Ermal Meta - Vietato morire - Capodanno in musica - 31-12-17  - Canale 5.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f3307f5e02')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f3307f5e02')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f3307f5e02')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Vietato morire - Battiti live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Vietato morire - Battiti live - 11-8-20.ts_snapshot_02.16.287.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Vietato morire - Battiti live - 11-8-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Vietato morire - Battiti live - 11-8-20.ts_snapshot_02.16.287.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Vietato morire - Battiti live - 11-8-20.ts.jpg">
+  <div class="tecnici-box" id="video_5aefc56a2f">
+    <div class="riga1">1920x1080 - 7.5 Mb/s - 4 min 13 s</div>
+    <div>0.24 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5aefc56a2f">AC-3 - L R - 192 kb/s - it<br>MPEG Audio - 128 kb/s - en</div>
+  <div class="notebox" id="note_5aefc56a2f">Ermal Meta - Vietato morire - Battiti live - 11-8-20.ts - Italia Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5aefc56a2f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5aefc56a2f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5aefc56a2f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Vietato morire - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Vietato morire - Sanremo - 7-2-17.ts_snapshot_03.26.545.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Vietato morire - Sanremo - 7-2-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Vietato morire - Sanremo - 7-2-17.ts_snapshot_03.26.545.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Vietato morire - Sanremo - 7-2-17.ts.jpg">
+  <div class="tecnici-box" id="video_a4600fd1a0">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 45 s</div>
+    <div>0.90 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a4600fd1a0">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_a4600fd1a0">Ermal Meta - Vietato morire - Sanremo - 1 Serata - 7-2-17.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a4600fd1a0')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a4600fd1a0')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a4600fd1a0')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Vietato morire - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Vietato morire - Sanremo - 13-2-25.ts_snapshot_01.30.011.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Vietato morire - Sanremo - 13-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Vietato morire - Sanremo - 13-2-25.ts_snapshot_01.30.011.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Vietato morire - Sanremo - 13-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_b8d5f963fd">
+    <div class="riga1">3840x2160 - 19.4 Mb/s - 4 min 15 s</div>
+    <div>0.63 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b8d5f963fd">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_b8d5f963fd">Ermal Meta - Vietato morire - Sanremo - 3 serata - 13-2-25 - dal Suzuki stage - Rai 4K.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b8d5f963fd')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b8d5f963fd')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b8d5f963fd')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Vietato morire - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Vietato morire - Sanremo - 13-2-25.mkv_snapshot_01.22.493.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Vietato morire - Sanremo - 13-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Vietato morire - Sanremo - 13-2-25.mkv_snapshot_01.22.493.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Vietato morire - Sanremo - 13-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_f9dba2874c">
+    <div class="riga1">1920x1080 - 25.7 Mb/s - 4 min 22 s</div>
+    <div>0.83 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f9dba2874c">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_f9dba2874c">Ermal Meta - Vietato morire - Festival di Sanremo - Terza serata - 13-2-25 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f9dba2874c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f9dba2874c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f9dba2874c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Vietato morire - Wind Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Vietato morire - Wind Music Awards - 5-6-17.ts_snapshot_02.57.690.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Vietato morire - Wind Music Awards - 5-6-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Vietato morire - Wind Music Awards - 5-6-17.ts_snapshot_02.57.690.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Vietato morire - Wind Music Awards - 5-6-17.ts.jpg">
+  <div class="tecnici-box" id="video_3007ac3704">
+    <div class="riga1">1920x1080 - 19.1 Mb/s - 4 min 57 s</div>
+    <div>0.72 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3007ac3704">MPEG Audio - 256 kb/s - one<br>MPEG Audio - 256 kb/s - two</div>
+  <div class="notebox" id="note_3007ac3704">Ermal Meta - Vietato morire - Wind Music Awards - 5-6-17.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3007ac3704')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3007ac3704')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3007ac3704')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #87A96B;" data-stars="0">
+  <div class="card-title" style="color:#516540;">Ermal Meta - Yoga Radio Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - Yoga Radio Estate - 24-6-25.ts_snapshot_11.17.688.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - Yoga Radio Estate - 24-6-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - Yoga Radio Estate - 24-6-25.ts_snapshot_11.17.688.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - Yoga Radio Estate - 24-6-25.ts.jpg">
+  <div class="tecnici-box" id="video_21658395da">
+    <div class="riga1">1920x1080 - 10 Mb/s - 12 min 3 s</div>
+    <div>0.91 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_21658395da">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_21658395da">Ermal Meta - Dall'alba al tramonto - Ferma gli orologi - Ragazza Paradiso - Yoga Radio Estate - 24-6-25 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#87A96B;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('21658395da')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('21658395da')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('21658395da')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

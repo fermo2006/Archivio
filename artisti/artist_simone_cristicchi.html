@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Simone Cristicchi</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#e8f6f2;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#8fd6bf; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Simone Cristicchi
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(11 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Simone Cristicchi - & Amara - La cura - Con il Cuore</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Simone Cristicchi - & Amara - La cura - Con il Cuore - 24-5-25.ts_snapshot_03.07.215.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Simone Cristicchi - & Amara - La cura - Con il Cuore - 24-5-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Simone Cristicchi - & Amara - La cura - Con il Cuore - 24-5-25.ts_snapshot_03.07.215.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Simone Cristicchi - & Amara - La cura - Con il Cuore - 24-5-25.ts.jpg">
+  <div class="tecnici-box" id="video_94e7b03318">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 7 min 44 s</div>
+    <div>1.64 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_94e7b03318">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_94e7b03318">Simone Cristicchi - & Amara - La cura - Con il Cuore - 24-5-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('94e7b03318')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('94e7b03318')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('94e7b03318')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Simone Cristicchi - & Amara - La cura - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Simone Cristicchi - & Amara - La cura - Sanremo - 14-2-25.ts_snapshot_02.20.497.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Simone Cristicchi - & Amara - La cura - Sanremo - 14-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Simone Cristicchi - & Amara - La cura - Sanremo - 14-2-25.ts_snapshot_02.20.497.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Simone Cristicchi - & Amara - La cura - Sanremo - 14-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_482537d6cb">
+    <div class="riga1">1920x1080 - 27.2 Mb/s - 5 min 39 s</div>
+    <div>1.20 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_482537d6cb">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_482537d6cb">Simone Cristicchi - & Amara - La cura - Sanremo - 14-2-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('482537d6cb')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('482537d6cb')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('482537d6cb')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Simone Cristicchi - & Enrico Nigiotti - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Enrico Nigiotti - & Simone Cristicchi - Sanremo - 6-2-20.ts_snapshot_04.36.724.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Enrico Nigiotti - & Simone Cristicchi - Sanremo - 6-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Enrico Nigiotti - & Simone Cristicchi - Sanremo - 6-2-20.ts_snapshot_04.36.724.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Enrico Nigiotti - & Simone Cristicchi - Sanremo - 6-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_affdba1d53">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 4 min 49 s</div>
+    <div>0.90 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_affdba1d53">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_affdba1d53">Simone Cristicchi - & Enrico Nigiotti - Ti regalero' una rosa - Sanremo - 6-2-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('affdba1d53')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('affdba1d53')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('affdba1d53')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Simone Cristicchi - Abbi cura di me - Con il cuore</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Simone Cristicchi - Abbi cura di me - Con il cuore - 10-6-19.ts_snapshot_02.50.467.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Simone Cristicchi - Abbi cura di me - Con il cuore - 10-6-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Simone Cristicchi - Abbi cura di me - Con il cuore - 10-6-19.ts_snapshot_02.50.467.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Simone Cristicchi - Abbi cura di me - Con il cuore - 10-6-19.ts.jpg">
+  <div class="tecnici-box" id="video_3411b34cf4">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 6 min 16 s</div>
+    <div>0.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3411b34cf4">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_3411b34cf4">Simone Cristicchi - Abbi cura di me - Con il cuore - 10-6-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3411b34cf4')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3411b34cf4')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3411b34cf4')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Simone Cristicchi - Abbi cura di me - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Simone Cristicchi - Abbi cura di me - Sanremo - 5-2-19.ts_snapshot_02.39.859.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Simone Cristicchi - Abbi cura di me - Sanremo - 5-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Simone Cristicchi - Abbi cura di me - Sanremo - 5-2-19.ts_snapshot_02.39.859.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Simone Cristicchi - Abbi cura di me - Sanremo - 5-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_d4699fbb66">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 3 s</div>
+    <div>0.96 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d4699fbb66">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_d4699fbb66">Simone Cristicchi - Abbi cura di me - Sanremo - 5-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d4699fbb66')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d4699fbb66')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d4699fbb66')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Simone Cristicchi - Abbi cura di me - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Simone Cristicchi - Abbi cura di me - Sanremo - 7-2-19.ts_snapshot_02.45.769.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Simone Cristicchi - Abbi cura di me - Sanremo - 7-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Simone Cristicchi - Abbi cura di me - Sanremo - 7-2-19.ts_snapshot_02.45.769.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Simone Cristicchi - Abbi cura di me - Sanremo - 7-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_1ba3966b79">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 40 s</div>
+    <div>0.97 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1ba3966b79">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_1ba3966b79">Simone Cristicchi - Abbi cura di me - Sanremo - 7-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1ba3966b79')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1ba3966b79')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1ba3966b79')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Simone Cristicchi - Abbi cura di me - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Simone Cristicchi - Abbi cura di me - Sanremo - 9-2-19.ts_snapshot_02.03.430.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Simone Cristicchi - Abbi cura di me - Sanremo - 9-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Simone Cristicchi - Abbi cura di me - Sanremo - 9-2-19.ts_snapshot_02.03.430.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Simone Cristicchi - Abbi cura di me - Sanremo - 9-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_28ce266f2a">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 33 s</div>
+    <div>0.94 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_28ce266f2a">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_28ce266f2a">Simone Cristicchi - Abbi cura di me - Sanremo - 9-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('28ce266f2a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('28ce266f2a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('28ce266f2a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Simone Cristicchi - Con il cuore</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Simone Cristicchi - Con il cuore - 24-5-25.ts_snapshot_01.41.789.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Simone Cristicchi - Con il cuore - 24-5-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Simone Cristicchi - Con il cuore - 24-5-25.ts_snapshot_01.41.789.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Simone Cristicchi - Con il cuore - 24-5-25.ts.jpg">
+  <div class="tecnici-box" id="video_0e4778dc8f">
+    <div class="riga1">1920x1080 - 19.3 Mb/s - 6 min 13 s</div>
+    <div>0.91 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_0e4778dc8f">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_0e4778dc8f">Simone Cristicchi - Con il cuore - 24-5-25.ts - Quando sarai piccola - La cura - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('0e4778dc8f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('0e4778dc8f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('0e4778dc8f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Simone Cristicchi - Quando sarai piccola - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Simone Cristicchi - Quando sarai piccola - Sanremo - 15-2-25.ts_snapshot_03.15.127.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Simone Cristicchi - Quando sarai piccola - Sanremo - 15-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Simone Cristicchi - Quando sarai piccola - Sanremo - 15-2-25.ts_snapshot_03.15.127.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Simone Cristicchi - Quando sarai piccola - Sanremo - 15-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_ce1d951f9d">
+    <div class="riga1">1920x1080 - 25.7 Mb/s - 4 min 16 s</div>
+    <div>0.89 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ce1d951f9d">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_ce1d951f9d">Simone Cristicchi - Quando sarai piccola - Sanremo - 15-2-25.ts - Serata finale - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ce1d951f9d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ce1d951f9d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ce1d951f9d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Simone Cristicchi - Quando sarai piccola - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Simone Cristicchi - Quando sarai piccola - Sanremo - 11-2-25.ts_snapshot_01.40.000.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Simone Cristicchi - Quando sarai piccola - Sanremo - 11-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Simone Cristicchi - Quando sarai piccola - Sanremo - 11-2-25.ts_snapshot_01.40.000.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Simone Cristicchi - Quando sarai piccola - Sanremo - 11-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_43a0dfbde1">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 4 min 40 s</div>
+    <div>0.98 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_43a0dfbde1">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_43a0dfbde1">Simone Cristicchi - Quando sarai piccola - Sanremo - 11-2-25.ts - 1 serata - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('43a0dfbde1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('43a0dfbde1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('43a0dfbde1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Simone Cristicchi - Quando sarai piccola - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Simone Cristicchi - Quando sarai piccola - Sanremo - 12-2-25.mkv_snapshot_06.17.120.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Simone Cristicchi - Quando sarai piccola - Sanremo - 12-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Simone Cristicchi - Quando sarai piccola - Sanremo - 12-2-25.mkv_snapshot_06.17.120.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Simone Cristicchi - Quando sarai piccola - Sanremo - 12-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_97e015414b">
+    <div class="riga1">1920x1080 - 27.2 Mb/s - 8 min 33 s</div>
+    <div>1.64 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_97e015414b">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_97e015414b">Simone Cristicchi - Quando sarai piccola - Sanremo - 12-2-25.mkv - 2 serata - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('97e015414b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('97e015414b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('97e015414b')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

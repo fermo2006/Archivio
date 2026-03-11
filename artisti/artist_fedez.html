@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Fedez</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#e8f6f2;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#8fd6bf; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Fedez
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(6 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Fedez - & Articolo 31 - Medley Articolo 31 - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fedez - & Articolo 31 - Medley Articolo 31 - Sanremo - 10-2-23.ts_snapshot_02.25.182.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fedez - & Articolo 31 - Medley Articolo 31 - Sanremo - 10-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fedez - & Articolo 31 - Medley Articolo 31 - Sanremo - 10-2-23.ts_snapshot_02.25.182.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fedez - & Articolo 31 - Medley Articolo 31 - Sanremo - 10-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_2a0c12fdb0">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 56 s</div>
+    <div>1.02 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2a0c12fdb0">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_2a0c12fdb0">Fedez - & Articolo 31 - Medley Articolo 31 - Sanremo - 10-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2a0c12fdb0')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2a0c12fdb0')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2a0c12fdb0')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Fedez - & Marco Masini - Bella stronza - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fedez - & Marco Masini - Bella stronza - Sanremo - 14-2-25.ts_snapshot_00.36.493.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fedez - & Marco Masini - Bella stronza - Sanremo - 14-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fedez - & Marco Masini - Bella stronza - Sanremo - 14-2-25.ts_snapshot_00.36.493.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fedez - & Marco Masini - Bella stronza - Sanremo - 14-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_4c239dfb1f">
+    <div class="riga1">1920x1080 - 25.9 Mb/s - 3 min 55 s</div>
+    <div>0.82 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4c239dfb1f">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_4c239dfb1f">Fedez - & Marco Masini - Bella stronza - Sanremo - 4 serata - 14-2-25 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4c239dfb1f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4c239dfb1f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4c239dfb1f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Fedez - Battito  - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fedez - Battito  - Sanremo - 12-2-25.mkv_snapshot_01.50.640.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fedez - Battito  - Sanremo - 12-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fedez - Battito  - Sanremo - 12-2-25.mkv_snapshot_01.50.640.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fedez - Battito  - Sanremo - 12-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_44b4c06348">
+    <div class="riga1">1920x1080 - 25.3 Mb/s - 4 min 33 s</div>
+    <div>0.85 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_44b4c06348">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_44b4c06348">Fedez - Battito  - Sanremo - 12-2-25.mkv - 2 serata - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('44b4c06348')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('44b4c06348')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('44b4c06348')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Fedez - Battito  - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fedez - Battito  - Sanremo  - 12-2-25.mkv_snapshot_03.47.060.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fedez - Battito  - Sanremo  - 12-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fedez - Battito  - Sanremo  - 12-2-25.mkv_snapshot_03.47.060.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fedez - Battito  - Sanremo  - 12-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_8dafef0d07">
+    <div class="riga1">3840x2160 - 19.4 Mb/s - 4 min 33 s</div>
+    <div>0.65 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8dafef0d07">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_8dafef0d07">Fedez - Battito  - Sanremo  - 12-2-25.mkv - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8dafef0d07')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8dafef0d07')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8dafef0d07')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Fedez - Battito - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fedez - Battito - Sanremo - 15-2-25.ts_snapshot_00.50.560.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fedez - Battito - Sanremo - 15-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fedez - Battito - Sanremo - 15-2-25.ts_snapshot_00.50.560.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fedez - Battito - Sanremo - 15-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_d5f307a943">
+    <div class="riga1">1920x1080 - 25.5 Mb/s - 4 min 35 s</div>
+    <div>0.95 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d5f307a943">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_d5f307a943">Fedez - Battito - Sanremo - 15-2-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d5f307a943')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d5f307a943')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d5f307a943')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Fedez - Freestyle - Problemi con tutti  - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fedez - Freestyle - Problemi con tutti  - Sanremo - 8-2-23.ts_snapshot_01.41.819.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fedez - Freestyle - Problemi con tutti  - Sanremo - 8-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fedez - Freestyle - Problemi con tutti  - Sanremo - 8-2-23.ts_snapshot_01.41.819.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fedez - Freestyle - Problemi con tutti  - Sanremo - 8-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_1399788ad1">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 3 min 57 s</div>
+    <div>0.82 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1399788ad1">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_1399788ad1">Fedez - Freestyle - Problemi con tutti  - Sanremo - 8-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1399788ad1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1399788ad1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1399788ad1')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

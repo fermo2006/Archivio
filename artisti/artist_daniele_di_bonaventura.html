@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Daniele Di Bonaventura</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#d8d4d2;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#3D2B1F; color:#fff; padding:8px 30px; border-radius:12px; margin:0;">
+  Daniele Di Bonaventura
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(11 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #3D2B1F;" data-stars="0">
+  <div class="card-title" style="color:#241912;">Daniele di Bonaventura</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Daniele di Bonaventura - 27-2-21.ts_snapshot_00.54.35.091.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Daniele di Bonaventura - 27-2-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Daniele di Bonaventura - 27-2-21.ts_snapshot_00.54.35.091.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Daniele di Bonaventura - 27-2-21.ts.jpg">
+  <div class="tecnici-box" id="video_22631a0da1">
+    <div class="riga1">1920x1080 - 3.8 Mb/s - 1 h 1 min</div>
+    <div>2.08 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_22631a0da1">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_22631a0da1">Daniele di Bonaventura - TangoSuite - 27-2-21<br>Dal Teatro dell'Aquila di Fermo - Rai 5 - trasmesso il 27-5-21<br>Omaggio a Piazzolla <br><br>Daniele di Bonaventura - Bandoneon,Arrangiamenti e Direzione<br><br>Orchestra Filarmonica Marchigiana<br><br>Gardel's Tango Suite - Carlos Gardel - arrangiamento Daniele di Bonaventura<br>   1. Sus ojos se cerraron<br>   2. Lejana tierra mia<br>   3. Por una cabeza<br>Piazzolla's Tango Suite - Astor Piazzolla - arrangiamento Daniele di Bonaventura<br>   1. Cafè 1930<br>   2. Prelude to the cyclical night<br>   3. Jeanne y Paul<br>   4. El penultimo<br>Tango Suite - Daniele di Bonaventura<br>   1. Valzer<br>   2. Milonga dell'assenza<br>   3. Tango<br>El Choclo - Angel Gregorio Villoldo Arroyo - arrangiamento Daniele di Bonaventura</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#3D2B1F;color:#fff;" title="Daniele di Bonaventura">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('22631a0da1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('22631a0da1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('22631a0da1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #3D2B1F;" data-stars="0">
+  <div class="card-title" style="color:#241912;">Daniele di Bonaventura</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Daniele di Bonaventura - 25-4-21.mp4_snapshot_10.22.473.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Daniele di Bonaventura - 25-4-21.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Daniele di Bonaventura - 25-4-21.mp4_snapshot_10.22.473.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Daniele di Bonaventura - 25-4-21.mp4.jpg">
+  <div class="tecnici-box" id="video_cbf6703d3a">
+    <div class="riga1">1920x1080 - 16.9 Mb/s - 10 min 33 s</div>
+    <div>1.26 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_cbf6703d3a">AAC - L R - 192 kb/s - en</div>
+  <div class="notebox" id="note_cbf6703d3a">Daniele di Bonaventura - 25-4-21 - Rai Uno<br>con Marcello Peghin alla chitarra 10 corde<br>Celebrazione del 76° Anniversario della Liberazione al Quirinale<br>Inno nazionale - <br>Reminiscenze -<br>Bella Ciao -</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#3D2B1F;color:#fff;" title="Daniele di Bonaventura">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('cbf6703d3a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('cbf6703d3a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('cbf6703d3a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #3D2B1F;" data-stars="0">
+  <div class="card-title" style="color:#241912;">Daniele di Bonaventura - & Ornella Vanoni</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Daniele di Bonaventura - & Ornella Vanoni - 27-4-24.ts_snapshot_10.35.794.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Daniele di Bonaventura - & Ornella Vanoni - 27-4-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Daniele di Bonaventura - & Ornella Vanoni - 27-4-24.ts_snapshot_10.35.794.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Daniele di Bonaventura - & Ornella Vanoni - 27-4-24.ts.jpg">
+  <div class="tecnici-box" id="video_3072c920a5">
+    <div class="riga1">1920x1080 - 13 Mb/s - 19 min 57 s</div>
+    <div>2.24 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3072c920a5">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_3072c920a5">Daniele di Bonaventura - con Ornella Vanoni - 27-4-24 - Perduto - Ricetta di donna - Accendi una luna nel cielo - La voglia la pazzia l'incoscienza l'allegria..- Dune mosse Feed  - con Paolo Fresu<br>da Senza Fine - Dal Teatro degli Arcimboldi - Milano</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#3D2B1F;color:#fff;" title="Daniele di Bonaventura">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3072c920a5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3072c920a5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3072c920a5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #3D2B1F;" data-stars="0">
+  <div class="card-title" style="color:#241912;">Daniele di Bonaventura - & Paolo Fresu - Ave Regina gloriosa</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Daniele di Bonaventura - & Paolo Fresu - Ave Regina gloriosa.ts_snapshot_07.51.330.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Daniele di Bonaventura - & Paolo Fresu - Ave Regina gloriosa.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Daniele di Bonaventura - & Paolo Fresu - Ave Regina gloriosa.ts_snapshot_07.51.330.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Daniele di Bonaventura - & Paolo Fresu - Ave Regina gloriosa.ts.jpg">
+  <div class="tecnici-box" id="video_65e92d98ac">
+    <div class="riga1">1920x1080 - 11.1 Mb/s - 9 min 6 s</div>
+    <div>0.77 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_65e92d98ac">MPEG Audio - 192 kb/s - it<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_65e92d98ac">Daniele di Bonaventura - & Paolo Fresu - Ave Regina gloriosa - Concerto di Natale -    25-12-17 - Assisi - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#3D2B1F;color:#fff;" title="Daniele di Bonaventura">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('65e92d98ac')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('65e92d98ac')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('65e92d98ac')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #3D2B1F;" data-stars="0">
+  <div class="card-title" style="color:#241912;">Daniele di Bonaventura - & Paolo Fresu - Concerto di Natale</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Daniele di Bonaventura - & Paolo Fresu - Concerto di Natale - 25-12-17.ts_snapshot_09.58.800.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Daniele di Bonaventura - & Paolo Fresu - Concerto di Natale - 25-12-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Daniele di Bonaventura - & Paolo Fresu - Concerto di Natale - 25-12-17.ts_snapshot_09.58.800.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Daniele di Bonaventura - & Paolo Fresu - Concerto di Natale - 25-12-17.ts.jpg">
+  <div class="tecnici-box" id="video_e26c3dbcb6">
+    <div class="riga1">1920x1080 - 10.7 Mb/s - 10 min 8 s</div>
+    <div>0.83 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e26c3dbcb6">MPEG Audio - 192 kb/s - it<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_e26c3dbcb6">Daniele di Bonaventura - & Paolo Fresu - Concerto di Natale - 25-12-17.ts             Adeste Fideles - Naschid'est in sa cabanna<br>Concerto di Natale da Assisi.ts  - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#3D2B1F;color:#fff;" title="Daniele di Bonaventura">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e26c3dbcb6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e26c3dbcb6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e26c3dbcb6')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #3D2B1F;" data-stars="0">
+  <div class="card-title" style="color:#241912;">Daniele di Bonaventura - & Paolo Fresu - Festa della Musica</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Daniele di Bonaventura - & Paolo Fresu - Festa della Musica - 21-6-20.mp4_snapshot_00.16.27.714.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Daniele di Bonaventura - & Paolo Fresu - Festa della Musica - 21-6-20.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Daniele di Bonaventura - & Paolo Fresu - Festa della Musica - 21-6-20.mp4_snapshot_00.16.27.714.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Daniele di Bonaventura - & Paolo Fresu - Festa della Musica - 21-6-20.mp4.jpg">
+  <div class="tecnici-box" id="video_60c7934cf5">
+    <div class="riga1">1280x720 - 1.1 Mb/s - 1 h 48 min</div>
+    <div>0.97 GB - 30 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_60c7934cf5">AAC - L R - 127 kb/s - en</div>
+  <div class="notebox" id="note_60c7934cf5">Daniele Bonaventura - & Paolo Fresu - Festa della Musica - 21-6-20.ts - Streaming<br>con Orchestra di Perugia - Michele Rabbia, Marco Bardoscia.<br>Valle dei Templi Agrigento</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#3D2B1F;color:#fff;" title="Daniele di Bonaventura">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('60c7934cf5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('60c7934cf5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('60c7934cf5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #3D2B1F;" data-stars="0">
+  <div class="card-title" style="color:#241912;">Daniele di Bonaventura - & Paolo Fresu - Mistico Mediterraneo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Daniele di Bonaventura - & Paolo Fresu - Mistico Mediterraneo.mkv_snapshot_00.00.27.173.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Daniele di Bonaventura - & Paolo Fresu - Mistico Mediterraneo.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Daniele di Bonaventura - & Paolo Fresu - Mistico Mediterraneo.mkv_snapshot_00.00.27.173.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Daniele di Bonaventura - & Paolo Fresu - Mistico Mediterraneo.mkv.jpg">
+  <div class="tecnici-box" id="video_b928792e28">
+    <div class="riga1">720x576 -  - 1 h 20 min</div>
+    <div>3.82 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b928792e28">AAC - L R</div>
+  <div class="notebox" id="note_b928792e28">Daniele di Bonaventura - & Paolo Fresu - Mistico Mediterraneo - Jazz sous les Pommiers - 31-5-11 - A Filetta<br>Rex Tremendae<br>Liberata<br>Da te a me<br>Le lac<br>Corale<br>Dies Irae<br>La Folie du Carinal<br>Figliolu d'ella <br>U Sipolcru<br>Scherzi Veranili<br>Sanctus<br>Benedictus<br>Litania<br>Gloria<br>Meditate - Mezzo Tv</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#3D2B1F;color:#fff;" title="Daniele di Bonaventura">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b928792e28')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b928792e28')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b928792e28')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #3D2B1F;" data-stars="0">
+  <div class="card-title" style="color:#241912;">Daniele di Bonaventura - & Paolo Fresu - Umbria Jazz</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Daniele di Bonaventura - & Paolo Fresu - Umbria Jazz - 20-7-20.mp4_snapshot_00.00.00.780.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Daniele di Bonaventura - & Paolo Fresu - Umbria Jazz - 20-7-20.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Daniele di Bonaventura - & Paolo Fresu - Umbria Jazz - 20-7-20.mp4_snapshot_00.00.00.780.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Daniele di Bonaventura - & Paolo Fresu - Umbria Jazz - 20-7-20.mp4.jpg">
+  <div class="tecnici-box" id="video_907cc3b9ea">
+    <div class="riga1">1920x1080 - 2.0 Mb/s - 1 h 33 min</div>
+    <div>1.39 GB - 30 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_907cc3b9ea">AAC - L R - 128 kb/s - en</div>
+  <div class="notebox" id="note_907cc3b9ea">Daniele di Bonaventura - & Paolo Fresu - Umbria Jazz - 20-7-20 -  goes to University - Two fro Tree and Orchestra-.mp4 - Streaming</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#3D2B1F;color:#fff;" title="Daniele di Bonaventura">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('907cc3b9ea')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('907cc3b9ea')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('907cc3b9ea')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #3D2B1F;" data-stars="0">
+  <div class="card-title" style="color:#241912;">Daniele di Bonaventura - Rigas Ritmi 2024</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Daniele di Bonaventura - Rigas Ritmi 2024.mp4_snapshot_00.38.08.680.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Daniele di Bonaventura - Rigas Ritmi 2024.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Daniele di Bonaventura - Rigas Ritmi 2024.mp4_snapshot_00.38.08.680.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Daniele di Bonaventura - Rigas Ritmi 2024.mp4.jpg">
+  <div class="tecnici-box" id="video_2c16789eb6">
+    <div class="riga1">1920x1080 - 3.0 Mb/s - 1 h 13 min</div>
+    <div>1.59 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2c16789eb6">AAC - L R - 128 kb/s</div>
+  <div class="notebox" id="note_2c16789eb6">Daniele di Bonaventura - Rigas Ritmi July 2024<br>ft Sinfonietta Riga<br>"Tango Suite"</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#3D2B1F;color:#fff;" title="Daniele di Bonaventura">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2c16789eb6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2c16789eb6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2c16789eb6')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #3D2B1F;" data-stars="0">
+  <div class="card-title" style="color:#241912;">Daniele di Bonaventura - Una traccia nell'infinito</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Daniele di Bonaventura - Una traccia nell'infinito - 29-7-24.ts_snapshot_08.41.628.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Daniele di Bonaventura - Una traccia nell'infinito - 29-7-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Daniele di Bonaventura - Una traccia nell'infinito - 29-7-24.ts_snapshot_08.41.628.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Daniele di Bonaventura - Una traccia nell'infinito - 29-7-24.ts.jpg">
+  <div class="tecnici-box" id="video_495424707c">
+    <div class="riga1">1920x1080 -  - 15 min 45 s</div>
+    <div>0.31 GB - ?? fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_495424707c">AAC - L R - en</div>
+  <div class="notebox" id="note_495424707c">Daniele di Bonaventura - Una traccia nell'infinito - 29-7-24 (Un ricordo di Oliver).ts         - HRT 1<br>Vela Luka - 29 Luglio 2024<br>Kad mi dodes ti - Dobro jutro tugo - Nista nova - Oprosti mi pape</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#3D2B1F;color:#fff;" title="Daniele di Bonaventura">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('495424707c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('495424707c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('495424707c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #3D2B1F;" data-stars="0">
+  <div class="card-title" style="color:#241912;">Daniele Di Bonaventura - Via dei Matti numero zero</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Daniele Di Bonaventura - Via dei Matti numero zero - 15-11-22.ts_snapshot_08.36.711.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Daniele Di Bonaventura - Via dei Matti numero zero - 15-11-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Daniele Di Bonaventura - Via dei Matti numero zero - 15-11-22.ts_snapshot_08.36.711.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Daniele Di Bonaventura - Via dei Matti numero zero - 15-11-22.ts.jpg">
+  <div class="tecnici-box" id="video_a35d519957">
+    <div class="riga1">1920x1080 - 7.8 Mb/s - 8 min 43 s</div>
+    <div>0.54 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a35d519957">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 384 kb/s - oth</div>
+  <div class="notebox" id="note_a35d519957">Daniele Di Bonaventura - Via dei Matti numero zero - (Rai Tre) - 15-11-22.ts -          Vola Vola Vola - El Choclo - con Stefano Bollani</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#3D2B1F;color:#fff;" title="Daniele di Bonaventura">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a35d519957')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a35d519957')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a35d519957')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

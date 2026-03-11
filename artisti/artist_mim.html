@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Mimì</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#e8f6f2;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#8fd6bf; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Mimì
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(12 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - Because the Night- XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - Because the Night- XFactor - 5-12-24.ts_snapshot_00.11.431.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - Because the Night- XFactor - 5-12-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - Because the Night- XFactor - 5-12-24.ts_snapshot_00.11.431.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - Because the Night- XFactor - 5-12-24.ts.jpg">
+  <div class="tecnici-box" id="video_13b5bc7b1c">
+    <div class="riga1">1920x1080 - 25.5 Mb/s - 2 min 4 s</div>
+    <div>0.42 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_13b5bc7b1c">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_13b5bc7b1c">Mimì - Because the Night- XFactor - 5-12-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('13b5bc7b1c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('13b5bc7b1c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('13b5bc7b1c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - Don’t Beat the Girl Out of My Boy - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - Don’t Beat the Girl Out of My Boy - XFactor - 24-10-24.ts_snapshot_05.54.862.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - Don’t Beat the Girl Out of My Boy - XFactor - 24-10-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - Don’t Beat the Girl Out of My Boy - XFactor - 24-10-24.ts_snapshot_05.54.862.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - Don’t Beat the Girl Out of My Boy - XFactor - 24-10-24.ts.jpg">
+  <div class="tecnici-box" id="video_03e06a3d0a">
+    <div class="riga1">1920x1080 - 27.7 Mb/s - 6 min 3 s</div>
+    <div>1.31 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_03e06a3d0a">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_03e06a3d0a">Mimì - Don’t Beat the Girl Out of My Boy - XFactor - 24-10-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('03e06a3d0a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('03e06a3d0a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('03e06a3d0a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - Dove si va - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - Dove si va - XFactor  - 5-12-24.ts_snapshot_03.48.779.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - Dove si va - XFactor  - 5-12-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - Dove si va - XFactor  - 5-12-24.ts_snapshot_03.48.779.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - Dove si va - XFactor  - 5-12-24.ts.jpg">
+  <div class="tecnici-box" id="video_2cfc2e5448">
+    <div class="riga1">1920x1080 - 25.5 Mb/s - 4 min 14 s</div>
+    <div>0.87 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_2cfc2e5448">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_2cfc2e5448">Mimì - Dove si va - XFactor  - 5-12-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2cfc2e5448')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2cfc2e5448')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2cfc2e5448')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - Dove si va - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - Dove si va - XFactor - 21-11-24.ts_snapshot_05.04.529.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - Dove si va - XFactor - 21-11-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - Dove si va - XFactor - 21-11-24.ts_snapshot_05.04.529.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - Dove si va - XFactor - 21-11-24.ts.jpg">
+  <div class="tecnici-box" id="video_8ed2af04d7">
+    <div class="riga1">1920x1080 - 25.5 Mb/s - 8 min 10 s</div>
+    <div>1.67 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_8ed2af04d7">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_8ed2af04d7">Mimì - Dove si va - XFactor - 21-11-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8ed2af04d7')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8ed2af04d7')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8ed2af04d7')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - Figures - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - Figures - XFactor - 14-11-24.ts_snapshot_01.09.666.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - Figures - XFactor - 14-11-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - Figures - XFactor - 14-11-24.ts_snapshot_01.09.666.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - Figures - XFactor - 14-11-24.ts.jpg">
+  <div class="tecnici-box" id="video_74237f5d2e">
+    <div class="riga1">1920x1080 - 26.3 Mb/s - 1 min 18 s</div>
+    <div>0.27 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_74237f5d2e">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_74237f5d2e">Mimì - Figures - XFactor - 14-11-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('74237f5d2e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('74237f5d2e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('74237f5d2e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - I will survive - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - I will survive - XFactor - 7-11-24.ts_snapshot_05.27.487.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - I will survive - XFactor - 7-11-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - I will survive - XFactor - 7-11-24.ts_snapshot_05.27.487.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - I will survive - XFactor - 7-11-24.ts.jpg">
+  <div class="tecnici-box" id="video_f6648b58d2">
+    <div class="riga1">1920x1080 - 26.1 Mb/s - 8 min 40 s</div>
+    <div>1.82 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_f6648b58d2">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_f6648b58d2">Mimì - I will survive - XFactor - 7-11-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f6648b58d2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f6648b58d2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f6648b58d2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - La sera dei miracoli - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - La sera dei miracoli - XFactor - 14-11-24 .ts_snapshot_04.21.768.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - La sera dei miracoli - XFactor - 14-11-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - La sera dei miracoli - XFactor - 14-11-24 .ts_snapshot_04.21.768.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - La sera dei miracoli - XFactor - 14-11-24.ts.jpg">
+  <div class="tecnici-box" id="video_2415bc686d">
+    <div class="riga1">1920x1080 - 25.9 Mb/s - 8 min 58 s</div>
+    <div>1.86 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_2415bc686d">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_2415bc686d">Mimì - La sera dei miracoli - XFactor - 14-11-24 .ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2415bc686d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2415bc686d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2415bc686d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - Lilac Wine - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - Lilac Wine - XFactor  - 21-11-24.ts_snapshot_02.42.488.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - Lilac Wine - XFactor  - 21-11-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - Lilac Wine - XFactor  - 21-11-24.ts_snapshot_02.42.488.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - Lilac Wine - XFactor  - 21-11-24.ts.jpg">
+  <div class="tecnici-box" id="video_6678e77da9">
+    <div class="riga1">1920x1080 - 25.5 Mb/s - 7 min 21 s</div>
+    <div>1.51 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_6678e77da9">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_6678e77da9">Mimì - Lilac Wine - XFactor  - 21-11-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6678e77da9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6678e77da9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6678e77da9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - Mi sei scoppiato dentro il cuore - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - Mi sei scoppiato dentro il cuore - XFactor - 28-11-24.ts_snapshot_05.05.071.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - Mi sei scoppiato dentro il cuore - XFactor - 28-11-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - Mi sei scoppiato dentro il cuore - XFactor - 28-11-24.ts_snapshot_05.05.071.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - Mi sei scoppiato dentro il cuore - XFactor - 28-11-24.ts.jpg">
+  <div class="tecnici-box" id="video_3c59bb9c7b">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 8 min 13 s</div>
+    <div>1.70 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_3c59bb9c7b">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_3c59bb9c7b">Mimì - Mi sei scoppiato dentro il cuore - XFactor - 28-11-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3c59bb9c7b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3c59bb9c7b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3c59bb9c7b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - Something On Your Mind - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - Something On Your Mind - XFactor - 31-10-24 .ts_snapshot_01.21.794.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - Something On Your Mind - XFactor - 31-10-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - Something On Your Mind - XFactor - 31-10-24 .ts_snapshot_01.21.794.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - Something On Your Mind - XFactor - 31-10-24.ts.jpg">
+  <div class="tecnici-box" id="video_b916baf155">
+    <div class="riga1">1920x1080 - 27.7 Mb/s - 2 min 12 s</div>
+    <div>0.47 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_b916baf155">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_b916baf155">Mimì - Something On Your Mind - XFactor - 31-10-24 .ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b916baf155')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b916baf155')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b916baf155')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - Strange Fruit - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - Strange Fruit - XFactor - 28-11-24.ts_snapshot_03.38.985.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - Strange Fruit - XFactor - 28-11-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - Strange Fruit - XFactor - 28-11-24.ts_snapshot_03.38.985.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - Strange Fruit - XFactor - 28-11-24.ts.jpg">
+  <div class="tecnici-box" id="video_4787430ca6">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 7 min 49 s</div>
+    <div>1.64 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_4787430ca6">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_4787430ca6">Mimì - Strange Fruit - XFactor - 28-11-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4787430ca6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4787430ca6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4787430ca6')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mimì - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mimì - XFactor - 5-12-24.ts_snapshot_04.47.497.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mimì - XFactor - 5-12-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mimì - XFactor - 5-12-24.ts_snapshot_04.47.497.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mimì - XFactor - 5-12-24.ts.jpg">
+  <div class="tecnici-box" id="video_c39841737f">
+    <div class="riga1">1920x1080 - 25.3 Mb/s - 9 min 23 s</div>
+    <div>1.91 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_c39841737f">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_c39841737f">Mimì - XFactor - 5-12-24.ts - Figures _Mi sei scoppiato dentro il cuore _La sera dei miracoli - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c39841737f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c39841737f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c39841737f')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

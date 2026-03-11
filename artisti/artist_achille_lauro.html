@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Achille Lauro</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#fff2cc;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#FFBF00; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Achille Lauro
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(39 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - 1-5-25.mp4_snapshot_01.27.192.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - 1-5-25.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - 1-5-25.mp4_snapshot_01.27.192.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - 1-5-25.mp4.jpg">
+  <div class="tecnici-box" id="video_333f88c14f">
+    <div class="riga1">1920x1080 - 16.1 Mb/s - 13 min 40 s</div>
+    <div>1.63 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_333f88c14f">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_333f88c14f">Achille Lauro - 1-5-25.mp4 - Incoscienti giovani - Amor - Amore Disperato<br>- Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('333f88c14f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('333f88c14f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('333f88c14f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - 1-5-25.mkv_snapshot_12.23.280.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - 1-5-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - 1-5-25.mkv_snapshot_12.23.280.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - 1-5-25.mkv.jpg">
+  <div class="tecnici-box" id="video_d7e3528763">
+    <div class="riga1">3840x2160 - 19.5 Mb/s - 12 min 38 s</div>
+    <div>1.81 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d7e3528763">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_d7e3528763">Achille Lauro - Roma - Concerto 1 Maggio 2025.mkv - Incoscienti giovani - Amor - Amore Disperato - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d7e3528763')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d7e3528763')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d7e3528763')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - & Annalisa - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - & Annalisa - Sanremo - 6-2-20.ts_snapshot_01.35.033.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - & Annalisa - Sanremo - 6-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - & Annalisa - Sanremo - 6-2-20.ts_snapshot_01.35.033.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - & Annalisa - Sanremo - 6-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_4444f38cb1">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 4 min 57 s</div>
+    <div>0.93 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4444f38cb1">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_4444f38cb1">Achille Lauro - & Annalisa - Sanremo - 6-2-20.ts - Gli uomini non cambiano - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4444f38cb1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4444f38cb1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4444f38cb1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - & Elodie - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - & Elodie - Sanremo - 4-2-25.ts_snapshot_01.07.638.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - & Elodie - Sanremo - 4-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - & Elodie - Sanremo - 4-2-25.ts_snapshot_01.07.638.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - & Elodie - Sanremo - 4-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_dfd0cd999f">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 5 min 43 s</div>
+    <div>1.20 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_dfd0cd999f">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_dfd0cd999f">Achille Lauro - & Elodie - A mano a mano - Folle citta' - Sanremo - 4 serata - 14-2-25 - Feed.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dfd0cd999f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dfd0cd999f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dfd0cd999f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - & Fiorella Mannoia - Seat Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - & Fiorella Mannoia - Seat Music Awards - 5-9-20.ts_snapshot_03.03.671.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - & Fiorella Mannoia - Seat Music Awards - 5-9-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - & Fiorella Mannoia - Seat Music Awards - 5-9-20.ts_snapshot_03.03.671.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - & Fiorella Mannoia - Seat Music Awards - 5-9-20.ts.jpg">
+  <div class="tecnici-box" id="video_2417dae683">
+    <div class="riga1">1920x1080 - 29.7 Mb/s - 4 min 17 s</div>
+    <div>0.95 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2417dae683">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_2417dae683">Achille Lauro - & Fiorella Mannoia - C'est la vie - Seat Music Awards - Verona - 5-9-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2417dae683')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2417dae683')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2417dae683')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - & Loredana Berte' – Sei bellissima - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - & Loredana Berte' – Sei bellissima - Sanremo - 4-2-22.ts_snapshot_02.17.221.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - & Loredana Berte' – Sei bellissima - Sanremo - 4-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - & Loredana Berte' – Sei bellissima - Sanremo - 4-2-22.ts_snapshot_02.17.221.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - & Loredana Berte' – Sei bellissima - Sanremo - 4-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_6c50b477a4">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 7 min 15 s</div>
+    <div>1.50 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6c50b477a4">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_6c50b477a4">Achille Lauro - & Loredana Berte' – Sei bellissima - Sanremo - 4 serata - 4-2-22.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6c50b477a4')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6c50b477a4')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6c50b477a4')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - & Rose Villain - Power Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - & Rose Villain - Power Hits - 29-8-23.ts_snapshot_00.17.660.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - & Rose Villain - Power Hits - 29-8-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - & Rose Villain - Power Hits - 29-8-23.ts_snapshot_00.17.660.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - & Rose Villain - Power Hits - 29-8-23.ts.jpg">
+  <div class="tecnici-box" id="video_59d43a2ace">
+    <div class="riga1">1920x1080 - 18.6 Mb/s - 3 min 35 s</div>
+    <div>0.55 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_59d43a2ace">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_59d43a2ace">Achille Lauro - & Rose Villain - Fragole - Power Hits - 29-8-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('59d43a2ace')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('59d43a2ace')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('59d43a2ace')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - & Rose Villain - Radio Zeta</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - & Rose Villain - Radio Zeta - 10-6-23.mkv_snapshot_00.27.956.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - & Rose Villain - Radio Zeta - 10-6-23.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - & Rose Villain - Radio Zeta - 10-6-23.mkv_snapshot_00.27.956.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - & Rose Villain - Radio Zeta - 10-6-23.mkv.jpg">
+  <div class="tecnici-box" id="video_b4ccae0519">
+    <div class="riga1">1920x1080 -  - 7 min 9 s</div>
+    <div>0.98 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b4ccae0519">AAC - L R</div>
+  <div class="notebox" id="note_b4ccae0519">Achille Lauro - & Rose Villain - Radio Zeta - 10-6-23.mkv - Rolls Royce - Bam bam twist - Fragole con Rose Villain  - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b4ccae0519')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b4ccae0519')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b4ccae0519')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - 1969 - Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - 1969 - Power Hits Estate - 9-9-19.ts_snapshot_00.40.000.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - 1969 - Power Hits Estate - 9-9-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - 1969 - Power Hits Estate - 9-9-19.ts_snapshot_00.40.000.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - 1969 - Power Hits Estate - 9-9-19.ts.jpg">
+  <div class="tecnici-box" id="video_32babe8cee">
+    <div class="riga1">1920x1080 - 13.4 Mb/s - 4 min 4 s</div>
+    <div>0.47 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_32babe8cee">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_32babe8cee">Achille Lauro - 1969 - Power Hits Estate - Verona - 9-9-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('32babe8cee')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('32babe8cee')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('32babe8cee')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - amoR - Radio Zeta Future Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - amoR - Radio Zeta Future Hits - 1-6-25.mkv_snapshot_02.50.760.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - amoR - Radio Zeta Future Hits - 1-6-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - amoR - Radio Zeta Future Hits - 1-6-25.mkv_snapshot_02.50.760.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - amoR - Radio Zeta Future Hits - 1-6-25.mkv.jpg">
+  <div class="tecnici-box" id="video_100b8936c0">
+    <div class="riga1">1920x1080 - 20.3 Mb/s - 3 min 10 s</div>
+    <div>0.46 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_100b8936c0">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_100b8936c0">Achille Lauro - amoR - Radio Zeta Future Hits - 1-6-25.mkv - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('100b8936c0')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('100b8936c0')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('100b8936c0')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Bam bam twist - Power Hits estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Bam bam twist - Power Hits estate - 9-9-20.ts_snapshot_00.04.953.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Bam bam twist - Power Hits estate - 9-9-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Bam bam twist - Power Hits estate - 9-9-20.ts_snapshot_00.04.953.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Bam bam twist - Power Hits estate - 9-9-20.ts.jpg">
+  <div class="tecnici-box" id="video_96f727eff8">
+    <div class="riga1">1920x1080 - 27.8 Mb/s - 2 min 53 s</div>
+    <div>0.64 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_96f727eff8">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_96f727eff8">Achille Lauro - Bam bam twist - Power Hits estate - 9-9-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('96f727eff8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('96f727eff8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('96f727eff8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Battiti Live - Gallipoli</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Battiti Live - Gallipoli - 7-7-23.ts_snapshot_03.04.136.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Battiti Live - Gallipoli - 7-7-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Battiti Live - Gallipoli - 7-7-23.ts_snapshot_03.04.136.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Battiti Live - Gallipoli - 7-7-23.ts.jpg">
+  <div class="tecnici-box" id="video_709472009b">
+    <div class="riga1">1920x1080 - 19 Mb/s - 6 min 23 s</div>
+    <div>0.91 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_709472009b">MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_709472009b">Achille Lauro - Battiti Live - Gallipoli - 7-7-23.ts - Bam Bam Twist - Fragole con Rose Villain - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('709472009b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('709472009b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('709472009b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Domenica - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Domenica - Sanremo - 1-2-22.ts_snapshot_01.36.339.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Domenica - Sanremo - 1-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Domenica - Sanremo - 1-2-22.ts_snapshot_01.36.339.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Domenica - Sanremo - 1-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_b3bc19c4b7">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 53 s</div>
+    <div>1.22 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b3bc19c4b7">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_b3bc19c4b7">Achille Lauro - Domenica - Sanremo - 1-2-22 - 1 serata.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b3bc19c4b7')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b3bc19c4b7')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b3bc19c4b7')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Domenica - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Domenica - Sanremo - 3-2-22.ts_snapshot_02.16.832.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Domenica - Sanremo - 3-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Domenica - Sanremo - 3-2-22.ts_snapshot_02.16.832.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Domenica - Sanremo - 3-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_43cbf8d4e9">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 48 s</div>
+    <div>1.11 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_43cbf8d4e9">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_43cbf8d4e9">Achille Lauro - Domenica - Sanremo - 3 serata - 3-2-22.ts - feat. Harlem Gospel Choir - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('43cbf8d4e9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('43cbf8d4e9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('43cbf8d4e9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Domenica - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Domenica - Sanremo - 5-2-22.ts_snapshot_03.19.460.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Domenica - Sanremo - 5-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Domenica - Sanremo - 5-2-22.ts_snapshot_03.19.460.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Domenica - Sanremo - 5-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_ffec1da4b8">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 6 min</div>
+    <div>1.25 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ffec1da4b8">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_ffec1da4b8">Achille Lauro - Domenica - Sanremo - 5 serata - 5-2-22.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ffec1da4b8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ffec1da4b8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ffec1da4b8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Incoscienti  giovani - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 12-2-25 .mkv_snapshot_03.14.620.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Incoscienti  giovani - Sanremo - 12-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 12-2-25 .mkv_snapshot_03.14.620.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Incoscienti  giovani - Sanremo - 12-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_7a594eccc5">
+    <div class="riga1">3840x2160 - 19.2 Mb/s - 4 min 57 s</div>
+    <div>0.70 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7a594eccc5">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_7a594eccc5">Achille Lauro - Incoscienti giovani - Sanremo - 2 serata - 12-2-25 - Rai 4K.mkv</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7a594eccc5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7a594eccc5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7a594eccc5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Incoscienti giovani - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 11-2-25.ts_snapshot_04.08.041.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Incoscienti giovani - Sanremo - 11-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 11-2-25.ts_snapshot_04.08.041.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Incoscienti giovani - Sanremo - 11-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_dcc9e58b8b">
+    <div class="riga1">1920x1080 - 25.4 Mb/s - 4 min 52 s</div>
+    <div>1.00 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_dcc9e58b8b">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_dcc9e58b8b">Achille Lauro - Incoscienti giovani - Sanremo - 1 serata - 11-2-25 - Feed.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dcc9e58b8b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dcc9e58b8b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dcc9e58b8b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Incoscienti giovani - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 11-2-25.mkv_snapshot_01.27.277.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Incoscienti giovani - Sanremo - 11-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 11-2-25.mkv_snapshot_01.27.277.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Incoscienti giovani - Sanremo - 11-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_4dfeffeb97">
+    <div class="riga1">3840x2160 - 19.1 Mb/s - 5 min 6 s</div>
+    <div>0.72 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4dfeffeb97">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_4dfeffeb97">Achille Lauro - Incoscienti giovani - Sanremo - 1 serata - 11-2-25 - Rai 4K.mkv</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4dfeffeb97')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4dfeffeb97')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4dfeffeb97')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Incoscienti giovani - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 12-2-25.mkv_snapshot_02.15.200.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Incoscienti giovani - Sanremo - 12-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 12-2-25.mkv_snapshot_02.15.200.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Incoscienti giovani - Sanremo - 12-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_3ba7d26256">
+    <div class="riga1">1920x1080 - 27.2 Mb/s - 4 min 57 s</div>
+    <div>0.95 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3ba7d26256">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_3ba7d26256">Achille Lauro - Incoscienti giovani - Sanremo - 2 serata - 12-2-25 - Feed.mkv</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3ba7d26256')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3ba7d26256')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3ba7d26256')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Incoscienti giovani - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 15-2-25.mkv_snapshot_04.30.208.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Incoscienti giovani - Sanremo - 15-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 15-2-25.mkv_snapshot_04.30.208.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Incoscienti giovani - Sanremo - 15-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_6c3f13874b">
+    <div class="riga1">3840x2160 - 19.3 Mb/s - 5 min 16 s</div>
+    <div>0.75 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6c3f13874b">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_6c3f13874b">Achille Lauro - Incoscienti giovani - Sanremo - Finale - 15-2-25 - Rai 4K.mkv</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6c3f13874b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6c3f13874b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6c3f13874b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Incoscienti giovani - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 15-2-25.ts_snapshot_05.14.230.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Incoscienti giovani - Sanremo - 15-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Incoscienti giovani - Sanremo - 15-2-25.ts_snapshot_05.14.230.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Incoscienti giovani - Sanremo - 15-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_ac53a88408">
+    <div class="riga1">1920x1080 - 25.7 Mb/s - 5 min 16 s</div>
+    <div>1.10 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ac53a88408">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_ac53a88408">Achille Lauro - Incoscienti giovani - Sanremo - Serata finale - 15-2-25 - Feed.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ac53a88408')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ac53a88408')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ac53a88408')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Latte + - RTL 102,5 Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Latte + - RTL 102,5 Power Hits Estate - 31-8-21.ts_snapshot_00.09.147.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Latte + - RTL 102,5 Power Hits Estate - 31-8-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Latte + - RTL 102,5 Power Hits Estate - 31-8-21.ts_snapshot_00.09.147.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Latte + - RTL 102,5 Power Hits Estate - 31-8-21.ts.jpg">
+  <div class="tecnici-box" id="video_93f779a9a7">
+    <div class="riga1">1920x1080 - 18.6 Mb/s - 3 min 14 s</div>
+    <div>0.50 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_93f779a9a7">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_93f779a9a7">Achille Lauro - Latte + - RTL 102,5 Power Hits Estate - 31-8-21.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('93f779a9a7')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('93f779a9a7')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('93f779a9a7')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Love Mi</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Love Mi - 27-6-23.ts_snapshot_04.38.437.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Love Mi - 27-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Love Mi - 27-6-23.ts_snapshot_04.38.437.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Love Mi - 27-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_d498868874">
+    <div class="riga1">1920x1080 - 19.4 Mb/s - 10 min 35 s</div>
+    <div>1.59 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_d498868874">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_d498868874">Achille Lauro - Love Mi Milano - 27-6-23.ts - Cadillac 1920, Thoiry Remix (con Quentin40), Fragole (con Rose Villain), 16 marzo - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d498868874')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d498868874')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d498868874')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Me ne frego - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Me ne frego - Sanremo - 7-2-20.ts_snapshot_00.01.813.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Me ne frego - Sanremo - 7-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Me ne frego - Sanremo - 7-2-20.ts_snapshot_00.01.813.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Me ne frego - Sanremo - 7-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_41bb2dae26">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 5 min 21 s</div>
+    <div>1.00 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_41bb2dae26">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_41bb2dae26">Achille Lauro - Me ne frego - Sanremo - 7-2-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('41bb2dae26')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('41bb2dae26')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('41bb2dae26')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Me ne frego - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Me ne frego - Sanremo - 4-2-20.ts_snapshot_04.22.934.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Me ne frego - Sanremo - 4-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Me ne frego - Sanremo - 4-2-20.ts_snapshot_04.22.934.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Me ne frego - Sanremo - 4-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_f9b525408f">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 5 min 59 s</div>
+    <div>1.14 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f9b525408f">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>MPEG Audio - 256 kb/s - fr</div>
+  <div class="notebox" id="note_f9b525408f">Achille Lauro - Me ne frego - Sanremo - 4-2-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f9b525408f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f9b525408f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f9b525408f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Power Hits Estate - 9-9-20.ts_snapshot_00.04.590.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Power Hits Estate - 9-9-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Power Hits Estate - 9-9-20.ts_snapshot_00.04.590.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Power Hits Estate - 9-9-20.ts.jpg">
+  <div class="tecnici-box" id="video_9b79f5b2f4">
+    <div class="riga1">1920x1080 - 27.8 Mb/s - 2 min 50 s</div>
+    <div>0.63 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_9b79f5b2f4">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_9b79f5b2f4">Achille Lauro - Power Hits Estate - Verona - 9-9-20.ts - Bam Bam Twist - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9b79f5b2f4')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9b79f5b2f4')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9b79f5b2f4')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Radio Italia Live  - 30-5-25.ts_snapshot_12.17.704.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Radio Italia Live  - 30-5-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Radio Italia Live  - 30-5-25.ts_snapshot_12.17.704.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Radio Italia Live  - 30-5-25.ts.jpg">
+  <div class="tecnici-box" id="video_0cf25849bb">
+    <div class="riga1">1920x1080 - 31 Mb/s - 13 min 45 s</div>
+    <div>3.27 GB - ?? fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_0cf25849bb">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_0cf25849bb">Achille Lauro - Radio Italia Live - Il Concerto - 30-5-25 - Amore disperato_Amor_Incoscienti Giovani - Milano - 30-5-25 (420).ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('0cf25849bb')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('0cf25849bb')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('0cf25849bb')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Radio Italia Live - 30-5-25.ts_snapshot_07.57.736.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Radio Italia Live - 30-5-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Radio Italia Live - 30-5-25.ts_snapshot_07.57.736.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Radio Italia Live - 30-5-25.ts.jpg">
+  <div class="tecnici-box" id="video_10f225ca78">
+    <div class="riga1">1920x1080 - 27 Mb/s - 13 min 45 s</div>
+    <div>2.97 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_10f225ca78">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_10f225ca78">Achille Lauro - Amore disperato_Amor_Incoscienti Giovani - Radio Italia Live - Milano - 30-5-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('10f225ca78')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('10f225ca78')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('10f225ca78')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Radio Italia - Il concerto - 20-5-23.ts_snapshot_05.37.559.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Radio Italia - Il concerto - 20-5-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Radio Italia - Il concerto - 20-5-23.ts_snapshot_05.37.559.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Radio Italia - Il concerto - 20-5-23.ts.jpg">
+  <div class="tecnici-box" id="video_2874d81e27">
+    <div class="riga1">1920x1080 - 27 Mb/s - 11 min 13 s</div>
+    <div>2.42 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_2874d81e27">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_2874d81e27">Achille Lauro - Radio Italia - Il concerto - Milano - 20-5-23.ts - Medley - Rolls Royce/Me ne frego/Bam Bam Twist/Domenica, Fragole (con Rose Villain) e 16 Marzo - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2874d81e27')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2874d81e27')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2874d81e27')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Sanremo - 11-2-23.ts_snapshot_02.56.297.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Sanremo - 11-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Sanremo - 11-2-23.ts_snapshot_02.56.297.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Sanremo - 11-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_2877789ea3">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 54 s</div>
+    <div>1.00 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2877789ea3">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_2877789ea3">Achille Lauro - Medley - (Rolls Royce, Me ne frego,Bam bam twist, Domenica e 16 marzo) - Sanremo - 11-2-23.ts - dal Suzuki Stage - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2877789ea3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2877789ea3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2877789ea3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Sanremo - 3-3-21.ts_snapshot_02.30.307.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Sanremo - 3-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Sanremo - 3-3-21.ts_snapshot_02.30.307.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Sanremo - 3-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_71ee11ea16">
+    <div class="riga1">1920x1080 - 23.1 Mb/s - 5 min 4 s</div>
+    <div>0.97 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_71ee11ea16">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_71ee11ea16">Achille Lauro - Sanremo - 3-3-21.ts - 2 serata con Claudio Santamaria e Francesca Barra - Bam Bam Twist nel quadro Rock 'n' Roll - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('71ee11ea16')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('71ee11ea16')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('71ee11ea16')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Sanremo - 2-3-21.ts.ts_snapshot_05.41.891.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Sanremo - 2-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Sanremo - 2-3-21.ts.ts_snapshot_05.41.891.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Sanremo - 2-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_04df2edce5">
+    <div class="riga1">1920x1080 - 23.4 Mb/s - 6 min 50 s</div>
+    <div>1.32 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_04df2edce5">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_04df2edce5">Achille Lauro - Sanremo - 2-3-21 - 1 serata.ts - Solo noi nel quadro Glam Rock - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('04df2edce5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('04df2edce5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('04df2edce5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Sanremo - 5-3-21.ts_snapshot_01.19.215.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Sanremo - 5-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Sanremo - 5-3-21.ts_snapshot_01.19.215.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Sanremo - 5-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_10890ebd67">
+    <div class="riga1">1920x1080 - 24.1 Mb/s - 7 min 51 s</div>
+    <div>1.56 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_10890ebd67">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_10890ebd67">Achille Lauro - Sanremo - 5-3-21.ts - 4 serata con Boss Doms e Fiorello: Rolls Royce e Me ne frego nel quadro Punk Rock - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('10890ebd67')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('10890ebd67')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('10890ebd67')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Sanremo - 4-3-21.ts_snapshot_02.52.070.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Sanremo - 4-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Sanremo - 4-3-21.ts_snapshot_02.52.070.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Sanremo - 4-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_c047c0ec42">
+    <div class="riga1">1920x1080 - 24 Mb/s - 6 min 41 s</div>
+    <div>1.32 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_c047c0ec42">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_c047c0ec42">Achille Lauro - Sanremo - 4-3-21.ts - 3 serata con Emma e Monica Guerritore: Penelope nel quadro Popular Music - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c047c0ec42')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c047c0ec42')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c047c0ec42')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Sanremo - 6-3-21.ts_snapshot_03.03.918.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Sanremo - 6-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Sanremo - 6-3-21.ts_snapshot_03.03.918.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Sanremo - 6-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_1e4e229234">
+    <div class="riga1">1920x1080 - 22.1 Mb/s - 5 min 54 s</div>
+    <div>1.08 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1e4e229234">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_1e4e229234">Achille Lauro - Sanremo - 6-3-21.ts - 5 serata con Giacomo Castellana: C'est la vie nel quadro Esseri umani - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1e4e229234')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1e4e229234')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1e4e229234')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Seat Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Seat Music Awards - 9-9-21.ts_snapshot_03.56.014.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Seat Music Awards - 9-9-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Seat Music Awards - 9-9-21.ts_snapshot_03.56.014.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Seat Music Awards - 9-9-21.ts.jpg">
+  <div class="tecnici-box" id="video_f819dd34f8">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 4 min 7 s</div>
+    <div>0.86 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f819dd34f8">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_f819dd34f8">Achille Lauro - Latte + - Seat Music Awards - Arena di Verona - 9-9-21.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f819dd34f8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f819dd34f8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f819dd34f8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Stripper - Eurovision</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - Stripper - Eurovision - 12-5-22.ts_snapshot_00.34.387.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - Stripper - Eurovision - 12-5-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - Stripper - Eurovision - 12-5-22.ts_snapshot_00.34.387.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - Stripper - Eurovision - 12-5-22.ts.jpg">
+  <div class="tecnici-box" id="video_260635cac1">
+    <div class="riga1">1920x1080 - 35.6 Mb/s - 3 min 53 s</div>
+    <div>1.03 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_260635cac1">MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_260635cac1">Achille Lauro - Stripper - Eurovision - 12-5-22.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('260635cac1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('260635cac1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('260635cac1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - TIM Music Awards - 13-9-25.ts_snapshot_00.13.268.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - TIM Music Awards - 13-9-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - TIM Music Awards - 13-9-25.ts_snapshot_00.13.268.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - TIM Music Awards - 13-9-25.ts.jpg">
+  <div class="tecnici-box" id="video_c2ebe8ceb5">
+    <div class="riga1">1920x1080 - 20.2 Mb/s - 10 min 2 s</div>
+    <div>1.53 GB - ?? fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_c2ebe8ceb5">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_c2ebe8ceb5">Achille Lauro - TIM Music Awards - 13-9-25.ts - Senza una stupida storia - Incoscienti giovani - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c2ebe8ceb5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c2ebe8ceb5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c2ebe8ceb5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFBF00;" data-stars="0">
+  <div class="card-title" style="color:#997200;">Achille Lauro - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Achille Lauro - TIM Music Awards - 16-9-23.ts_snapshot_03.16.955.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Achille Lauro - TIM Music Awards - 16-9-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Achille Lauro - TIM Music Awards - 16-9-23.ts_snapshot_03.16.955.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Achille Lauro - TIM Music Awards - 16-9-23.ts.jpg">
+  <div class="tecnici-box" id="video_22ba590a93">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 8 min 28 s</div>
+    <div>1.76 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_22ba590a93">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_22ba590a93">Achille Lauro - TIM Music Awards - 16-9-23.ts - Thoiry - Rolls Royce - Bam Bam Twist - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFBF00;color:#222;" title="Achille Lauro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('22ba590a93')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('22ba590a93')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('22ba590a93')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

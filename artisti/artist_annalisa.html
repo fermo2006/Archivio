@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Annalisa</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#fee1e6;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#FC6C85; color:#fff; padding:8px 30px; border-radius:12px; margin:0;">
+  Annalisa
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(51 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - & Michele Bravi - Il mondo prima di te - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - & Michele Bravi - Il mondo prima di te - Sanremo - 9-2-18.ts_snapshot_00.02.102.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - & Michele Bravi - Il mondo prima di te - Sanremo - 9-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - & Michele Bravi - Il mondo prima di te - Sanremo - 9-2-18.ts_snapshot_00.02.102.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - & Michele Bravi - Il mondo prima di te - Sanremo - 9-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_a57224977d">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 3 min 53 s</div>
+    <div>0.80 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a57224977d">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_a57224977d">Annalisa con Michele Bravi - Il mondo prima di te  - Sanremo - 9-2-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a57224977d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a57224977d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a57224977d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - & Tananai  - Radio Italia</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - & Tananai  - Radio Italia - 27-6-24.ts_snapshot_00.22.579.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - & Tananai  - Radio Italia - 27-6-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - & Tananai  - Radio Italia - 27-6-24.ts_snapshot_00.22.579.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - & Tananai  - Radio Italia - 27-6-24.ts.jpg">
+  <div class="tecnici-box" id="video_ba76a8a47e">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 3 min 40 s</div>
+    <div>0.76 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_ba76a8a47e">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_ba76a8a47e">Annalisa - & Tananai  - Radio Italia - Il concerto - Napoli - 27-6-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ba76a8a47e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ba76a8a47e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ba76a8a47e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Battiti Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Battiti Live - 7-7-23.ts_snapshot_03.59.912.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Battiti Live - 7-7-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Battiti Live - 7-7-23.ts_snapshot_03.59.912.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Battiti Live - 7-7-23.ts.jpg">
+  <div class="tecnici-box" id="video_79e5627d1e">
+    <div class="riga1">1920x1080 - 19 Mb/s - 7 min 43 s</div>
+    <div>1.10 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_79e5627d1e">MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_79e5627d1e">Annalisa - Battiti Live - Gallipoli - 7-7-23.ts Mon Amour - Bellissima - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('79e5627d1e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('79e5627d1e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('79e5627d1e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Bellissima - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Bellissima - Sanremo - 9-2-23.ts_snapshot_02.03.187.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Bellissima - Sanremo - 9-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Bellissima - Sanremo - 9-2-23.ts_snapshot_02.03.187.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Bellissima - Sanremo - 9-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_343765000d">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 33 s</div>
+    <div>0.94 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_343765000d">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_343765000d">Annalisa - Bellissima - Sanremo - 9-2-23.ts in collegamento dal Suzuki Stage - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('343765000d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('343765000d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('343765000d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Combattente - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Combattente - Tim Music Awards - 16-9-23.ts_snapshot_00.11.635.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Combattente - Tim Music Awards - 16-9-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Combattente - Tim Music Awards - 16-9-23.ts_snapshot_00.11.635.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Combattente - Tim Music Awards - 16-9-23.ts.jpg">
+  <div class="tecnici-box" id="video_4189fb871f">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 8 min 33 s</div>
+    <div>1.78 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4189fb871f">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_4189fb871f">Annalisa - Combattente con Fiorella Mannoia e Alessandra Amoroso - TIM Music Awards - 16-9-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4189fb871f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4189fb871f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4189fb871f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Dieci - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Dieci - Sanremo - 2-3-21.ts_snapshot_01.33.220.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Dieci - Sanremo - 2-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Dieci - Sanremo - 2-3-21.ts_snapshot_01.33.220.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Dieci - Sanremo - 2-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_bd4ded4b9a">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 43 s</div>
+    <div>0.98 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_bd4ded4b9a">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_bd4ded4b9a">Annalisa - Dieci - Sanremo - 2-3-21 - 1 serata.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('bd4ded4b9a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('bd4ded4b9a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('bd4ded4b9a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Dieci - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Dieci - Sanremo - 5-3-21.ts_snapshot_00.38.690.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Dieci - Sanremo - 5-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Dieci - Sanremo - 5-3-21.ts_snapshot_00.38.690.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Dieci - Sanremo - 5-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_588c5c47d5">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 21 s</div>
+    <div>0.90 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_588c5c47d5">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_588c5c47d5">Annalisa - Dieci - Sanremo - 5-3-21 - 4 Serata.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('588c5c47d5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('588c5c47d5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('588c5c47d5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Dieci - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Dieci - Sanremo - 6-3-21.ts_snapshot_03.31.454.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Dieci - Sanremo - 6-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Dieci - Sanremo - 6-3-21.ts_snapshot_03.31.454.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Dieci - Sanremo - 6-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_b3429d9b59">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 31 s</div>
+    <div>0.94 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b3429d9b59">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_b3429d9b59">Annalisa - Dieci - Sanremo - 6-3-21.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b3429d9b59')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b3429d9b59')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b3429d9b59')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Disco Paradise - Love Mi</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Disco Paradise - Love Mi - 27-6-23.ts_snapshot_03.03.107.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Disco Paradise - Love Mi - 27-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Disco Paradise - Love Mi - 27-6-23.ts_snapshot_03.03.107.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Disco Paradise - Love Mi - 27-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_77f303f3b9">
+    <div class="riga1">1920x1080 - 19.4 Mb/s - 4 min 41 s</div>
+    <div>0.70 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_77f303f3b9">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_77f303f3b9">Annalisa con Fedez - Disco Paradise - Love Mi Milano - 27-6-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('77f303f3b9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('77f303f3b9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('77f303f3b9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Forum di Assago</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Forum di Assago - 4-11-23.mkv_snapshot_00.04.54.000.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Forum di Assago - 4-11-23.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Forum di Assago - 4-11-23.mkv_snapshot_00.04.54.000.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Forum di Assago - 4-11-23.mkv.jpg">
+  <div class="tecnici-box" id="video_367801105a">
+    <div class="riga1">1920x1080 -  - 2 h 21 min</div>
+    <div>18.27 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_367801105a">AAC - L R</div>
+  <div class="notebox" id="note_367801105a">Annalisa - Forum di Assago - 4-11-23.mkv - Feed - RTL 102,5<br>Il Glitch - (Video Introduction - Contains elements of "Euforia".)<br>Euforia - (Live debut)<br>La crisi a Saint-Tropez - (Live debut)<br>Se avessi un cuore<br>Alice e il blu<br>Un domani - (Annalisa feat. Mr. Rain song)<br>Amsterdam / Tsunami<br>Bonsai<br>Direzione la vita<br>Movimento lento<br>Aria - (Live debut)<br><br>Act 2<br>Scarabocchi - (Video Interlude - Contains elements of "Bye Bye".)<br>Bye Bye<br>Rosso Corallo - (Live debut)<br>La Proiezione - (Video Interlude)<br>Mon Amour<br>Diamante lei e luce lui / Una finestra tra le stelle / Senza riserva<br>Avocado toast - (Contains elements of "Bang Bang (My Baby Shot Me Down)" by Frank Sinatra.)<br>Vento sulla luna / Walking on the Moon <br>(w/ band introductions)<br><br>Act 3<br>Nuda - (Video Interlude - Contains elements of "Nuda".)<br>Nuda<br>Gommapiuma - (Live debut)<br>Bollicine - (Live debut)<br>Tropicana - (Boomdabash & Annalisa song)<br>DISCO PARADISE - (Fedez, Annalisa & Articolo 31 song) (w/ dance crew introductions)<br>Il mondo prima di te - (Acoustic on piano)<br>Dieci - (Acoustic on piano)<br>Eva+Eva<br>Ti dico solo - (Live debut)<br>Stelle - (Live debut)<br>Ragazza Sola<br>Purple Rain - (Prince cover)<br>Encore:<br>Bellissima<br>Indaco Violento</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('367801105a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('367801105a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('367801105a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Houseparty - Power Hits estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Houseparty - Power Hits estate - 9-9-20.ts_snapshot_02.50.602.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Houseparty - Power Hits estate - 9-9-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Houseparty - Power Hits estate - 9-9-20.ts_snapshot_02.50.602.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Houseparty - Power Hits estate - 9-9-20.ts.jpg">
+  <div class="tecnici-box" id="video_13475f7a9c">
+    <div class="riga1">1920x1080 - 27.8 Mb/s - 3 min 26 s</div>
+    <div>0.76 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_13475f7a9c">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_13475f7a9c">Annalisa - Houseparty - Power Hits estate - 9-9-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('13475f7a9c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('13475f7a9c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('13475f7a9c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Inno di Mameli - Finale Coppa Italia</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Inno di Mameli - Finale Coppa Italia - 19-5-21.ts_snapshot_00.43.689.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Inno di Mameli - Finale Coppa Italia - 19-5-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Inno di Mameli - Finale Coppa Italia - 19-5-21.ts_snapshot_00.43.689.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Inno di Mameli - Finale Coppa Italia - 19-5-21.ts.jpg">
+  <div class="tecnici-box" id="video_42f36680be">
+    <div class="riga1">1920x1080 - 14 Mb/s - 2 min 25 s</div>
+    <div>0.25 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_42f36680be">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_42f36680be">Annalisa - Inno di Mameli - Finale Coppa Italia - 19-5-21.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('42f36680be')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('42f36680be')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('42f36680be')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - La musica è finita - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - La musica è finita - Sanremo - 4-3-21.ts_snapshot_03.13.575.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - La musica è finita - Sanremo - 4-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - La musica è finita - Sanremo - 4-3-21.ts_snapshot_03.13.575.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - La musica è finita - Sanremo - 4-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_68829d1e4e">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 59 s</div>
+    <div>1.04 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_68829d1e4e">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_68829d1e4e">Annalisa - La musica e' finita - con Federico Poggipollini - Sanremo - 4-3-21 - 3 Serata.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('68829d1e4e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('68829d1e4e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('68829d1e4e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Love Mi</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Love Mi - 27-6-23.ts_snapshot_03.06.607.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Love Mi - 27-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Love Mi - 27-6-23.ts_snapshot_03.06.607.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Love Mi - 27-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_2950bd7cc9">
+    <div class="riga1">1920x1080 - 19.4 Mb/s - 12 min 52 s</div>
+    <div>1.93 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_2950bd7cc9">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_2950bd7cc9">Annalisa - Love Mi Milano - 27-6-23.ts - Nuda, Mon Amour, Bellissima - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2950bd7cc9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2950bd7cc9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2950bd7cc9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Maschio - Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Maschio - Power Hits Estate - 1-9-25.ts_snapshot_00.18.047.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Maschio - Power Hits Estate - 1-9-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Maschio - Power Hits Estate - 1-9-25.ts_snapshot_00.18.047.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Maschio - Power Hits Estate - 1-9-25.ts.jpg">
+  <div class="tecnici-box" id="video_9920aa51ff">
+    <div class="riga1">1920x1080 - 18.6 Mb/s - 3 min 32 s</div>
+    <div>0.54 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_9920aa51ff">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_9920aa51ff">Annalisa - Maschio - RTL 102.5 Power Hits Estate - 1-9-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9920aa51ff')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9920aa51ff')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9920aa51ff')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Maschio - Radio Zeta Future Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Maschio - Radio Zeta Future Hits - 1-6-25.mkv_snapshot_01.26.043.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Maschio - Radio Zeta Future Hits - 1-6-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Maschio - Radio Zeta Future Hits - 1-6-25.mkv_snapshot_01.26.043.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Maschio - Radio Zeta Future Hits - 1-6-25.mkv.jpg">
+  <div class="tecnici-box" id="video_6cb155b6a2">
+    <div class="riga1">1920x1080 - 20.4 Mb/s - 3 min 47 s</div>
+    <div>0.56 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6cb155b6a2">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_6cb155b6a2">Annalisa - Maschio - Radio Zeta Future Hits - 1-6-25.mkv - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6cb155b6a2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6cb155b6a2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6cb155b6a2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Mon Amour - Power Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Mon Amour - Power Hits - 29-8-23.ts_snapshot_03.55.912.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Mon Amour - Power Hits - 29-8-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Mon Amour - Power Hits - 29-8-23.ts_snapshot_03.55.912.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Mon Amour - Power Hits - 29-8-23.ts.jpg">
+  <div class="tecnici-box" id="video_0a8960c013">
+    <div class="riga1">1920x1080 - 18.6 Mb/s - 4 min 30 s</div>
+    <div>0.69 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_0a8960c013">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_0a8960c013">Annalisa - Mon Amour - Power Hits - 29-8-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('0a8960c013')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('0a8960c013')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('0a8960c013')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Movimento lento - Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Movimento lento - Power Hits Estate - 31-8-21.ts_snapshot_00.11.719.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Movimento lento - Power Hits Estate - 31-8-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Movimento lento - Power Hits Estate - 31-8-21.ts_snapshot_00.11.719.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Movimento lento - Power Hits Estate - 31-8-21.ts.jpg">
+  <div class="tecnici-box" id="video_f8c3a2ce8f">
+    <div class="riga1">1920x1080 - 18.6 Mb/s - 3 min 12 s</div>
+    <div>0.49 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_f8c3a2ce8f">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_f8c3a2ce8f">Annalisa ft. Federico Rossi - Movimento lento - Power Hits Estate - 31-8-21.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f8c3a2ce8f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f8c3a2ce8f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f8c3a2ce8f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Movimento lento - Seat Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Movimento lento - Seat Music Awards - 10-9-21.ts_snapshot_04.09.862.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Movimento lento - Seat Music Awards - 10-9-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Movimento lento - Seat Music Awards - 10-9-21.ts_snapshot_04.09.862.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Movimento lento - Seat Music Awards - 10-9-21.ts.jpg">
+  <div class="tecnici-box" id="video_061a452be7">
+    <div class="riga1">1920x1080 - 16.9 Mb/s - 4 min 21 s</div>
+    <div>0.56 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_061a452be7">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_061a452be7">Annalisa con Federico Rossi - Movimento lento - Seat Music Awards - Verona - 10-9-21.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('061a452be7')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('061a452be7')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('061a452be7')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Premiazione - Power Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Premiazione - Power Hits - 3-9-24.ts_snapshot_02.14.574.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Premiazione - Power Hits - 3-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Premiazione - Power Hits - 3-9-24.ts_snapshot_02.14.574.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Premiazione - Power Hits - 3-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_29a1f5b3c6">
+    <div class="riga1">1920x1080 - 18.1 Mb/s - 5 min 45 s</div>
+    <div>0.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_29a1f5b3c6">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_29a1f5b3c6">Annalisa con Tananai - Premiazione - Storie brevi -Power Hits - Verona - 3-9-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('29a1f5b3c6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('29a1f5b3c6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('29a1f5b3c6')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Radio Italia Live - 27-6-24.ts_snapshot_08.08.921.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Radio Italia Live - 27-6-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Radio Italia Live - 27-6-24.ts_snapshot_08.08.921.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Radio Italia Live - 27-6-24.ts.jpg">
+  <div class="tecnici-box" id="video_690fb80049">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 14 min 21 s</div>
+    <div>2.98 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_690fb80049">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_690fb80049">Annalisa - Radio Italia Live - Il concerto - Napoli - 27-6-24.ts - Bellissima, Ragazza sola e Sinceramente - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('690fb80049')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('690fb80049')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('690fb80049')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Radio Italia Live - 27-6-25.ts_snapshot_08.06.606.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Radio Italia Live - 27-6-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Radio Italia Live - 27-6-25.ts_snapshot_08.06.606.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Radio Italia Live - 27-6-25.ts.jpg">
+  <div class="tecnici-box" id="video_859813beab">
+    <div class="riga1">1920x1080 - 24.5 Mb/s - 16 min 20 s</div>
+    <div>3.22 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_859813beab">PCM - 1920 kb/s - int</div>
+  <div class="notebox" id="note_859813beab">Annalisa - Radio Italia Live - Il Concerto - Palermo - 27-6-25.ts - Euforia, Bellissima e Maschio - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('859813beab')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('859813beab')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('859813beab')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Radio Italia Live - 15-5-24.ts_snapshot_00.27.284.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Radio Italia Live - 15-5-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Radio Italia Live - 15-5-24.ts_snapshot_00.27.284.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Radio Italia Live - 15-5-24.ts.jpg">
+  <div class="tecnici-box" id="video_959b5af594">
+    <div class="riga1">1920x1080 - 26 Mb/s - 15 min 25 s</div>
+    <div>3.21 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_959b5af594">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_959b5af594">Annalisa - Radio Italia Live - Milano - 15-5-24.ts - Bellissima, Mon Amour e Sinceramente - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('959b5af594')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('959b5af594')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('959b5af594')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Radio Italia Live -  Prove</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Radio Italia Live -  Prove - 15-5-24.ts_snapshot_03.51.409.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Radio Italia Live -  Prove - 15-5-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Radio Italia Live -  Prove - 15-5-24.ts_snapshot_03.51.409.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Radio Italia Live -  Prove - 15-5-24.ts.jpg">
+  <div class="tecnici-box" id="video_a0d7ba8099">
+    <div class="riga1">1920x1080 - 26 Mb/s - 21 min 3 s</div>
+    <div>4.39 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_a0d7ba8099">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_a0d7ba8099">Annalisa - Radio Italia Live (Il Concerto) - Milano - Prove  - 15-5-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a0d7ba8099')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a0d7ba8099')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a0d7ba8099')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Radio Italia Live - Prove</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Radio Italia Live - Prove - 27-6-24.ts_snapshot_04.58.263.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Radio Italia Live - Prove - 27-6-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Radio Italia Live - Prove - 27-6-24.ts_snapshot_04.58.263.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Radio Italia Live - Prove - 27-6-24.ts.jpg">
+  <div class="tecnici-box" id="video_bb13054100">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 27 min 42 s</div>
+    <div>5.70 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_bb13054100">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_bb13054100">Annalisa - Radio Italia Live - Il concerto - Napoli - Prova - 27-6-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('bb13054100')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('bb13054100')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('bb13054100')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Radio Zeta</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Radio Zeta - 10-6-23.ts_snapshot_04.44.133.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Radio Zeta - 10-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Radio Zeta - 10-6-23.ts_snapshot_04.44.133.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Radio Zeta - 10-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_ca348036b9">
+    <div class="riga1">1920x1080 - 18.1 Mb/s - 8 min 22 s</div>
+    <div>1.26 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ca348036b9">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_ca348036b9">Annalisa - Radio Zeta - 10-6-23.ts - Disco Paradise - Mon Amour - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ca348036b9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ca348036b9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ca348036b9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Radio Zeta Future Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Radio Zeta Future Hits - 31-5-24.ts_snapshot_03.22.330.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Radio Zeta Future Hits - 31-5-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Radio Zeta Future Hits - 31-5-24.ts_snapshot_03.22.330.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Radio Zeta Future Hits - 31-5-24.ts.jpg">
+  <div class="tecnici-box" id="video_5b2c7e623e">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 5 min 38 s</div>
+    <div>0.84 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_5b2c7e623e">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_5b2c7e623e">Annalisa - Radio Zeta Future Hits - 31-5-24.ts - Sinceramente - Mon Amour - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5b2c7e623e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5b2c7e623e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5b2c7e623e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Shallow</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Shallow - 29-12-22.ts_snapshot_02.08.908.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Shallow - 29-12-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Shallow - 29-12-22.ts_snapshot_02.08.908.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Shallow - 29-12-22.ts.jpg">
+  <div class="tecnici-box" id="video_7b38e18245">
+    <div class="riga1">1920x1080 - 5.6 Mb/s - 4 min 51 s</div>
+    <div>0.21 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7b38e18245">AC-3 - L R - 192 kb/s - it<br>AC-3 - L R - 160 kb/s - en</div>
+  <div class="notebox" id="note_7b38e18245">Annalisa _Gianluca Ginoble (Il Volo) - Shallow - 29-12-22.ts - Canale 5</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7b38e18245')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7b38e18245')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7b38e18245')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Sinceramente -  Power Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Sinceramente -  Power Hits - 3-9-24.ts_snapshot_00.35.686.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Sinceramente -  Power Hits - 3-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Sinceramente -  Power Hits - 3-9-24.ts_snapshot_00.35.686.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Sinceramente -  Power Hits - 3-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_bc23334598">
+    <div class="riga1">1920x1080 - 18.1 Mb/s - 5 min 37 s</div>
+    <div>0.85 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_bc23334598">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_bc23334598">Annalisa - Sinceramente -  Power Hits - Verona - 3-9-24.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('bc23334598')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('bc23334598')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('bc23334598')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Sinceramente - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Sinceramente - Sanremo - 7-2-24.ts_snapshot_02.22.251.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Sinceramente - Sanremo - 7-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Sinceramente - Sanremo - 7-2-24.ts_snapshot_02.22.251.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Sinceramente - Sanremo - 7-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_62abc79542">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 6 min 1 s</div>
+    <div>0.91 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_62abc79542">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_62abc79542">Annalisa - Sinceramente - Sanremo - 7-2-24.ts - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('62abc79542')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('62abc79542')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('62abc79542')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Sinceramente - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Sinceramente - Sanremo - 6-2-24.ts_snapshot_01.22.637.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Sinceramente - Sanremo - 6-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Sinceramente - Sanremo - 6-2-24.ts_snapshot_01.22.637.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Sinceramente - Sanremo - 6-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_81d7785933">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 5 min 29 s</div>
+    <div>0.83 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_81d7785933">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_81d7785933">Annalisa - Sinceramente - Sanremo - 6-2-24 - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('81d7785933')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('81d7785933')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('81d7785933')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Sinceramente - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Sinceramente - Sanremo - 10-2-24.ts_snapshot_03.15.718.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Sinceramente - Sanremo - 10-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Sinceramente - Sanremo - 10-2-24.ts_snapshot_03.15.718.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Sinceramente - Sanremo - 10-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_7ece168b73">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 5 min 48 s</div>
+    <div>0.88 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7ece168b73">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_7ece168b73">Annalisa - Sinceramente - Sanremo - 10-2-24.ts - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7ece168b73')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7ece168b73')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7ece168b73')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Sinceramente - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Sinceramente - Sanremo - 7-2-24.mpg_snapshot_05.30.817.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Sinceramente  Sanremo - 7-2-24.mpg.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Sinceramente - Sanremo - 7-2-24.mpg_snapshot_05.30.817.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Sinceramente  Sanremo - 7-2-24.mpg.jpg">
+  <div class="tecnici-box" id="video_e089912b7a">
+    <div class="riga1">1920x1080 - 17.7 Mb/s - 6 min 34 s</div>
+    <div>0.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e089912b7a">MPEG Audio - 320 kb/s</div>
+  <div class="notebox" id="note_e089912b7a">Annalisa - Sinceramente - Sanremo 2a Serata - 07-02-2024.mpg - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e089912b7a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e089912b7a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e089912b7a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Sinceramente - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Sinceramente - Sanremo - 6-2-24.mpg_snapshot_01.46.212.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Sinceramente - Sanremo - 6-2-24.mpg.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Sinceramente - Sanremo - 6-2-24.mpg_snapshot_01.46.212.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Sinceramente - Sanremo - 6-2-24.mpg.jpg">
+  <div class="tecnici-box" id="video_55439eb418">
+    <div class="riga1">1920x1080 - 17.7 Mb/s - 5 min 29 s</div>
+    <div>0.73 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_55439eb418">MPEG Audio - 320 kb/s</div>
+  <div class="notebox" id="note_55439eb418">Annalisa - Sinceramente - Sanremo - 1a Serata - 6-2-24.mpg - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('55439eb418')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('55439eb418')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('55439eb418')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Sinceramente - Tim Summer Festival</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Sinceramente - Tim Summer Festival - 12-7-24.ts_snapshot_03.39.421.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Sinceramente - Tim Summer Festival - 12-7-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Sinceramente - Tim Summer Festival - 12-7-24.ts_snapshot_03.39.421.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Sinceramente - Tim Summer Festival - 12-7-24.ts.jpg">
+  <div class="tecnici-box" id="video_f95c27ad2e">
+    <div class="riga1">1920x1080 -  - 3 min 44 s</div>
+    <div>0.49 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f95c27ad2e">AAC - L R</div>
+  <div class="notebox" id="note_f95c27ad2e">Annalisa - Sinceramente - Tim Summer Festival - 12-7-24.ts - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f95c27ad2e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f95c27ad2e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f95c27ad2e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Storie brevi - Power Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Storie brevi - Power Hits - 3-9-24.ts_snapshot_01.14.831.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Storie brevi - Power Hits - 3-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Storie brevi - Power Hits - 3-9-24.ts_snapshot_01.14.831.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Storie brevi - Power Hits - 3-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_084a44dda5">
+    <div class="riga1">1920x1080 - 18.1 Mb/s - 3 min 2 s</div>
+    <div>0.46 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_084a44dda5">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_084a44dda5">Annalisa - con Tananai - Storie brevi - Power Hits - Verona - 3-9-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('084a44dda5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('084a44dda5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('084a44dda5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Storie brevi - Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Storie brevi - Power Hits Estate - 1-9-25.ts_snapshot_00.42.983.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Storie brevi - Power Hits Estate - 1-9-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Storie brevi - Power Hits Estate - 1-9-25.ts_snapshot_00.42.983.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Storie brevi - Power Hits Estate - 1-9-25.ts.jpg">
+  <div class="tecnici-box" id="video_744a9f869a">
+    <div class="riga1">1920x1080 - 18.6 Mb/s - 3 min 7 s</div>
+    <div>0.48 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_744a9f869a">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_744a9f869a">Annalisa - Storie Brevi - Con Tananai - RTL 102.5 Power Hits Estate - 1-9-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('744a9f869a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('744a9f869a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('744a9f869a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Storie brevi - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Storie brevi - Tim Music Awards - 14-9-24.ts_snapshot_02.05.953.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Storie brevi - Tim Music Awards - 14-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Storie brevi - Tim Music Awards - 14-9-24.ts_snapshot_02.05.953.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Storie brevi - Tim Music Awards - 14-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_63bffbfd13">
+    <div class="riga1">1920x1080 - 29.1 Mb/s - 5 min 29 s</div>
+    <div>1.20 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_63bffbfd13">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_63bffbfd13">Annalisa - Storie brevi - con Tananai - Tim Music Awards - 14-9-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('63bffbfd13')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('63bffbfd13')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('63bffbfd13')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Sweet dreams - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Sweet dreams - Sanremo - 9-2-24.ts_snapshot_01.24.843.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Sweet dreams - Sanremo - 9-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Sweet dreams - Sanremo - 9-2-24.ts_snapshot_01.24.843.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Sweet dreams - Sanremo - 9-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_01a86cfacc">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 5 min 18 s</div>
+    <div>0.80 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_01a86cfacc">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_01a86cfacc">Annalisa con La Rappresentante di Lista e il coro Artemia - Sweet dreams - 74 Festival della Canzone Italiana 4K - 9-2-24.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('01a86cfacc')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('01a86cfacc')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('01a86cfacc')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Tim Music Awards - 12-9-25.mkv_snapshot_03.22.324.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Tim Music Awards - 12-9-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Tim Music Awards - 12-9-25.mkv_snapshot_03.22.324.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Tim Music Awards - 12-9-25.mkv.jpg">
+  <div class="tecnici-box" id="video_ebf7628145">
+    <div class="riga1">1920x1080 - 15.9 Mb/s - 12 min 17 s</div>
+    <div>1.41 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ebf7628145">MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_ebf7628145">Annalisa - Tim Music Awards - 12-9-25.mkv - Piazza San Marco con Marco Mengoni - Maschio - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ebf7628145')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ebf7628145')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ebf7628145')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Tim Music Awards - 14-9-24.ts_snapshot_02.03.528.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Tim Music Awards - 14-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Tim Music Awards - 14-9-24.ts_snapshot_02.03.528.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Tim Music Awards - 14-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_941edcde6b">
+    <div class="riga1">1920x1080 - 27.6 Mb/s - 8 min 58 s</div>
+    <div>1.86 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_941edcde6b">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_941edcde6b">Annalisa - Tim Music Awards - 14-9-24.ts - Euforia / Sinceramente / Indaco violento - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('941edcde6b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('941edcde6b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('941edcde6b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Tim Music Awards  - 14-9-24.ts_snapshot_00.44.400.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Tim Music Awards  - 14-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Tim Music Awards  - 14-9-24.ts_snapshot_00.44.400.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Tim Music Awards  - 14-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_69846ff01a">
+    <div class="riga1">1920x1080 - 29.1 Mb/s - 3 min 59 s</div>
+    <div>0.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_69846ff01a">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_69846ff01a">Annalisa _ Tedua - Tim Music Awards - 14-9-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('69846ff01a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('69846ff01a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('69846ff01a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Tim Music Awards - 15-9-23.ts_snapshot_00.09.915.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Tim Music Awards - 15-9-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Tim Music Awards - 15-9-23.ts_snapshot_00.09.915.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Tim Music Awards - 15-9-23.ts.jpg">
+  <div class="tecnici-box" id="video_a03a02c91f">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 10 min 30 s</div>
+    <div>2.18 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a03a02c91f">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_a03a02c91f">Annalisa - TIM Music Awards - Arena di Verona - (1 serata) - 15-9-23.ts - Ragazza sola / Bellissima / Mon Amour - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a03a02c91f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a03a02c91f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a03a02c91f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Tim Music Awards - Prove</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Tim Music Awards - Prove - 12-9-25.mkv_snapshot_02.54.682.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Tim Music Awards - Prove - 12-9-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Tim Music Awards - Prove - 12-9-25.mkv_snapshot_02.54.682.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Tim Music Awards - Prove - 12-9-25.mkv.jpg">
+  <div class="tecnici-box" id="video_6a818d7fb9">
+    <div class="riga1">1920x1080 - 14.9 Mb/s - 24 min 42 s</div>
+    <div>2.67 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6a818d7fb9">MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_6a818d7fb9">Annalisa - Tim Music Awards - Prove - 12-9-25.mkv - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6a818d7fb9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6a818d7fb9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6a818d7fb9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Tim Music Awards - Prove</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Tim Music Awards - Prove - 14-9-24.ts_snapshot_25.44.829.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Tim Music Awards - Prove - 14-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Tim Music Awards - Prove - 14-9-24.ts_snapshot_25.44.829.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Tim Music Awards - Prove - 14-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_f2f4f4e015">
+    <div class="riga1">1920x1080 - 29.1 Mb/s - 31 min 26 s</div>
+    <div>6.84 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f2f4f4e015">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_f2f4f4e015">Annalisa - Tim Music Awards - Prove - 14-9-24.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f2f4f4e015')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f2f4f4e015')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f2f4f4e015')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Torino is Fantastic</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Torino is Fantastic - 24-6-25.ts_snapshot_03.00.293.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Torino is Fantastic - 24-6-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Torino is Fantastic - 24-6-25.ts_snapshot_03.00.293.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Torino is Fantastic - 24-6-25.ts.jpg">
+  <div class="tecnici-box" id="video_6a3b89fa48">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 12 min 48 s</div>
+    <div>1.86 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6a3b89fa48">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_6a3b89fa48">Annalisa - Torino is Fantastic - 24-6-25.ts - Sinceramente - Mon Amour - Maschio - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6a3b89fa48')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6a3b89fa48')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6a3b89fa48')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Tsunami - Seat Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Tsunami - Seat Music Awards - 5-9-20.ts_snapshot_00.05.862.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Tsunami - Seat Music Awards - 5-9-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Tsunami - Seat Music Awards - 5-9-20.ts_snapshot_00.05.862.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Tsunami - Seat Music Awards - 5-9-20.ts.jpg">
+  <div class="tecnici-box" id="video_5f47c7dff3">
+    <div class="riga1">1920x1080 - 29.7 Mb/s - 4 min 37 s</div>
+    <div>1.03 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5f47c7dff3">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_5f47c7dff3">Annalisa - Tsunami - Seat Music Awards - Verona - 5-9-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5f47c7dff3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5f47c7dff3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5f47c7dff3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Tutti in Arena</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Tutti in Arena - 5-9-24.mkv_snapshot_00.00.25.210.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Tutti in Arena - 5-9-24.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Tutti in Arena - 5-9-24.mkv_snapshot_00.00.25.210.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Tutti in Arena - 5-9-24.mkv.jpg">
+  <div class="tecnici-box" id="video_6e8f3b18d1">
+    <div class="riga1">1920x1080 - 5.4 Mb/s - 2 h 33 min</div>
+    <div>6.27 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6e8f3b18d1">AC-3 - L R - 192 kb/s - it<br>AC-3 - L R - 160 kb/s - en</div>
+  <div class="notebox" id="note_6e8f3b18d1">Annalisa - Tutti in Arena - 5-9-24 - Canale5.mkv                                                       Euforia<br>Se avessi un cuore<br>Eppure sentire (un senso di te) (con Elisa)<br>Ragazza sola<br>Direzione la vita<br>Movimento lento<br>La genesi del tuo colore (con Irama)<br>Un domani<br>La crisi a Saint-Tropez<br>Nuda<br>Come saprei (con Giorgia)<br>Eva+Eva<br>Stelle<br>Il mondo prima di te / Dieci<br>Sweet Dreams (Are Made of This)<br>Bellissima<br>Tropicana / Disco Paradise<br>Bollicine<br>Bye Bye<br>Tango (con Tananai)<br>Mon Amour<br>Medley Diamante lei e luce lui / Una finestra tra le stelle / Senza riserva<br>Superclassico (con Ernia)<br>Rosso corallo<br>Tsunami<br>Medley Vento sulla Luna / Walking on the Moon<br>Sinceramente<br>Indaco violento<br>Storie brevi (con Tananai)<br>Formazione<br>Band<br>Daniel Bestonzo – tastiera e sintetizzatore<br>Gianni Pastorino – tastiera e sintetizzatore<br>Dario Panza – batteria<br>Ballerini<br>Simone Baroni – coreografo<br>Davide Telleri – assistente coreografo<br>Marco Ricciotti – assistente coreografo<br>Agnese Acheampong<br>Kevin Amadio<br>Jacopo Ballabio<br>Loris Carvana<br>Giada Farano<br>Lara Ferrari<br>Deborah Pini<br>Deghi Sverzut<br>Yusef Zahir<br>Johara Cornacchia</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6e8f3b18d1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6e8f3b18d1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6e8f3b18d1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - Una nessuna centomila</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - Una nessuna centomila - 8-5-24.mp4_snapshot_00.17.956.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - Una nessuna centomila - 8-5-24.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - Una nessuna centomila - 8-5-24.mp4_snapshot_00.17.956.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - Una nessuna centomila - 8-5-24.mp4.jpg">
+  <div class="tecnici-box" id="video_553f4c55ff">
+    <div class="riga1">1920x1080 - 18 Mb/s - 9 min 55 s</div>
+    <div>1.27 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_553f4c55ff">AAC - L R - 253 kb/s</div>
+  <div class="notebox" id="note_553f4c55ff">Annalisa - Una nessuna centomila - 8-5-24.mp4 - Sinceramente - Nessun dolore con Francesca Michielin - noemi - amoroso - emma - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('553f4c55ff')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('553f4c55ff')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('553f4c55ff')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - XFactor - 16-11-23.ts_snapshot_07.58.450.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - XFactor - 16-11-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - XFactor - 16-11-23.ts_snapshot_07.58.450.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - XFactor - 16-11-23.ts.jpg">
+  <div class="tecnici-box" id="video_07d324580d">
+    <div class="riga1">1920x1080 - 24.4 Mb/s - 8 min 11 s</div>
+    <div>1.61 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_07d324580d">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_07d324580d">Annalisa - XFactor - 16-11-23.ts - Bellissima  / Mon amour  / Ragazza sola  / Euforia - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('07d324580d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('07d324580d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('07d324580d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FC6C85;" data-stars="0">
+  <div class="card-title" style="color:#97404f;">Annalisa - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Annalisa - XFactor - 23-10-25.ts_snapshot_00.53.829.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Annalisa - XFactor - 23-10-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Annalisa - XFactor - 23-10-25.ts_snapshot_00.53.829.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Annalisa - XFactor - 23-10-25.ts.jpg">
+  <div class="tecnici-box" id="video_50a1b3b2b1">
+    <div class="riga1">1920x1080 - 25.1 Mb/s - 7 min 45 s</div>
+    <div>1.57 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_50a1b3b2b1">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_50a1b3b2b1">Annalisa - Piazza San Marco / Esibizionista - XFactor - 23-10-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FC6C85;color:#fff;" title="Annalisa">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('50a1b3b2b1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('50a1b3b2b1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('50a1b3b2b1')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

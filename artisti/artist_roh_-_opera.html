@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Roh - Opera</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#ffeddc;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#FFA652; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Roh - Opera
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(17 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Aida</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Aida - 12-10-22.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Aida - 12-10-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Aida - 12-10-22.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Aida - 12-10-22.ts.jpg">
+  <div class="tecnici-box" id="video_8a93fb4614">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 3 h 33 min</div>
+    <div>28.39 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8a93fb4614">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_8a93fb4614">ROH - Aida - 12-10-22.ts - Feed<br>Director - Antonio Pappano<br>Aida - Elena Stikhina<br>Radames - Francesco Meli<br>Amneris - Agnieszka Rehlis<br>Amonasro - Ludovic Tezier<br>Ramfis - Soloman Howard<br>King of Egypt - In Sung Sim</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8a93fb4614')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8a93fb4614')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8a93fb4614')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Andrea Chènier</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Andrea Chénier - 11-6-24.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Andrea Chénier - 11-6-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Andrea Chénier - 11-6-24.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Andrea Chénier - 11-6-24.ts.jpg">
+  <div class="tecnici-box" id="video_81c9b3a77a">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 2 h 55 min</div>
+    <div>23.37 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_81c9b3a77a">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_81c9b3a77a">ROH - Andrea Chénier - 11-6-24.ts - Feed<br>Carlo - GéRard Amartuvshin Enkhbat<br>Il Maestro Di Casa - Simon Thorpe<br>Un Vecchio Giardiniere - Richard Holliday<br>Maddalena Di Coigny - Sondra Radvanovsky<br>Bersi - Katia Ledoux<br>Contessa Di Coigny - Rosalind Plowright<br>Pietro FléVille - William Dazeley<br>Filandro Fiorinelli - Rich Gittins<br>Andrea ChéNier - Jonas Kaufmann<br>L’Abate - Aled Hall<br>Mathieu - James Cleverton<br>Orazio Coclite - Michael Kenneth Stewart<br>Un “Incredibile” - Alexander Kravets<br>Roucher - Ashley Riches<br>Massimiliano Robespierre - Andrew Hobday<br>Madelon - Elena Zilio<br>Nipote Di Madelon - Markel Stewart-Arrien<br>Fouquier-Tinville - Eddie Wade<br>Laval-Montmorency - Irene Hardy<br>Dumas - Jamie Woollard*<br>Gravier De Vergennes - Richard Holliday<br>Idia Legrey - Judith Georg</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('81c9b3a77a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('81c9b3a77a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('81c9b3a77a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Carmen</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Carmen - 1-5-24.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Carmen - 1-5-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Carmen - 1-5-24.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Carmen - 1-5-24.ts.jpg">
+  <div class="tecnici-box" id="video_82e1ff311d">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 3 h 20 min</div>
+    <div>26.27 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_82e1ff311d">AC-3 - L R C LFE Ls Rs - 640 kb/s - de</div>
+  <div class="notebox" id="note_82e1ff311d">ROH - Carmen - 1-5-24.ts - Feed<br>Conductor - Antonello Manacorda<br>Micaela - Olga Kulchynska<br>Carmen - Aigul Akhmetshina<br>Don José - Piotr Beczala<br>Escamillo - Kostas Smoriginas <br>Morales - Grisha Martirosyan<br>Frasquita - Sarah Defresne<br>Mercedes - Gabriele Kupsyte<br>Dancairo - Pierre Doyen<br>Remendado - Vincent Ordonneau<br>Bohemian - Dawid Kimberg<br>Marchande d'oranges - Louise Armit<br>Mother of Don Jose - Caroline Lena Olsson</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('82e1ff311d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('82e1ff311d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('82e1ff311d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Die Walkure</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Die Walkure - 14-5-25.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Die Walkure - 14-5-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Die Walkure - 14-5-25.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Die Walkure - 14-5-25.ts.jpg">
+  <div class="tecnici-box" id="video_364f3bd6cb">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 5 h 11 min</div>
+    <div>41.68 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_364f3bd6cb">AC-3 - L R C LFE Ls Rs - 640 kb/s - en</div>
+  <div class="notebox" id="note_364f3bd6cb">ROH - Die Walkure - 14-5-25.ts - Feed<br>Conductor - Antonio Pappano<br>Wotan - Christopher Maltman<br>Brünnhilde - Elisabet Strid<br>Sieglinde - Natalya Romaniw<br>Siegmund - Stanislas De Barbeyrac<br>Hunding - Soloman Howard<br>Erda - Illona Linthwaite<br>Fricka - Marina Prudenskaya<br>Helmwige - Maida Hundeling<br>Ortlinde - Katie Lowe<br>Gerhilde - Lee Bisset<br>Waltraute - Claire Barnett-jones<br>Siegrune - Catherine Carby<br>Rossweisse - Alison Kettlewell<br>Grimgerde - Monika-Evelin Liiv<br>Schwertleite - Rhonda Browne</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('364f3bd6cb')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('364f3bd6cb')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('364f3bd6cb')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Il Barbiere di Siviglia</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Il Barbiere di Siviglia - 15-2-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Il Barbiere di Siviglia - 15-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Il Barbiere di Siviglia - 15-2-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Il Barbiere di Siviglia - 15-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_9ee1a62f0c">
+    <div class="riga1">1920x1080 - 18 Mb/s - 3 h 33 min</div>
+    <div>27.84 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_9ee1a62f0c">AC-3 - L R C LFE Ls Rs - 448 kb/s - de</div>
+  <div class="notebox" id="note_9ee1a62f0c">ROH - Il Barbiere di Siviglia - 15-2-23.ts - Feed<br>Conductor - Rafael Payare<br>Rosina - Aigul Akhmetshina<br>Figaro - Andrzej Filonczyk<br>Count Almaviva - Lawrence Brownlee<br>Don Basilio - Bryn Terfel<br>Doctor Bartolo - Grant Doyle replaces Fabio Capitanucci<br>Berta - Ailish Tynan<br>Fiorello - Josef Jeongmeen Ahn<br>Ambrogio - Charbel Mattar<br>Officer - Dawid Kimberg<br>Notary - Andrew Macnair</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9ee1a62f0c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9ee1a62f0c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9ee1a62f0c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Il Conte d'Hoffmann</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Il conte d' Hoffmann - 15-1-25.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Il Conte d' Hoffmann - 15-1-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Il conte d' Hoffmann - 15-1-25.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Il Conte d' Hoffmann - 15-1-25.ts.jpg">
+  <div class="tecnici-box" id="video_ce9b6b1bbe">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 3 h 55 min</div>
+    <div>31.34 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ce9b6b1bbe">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_ce9b6b1bbe">ROH - Il Conte d' Hoffmann - 15-1-25.ts - Feed<br>Conductor - Antonello Manacorda<br>Hoffmann - Juan Digo Flores<br>Spalanzani - Vincent Ordonneau<br>Olimpia - Olga Pudova<br>Antonia - Ermonela Jaho<br>Luther_Crespel - Alaistar Miles<br>Giulietta - Marina Costa Jackson<br>Muse of Poetry_- Christine Rice<br>Stella/Wife/Nurse - Maria Leon<br>Nicklausse - Julie Boulianne<br>Lindorf_Coppelius_Dapertutto - Alex Esposito<br>Andres_Cochenille_Frantz_Pitichinaccio - Christophe Moragne<br>Luther - Jeremy White<br>Hermann_Schlemil - Grisha Martirosyan<br>Nathanael - Ryan Vaughan Davies</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ce9b6b1bbe')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ce9b6b1bbe')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ce9b6b1bbe')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Il Trovatore</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Il Trovatore - 13-6-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Il Trovatore - 13-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Il Trovatore - 13-6-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Il Trovatore - 13-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_759eab3910">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 3 h 12 min</div>
+    <div>25.60 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_759eab3910">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_759eab3910">ROH - Il Trovatore - 13-6-23.ts - Feed<br>Conductor - Antonio Pappano<br>Leonora - Rachel Willis-Sørensen<br>Manrico - Riccardo Massi<br>Count di Luna - Ludovic Tézier<br>Azucena - Jamie Barton<br>Ferrando - Roberto Tagliavini<br>Ines - Gabriele Kupsyte<br>Ruiz - Michael Gibson<br>An Old Gypsy - John Morrissey<br>Messenger - Andrew O'Connor</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('759eab3910')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('759eab3910')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('759eab3910')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - La Bohème</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - La Bohème - 20-10-22.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - La Bohème - 20-10-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - La Bohème - 20-10-22.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - La Bohème - 20-10-22.ts.jpg">
+  <div class="tecnici-box" id="video_370093235e">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 2 h 54 min</div>
+    <div>23.12 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_370093235e">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_370093235e">ROH - La Bohème - 20-10-22.ts - Feed<br>Conductor - Kevin John Edusei<br>Mimì- Ailyn Perez<br>Rodolfo - Juan Diego Florez<br>Marcello - Andrey Zhilikhovsky<br>Musetta - Danielle de Niese<br>Schaunard - Ross Ramgobin<br>Colline - Michael Mofidian<br>Benoit - Jeremy White<br>Alcindoro - Wyn Pencarreg<br>Parpignol - Andrew Macnair</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('370093235e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('370093235e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('370093235e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - La Traviata</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - La traviata - 14-1-26.ts_snapshot_00.00.12.719.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - La traviata - 14-1-26.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - La traviata - 14-1-26.ts_snapshot_00.00.12.719.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - La traviata - 14-1-26.ts.jpg">
+  <div class="tecnici-box" id="video_0bb6fbb33b">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 3 h 34 min</div>
+    <div>28.55 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_0bb6fbb33b">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_0bb6fbb33b">ROH - La traviata - 14-1-26<br>Conductor - Antonello Manacorda<br>Violetta Valèry - Ermonella Jaho<br>Alfredo Germont - Giovanni Sala<br>Giorgio Germont - Aleksei Isaev<br>Annina - Veena Akama-Makia<br>Doctor Grenvil - Barnaby Rea<br>Flora Bervoix - Ellen Pearson<br>Baron Douphol - Sam Hird<br>Gastone de Letorières - Giorgi Guliashvili<br>Marquis D'Obigny - Ossian Huskinson<br>Giuseppe - Andrew Macnair<br>Messanger - Thomas Barnard<br>Servant - Eugene Dillon-Hooper</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('0bb6fbb33b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('0bb6fbb33b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('0bb6fbb33b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Madama Butterfly</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Madama Butterfly - 26-3-24.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Madama Butterfly - 26-3-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Madama Butterfly - 26-3-24.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Madama Butterfly - 26-3-24.ts.jpg">
+  <div class="tecnici-box" id="video_536f62dd35">
+    <div class="riga1">1920x1080 - 17.8 Mb/s - 3 h 15 min</div>
+    <div>25.57 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_536f62dd35">AC-3 - L R C LFE Ls Rs - 640 kb/s - de</div>
+  <div class="notebox" id="note_536f62dd35">ROH - Madama Butterfly - 26-3-24.ts - Feed<br>Conductor - Kevin John Edusei<br>Cio-Cio-San - Asmik Grigorian<br>Lieutenant B.F. Pinkerton - Joshua Guerrero<br>Sharpless - Lauri Vasar<br>Suzuki - Hongni Wu<br>Goro - Ya-Chung Huang<br>The Bonze - Jeremy White<br>Prince Yamadori - Josef Jeongmeen Ahn<br>Kate Pinkerton - Veena Akama-Makia<br>Imperial Commissioner - Romanas Kudriašovas<br>Official Registrar - Lee Hickenbotton<br>Cio-Cio-San's Mother - Eryl Royle<br>Uncle Yakuside - Andrew O'Connor<br>Cousin - Amy Vatt<br>Aunt - Kiera Lyness<br>Dolore - Claudia Fleming<br>Chorus - Royal Opera Chorus<br>Orchestra - Orchestra of the Royal Opera House</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('536f62dd35')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('536f62dd35')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('536f62dd35')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Madama Butterfly</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Madama Butterfly - 27-9-22.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Madama Butterfly - 27-9-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Madama Butterfly - 27-9-22.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Madama Butterfly - 27-9-22.ts.jpg">
+  <div class="tecnici-box" id="video_51e77fa798">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 3 h 11 min</div>
+    <div>25.43 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_51e77fa798">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_51e77fa798">ROH - Madama Butterfly - 27-9-22.ts - Feed<br>Conductor - Nicola Luisotti<br>Cio Cio San - Maria Agresta<br>Lieutenant B.F. Pinkerton - Joshua Guerrero<br>Sharpless - Carlos Álvarez<br>Suzuki - Christine Rice<br>Goro - Carlo Bosi<br>The Bonze - Jeremy White<br>Prince Yamadori - Josef Jeongmeen Ahn<br>Kata Pinkerton - Gabriele Kupsyte<br>Imperial Commissioner - Dawid Kimberg<br>Official Registrar - Lee Hickenbottom<br>Mother - Eryl Royle<br>Cousin - Amy Catt<br>Aunt - Kiera Lyness<br>Uncle Yakusidè - Andrew O'Connor</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('51e77fa798')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('51e77fa798')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('51e77fa798')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Rusalka</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Rusalka - 24-1-24.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Rusalka - 24-1-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Rusalka - 24-1-24.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Rusalka - 24-1-24.ts.jpg">
+  <div class="tecnici-box" id="video_292082f2b7">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 3 h 31 min</div>
+    <div>28.04 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_292082f2b7">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_292082f2b7">ROH - Rusalka - 24-1-24.ts - Feed<br>Conductor - Semyon Bychkov<br>Rusalka - Asmik Grigorian<br>Prince - David Butt Philip<br>Vodník - Aleksei Isaev<br>Ježibaba - Sarah Connolly<br>Duchess - Emma Bell<br>Kuchtík - Hongni Wu<br>Hajný - Ross Ramgobin<br>First Wood Spirit - Vuvu Mpofu<br>Second Wood Spirit - Gabrielé Kupsyté<br>Third Wood Spirit - Anne Marie Stanley<br>Lovec - Josef Jeongmeen Ahn</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('292082f2b7')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('292082f2b7')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('292082f2b7')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - The marriage of Figaro</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - The marriage of Figaro - 10-9-24.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - The marriage of Figaro - 10-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - The marriage of Figaro - 10-9-24.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - The marriage of Figaro - 10-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_6f5cac57d1">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 3 h 58 min</div>
+    <div>31.71 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6f5cac57d1">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_6f5cac57d1">ROH - The Marriage Of Figaro - 10-9-24.ts - Feed<br>Conductor: Julia Jones<br>Figaro Luca Micheletti<br>Susanna Siobhan Stagg<br>Bartolo Peter KáLmáN<br>Marcellina Rebecca Evans<br>Cherubino Ginger Costa-Jackson<br>Conte Almaviva Huw Montague Rendall<br>Don Basilio Adrian Thompson<br>Contessa Almaviva Maria Bengtsson<br>Antonio Jeremy White<br>Don Curzio Alasdair Elliott<br>Barbarina Isabela DíAz<br>Prima Damigella D’Onore Caroline Modiba<br>Seconda Damigella D’Onore Miranda Westcott<br>Servitù Del Palazzo Del Conte<br> <br>Attori Chris Agha, Jake Barton, Lucy Brenchley, Kenneth Bryers, Jane Evers, Iliana Flade, Jamie Francis, Irene Hardy, Samuel Morgan- Freeman, Mette Nilsen, Josh Thompson,<br>Sirena Tocco</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6f5cac57d1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6f5cac57d1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6f5cac57d1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - The marriage of Figaro</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - The Marriage of Figaro - 27-4-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - The marriage of Figaro - 27-4-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - The Marriage of Figaro - 27-4-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - The marriage of Figaro - 27-4-23.ts.jpg">
+  <div class="tecnici-box" id="video_9c6b6ba685">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 3 h 44 min</div>
+    <div>30.06 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_9c6b6ba685">AC-3 - L R C LFE Ls Rs - 640 kb/s - en</div>
+  <div class="notebox" id="note_9c6b6ba685">ROH - The marriage of Figaro - 27-4-23.ts - Feed<br>Conductor - Antonio Pappano<br>Figaro - Riccardo Fassi<br>Susanna - Giulia Semenzato<br>Count Almaviva - German E. Alcantara<br>Countess Almaviva - Federica Lombardi<br>Cherubino - Hanna Hipp<br>Don Basilio - Gregory Bonfatti<br>Marcellina - Monica Bacelli<br>Bartolo - Gianluca Buratto<br>Antonio - Jeremy White<br>Barbarina - Alexandra Lowe<br>Don Curzio - Alasdair Elliott<br>First Bridesmaid - Helen Withers<br>Second Bridesmaid - Miranda Westcott</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9c6b6ba685')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9c6b6ba685')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9c6b6ba685')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Tosca</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Tosca - 1-10-25.ts_snapshot_00.15.05.560.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Tosca - 1-10-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Tosca - 1-10-25.ts_snapshot_00.15.05.560.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Tosca - 1-10-25.ts.jpg">
+  <div class="tecnici-box" id="video_caa7892d3b">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 3 h 12 min</div>
+    <div>25.59 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_caa7892d3b">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_caa7892d3b">ROH - Tosca - 1-10-25.ts - Feed<br>Conductor - Jakub Hrusa<br>Floria Tosca - Anna Netrebko<br>Mario Cavaradossi - Freddie De Tommaso<br>Baron Scarpia - Gerard Finley<br>Spoletta - Carlo Bosi<br>Cesare Angelotti - Ossian Huskinson<br>Sacristan - Alessandro Corbelli<br>Sciarrone - Siphe Kwani<br>Gaoler - Olle Zetterstrom<br>Young Shepard - Esmae Froud</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('caa7892d3b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('caa7892d3b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('caa7892d3b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Turandot</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Turandot - 1-4-25.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Turandot - 1-4-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Turandot - 1-4-25.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Turandot - 1-4-25.ts.jpg">
+  <div class="tecnici-box" id="video_7dfc15668a">
+    <div class="riga1">1920x1080 - 17.8 Mb/s - 3 h 17 min</div>
+    <div>26.09 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7dfc15668a">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_7dfc15668a">ROH - Turandot - 1-4-25.ts - Feed<br>Conductor - Rafael Payare<br>Calaf - Seokjong Baek<br>Liu - Gemma Summerfield<br>Timur - Adam Palka<br>Ping - Hansung Yoo<br>Pang - Aled Hall<br>Pong - Michael Gibson<br>Emperor Altoum - Paul Hopwood<br>Mandarin - Ossian Huskinson<br>Soprano Solo 1 - Marianne Cotterill<br>Soprano Solo 2 - Tamsin Coombs</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7dfc15668a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7dfc15668a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7dfc15668a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #FFA652;" data-stars="0">
+  <div class="card-title" style="color:#996331;">The Royal Opera - Turandot</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/ROH - Turandot - 22-3-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/ROH - Turandot - 22-3-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/ROH - Turandot - 22-3-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/ROH - Turandot - 22-3-23.ts.jpg">
+  <div class="tecnici-box" id="video_3fe53a3634">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 3 h 11 min</div>
+    <div>25.47 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3fe53a3634">AC-3 - L R C LFE Ls Rs - 640 kb/s</div>
+  <div class="notebox" id="note_3fe53a3634">ROH - Turandot - 22-3-23.ts - Feed<br>Conductor- Antonio Pappano<br>Princess Turandot - Anna Pirozzi<br>Calaf - Yonghoon Lee<br>Liù - Masabane Cecilia Rangwanasha<br>Timur - Vitalij Kowaljow<br>Ping - Hansung Yoo<br>Pang - Aled Hall<br>Pong - Michael Gibson<br>Emperor Altoum - Alexander Kravets<br>Mandarin - Blaise Malaba</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#FFA652;color:#222;" title="ROH - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3fe53a3634')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3fe53a3634')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3fe53a3634')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

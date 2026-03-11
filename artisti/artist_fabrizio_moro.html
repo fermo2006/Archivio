@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Fabrizio Moro</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#d0e2d9;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#177245; color:#fff; padding:8px 30px; border-radius:12px; margin:0;">
+  Fabrizio Moro
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(39 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente - 11-2-18.ts_snapshot_05.14.391.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente - 11-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente - 11-2-18.ts_snapshot_05.14.391.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente - 11-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_4c9798ca8f">
+    <div class="riga1">1920x1080 - 12.8 Mb/s - 8 min 42 s</div>
+    <div>0.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4c9798ca8f">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_4c9798ca8f">Ermal Meta - & Fabrizio Moro  - Non mi avete fatto niente - Che tempo che fa - 11-2-18.ts -  Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4c9798ca8f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4c9798ca8f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4c9798ca8f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro - Amici</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Amici - 6-4-19.ts_snapshot_07.28.188.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Amici - 6-4-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Amici - 6-4-19.ts_snapshot_07.28.188.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Amici - 6-4-19.ts.jpg">
+  <div class="tecnici-box" id="video_50c13cd88c">
+    <div class="riga1">1920x1080 - 20 Mb/s - 7 min 49 s</div>
+    <div>1.18 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_50c13cd88c">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - int</div>
+  <div class="notebox" id="note_50c13cd88c">Ermal Meta - & Fabrizio Moro - Amici - 6-4-19.ts  Ermal Meta - Piccola anima con Alvis Giordana - Fabrizio Moro - Pensa - con Alberto Jefeo - Ermal Meta - Vietato morire con Alvis Giordana - Fabrizio Moro - Portami via con Alberto Jefeo - Ermal Meta & Fabrizio Moro - Non mi avete fatto niente - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('50c13cd88c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('50c13cd88c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('50c13cd88c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro - Come e' profondo il mare</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Come e' profondo il mare - 3-6-22.ts_snapshot_07.23.876.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Come e' profondo il mare - 3-6-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Come e' profondo il mare - 3-6-22.ts_snapshot_07.23.876.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Come e' profondo il mare - 3-6-22.ts.jpg">
+  <div class="tecnici-box" id="video_51de460639">
+    <div class="riga1">1920x1080 -  - 7 min 54 s</div>
+    <div>1.03 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_51de460639">AAC - L R - de</div>
+  <div class="notebox" id="note_51de460639">Ermal Meta - & Fabrizio Moro - Come e' profondo il mare - DallArenaLucio - 3-6-22 - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('51de460639')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('51de460639')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('51de460639')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-5-18.ts_snapshot_03.46.534.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-5-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-5-18.ts_snapshot_03.46.534.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-5-18.ts.jpg">
+  <div class="tecnici-box" id="video_ac7458d5e2">
+    <div class="riga1">1920x1080 - 37.9 Mb/s - 4 min</div>
+    <div>1.13 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ac7458d5e2">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_ac7458d5e2">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Eurovision - 9-5-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ac7458d5e2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ac7458d5e2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ac7458d5e2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 6-2-18.ts_snapshot_00.01.589.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 6-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 6-2-18.ts_snapshot_00.01.589.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 6-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_ce580b992d">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 3 min 48 s</div>
+    <div>0.79 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ce580b992d">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_ce580b992d">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Sanremo - 6-2-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ce580b992d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ce580b992d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ce580b992d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-2-18.ts_snapshot_00.01.322.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-2-18.ts_snapshot_00.01.322.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 9-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_da99ccacf3">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 1 s</div>
+    <div>1.04 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_da99ccacf3">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_da99ccacf3">Ermal Meta e Fabrizio Moro con Simone Cristicchi - Non mi avete fatto niente - Sanremo - 9-2-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('da99ccacf3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('da99ccacf3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('da99ccacf3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 10-2-18.ts_snapshot_02.24.654.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 10-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 10-2-18.ts_snapshot_02.24.654.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 10-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_ee7aac23d8">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 3 min 48 s</div>
+    <div>0.79 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ee7aac23d8">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_ee7aac23d8">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 10-2-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ee7aac23d8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ee7aac23d8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ee7aac23d8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 8-2-18.ts_snapshot_02.17.325.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 8-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 8-2-18.ts_snapshot_02.17.325.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 8-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_2f440cc1ea">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 3 min 53 s</div>
+    <div>0.81 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2f440cc1ea">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_2f440cc1ea">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Sanremo - 8-2-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2f440cc1ea')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2f440cc1ea')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2f440cc1ea')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 19-6-18.ts_snapshot_02.49.712.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 19-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 19-6-18.ts_snapshot_02.49.712.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - 19-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_99090f3d6d">
+    <div class="riga1">1920x1080 - 28.6 Mb/s - 4 min 58 s</div>
+    <div>1.03 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_99090f3d6d">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_99090f3d6d">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Con il cuore - Assisi - 19-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('99090f3d6d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('99090f3d6d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('99090f3d6d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards - 4-6-18.ts_snapshot_03.20.291.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards - 4-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards - 4-6-18.ts_snapshot_03.20.291.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards - 4-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_71f1108118">
+    <div class="riga1">1920x1080 - 27.5 Mb/s - 4 min 54 s</div>
+    <div>1.00 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_71f1108118">MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_71f1108118">Ermal Meta - & Fabrizio Moro - Non mi avete fatto niente - Wind Music Awards - 4-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('71f1108118')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('71f1108118')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('71f1108118')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 11-5-18.ts_snapshot_02.58.670.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 11-5-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 11-5-18.ts_snapshot_02.58.670.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 11-5-18.ts.jpg">
+  <div class="tecnici-box" id="video_a1efc2ef3e">
+    <div class="riga1">1920x1080 - 40.3 Mb/s - 3 min 9 s</div>
+    <div>0.95 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a1efc2ef3e">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_a1efc2ef3e">Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - Eurovision - 11-5-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a1efc2ef3e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a1efc2ef3e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a1efc2ef3e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 12-5-18.ts_snapshot_03.50.944.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 12-5-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 12-5-18.ts_snapshot_03.50.944.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente - 12-5-18.ts.jpg">
+  <div class="tecnici-box" id="video_49c9bf517a">
+    <div class="riga1">1920x1080 - 39.4 Mb/s - 4 min 3 s</div>
+    <div>1.19 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_49c9bf517a">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_49c9bf517a">Ermal Meta & Fabrizio Moro – Non mi avete fatto niente - Eurovision - (prova) - 12-5-18 ore 13-30.mp4 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('49c9bf517a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('49c9bf517a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('49c9bf517a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente  - 12-5-18.ts_snapshot_03.52.823.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente  - 12-5-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente  - 12-5-18.ts_snapshot_03.52.823.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ermal Meta - & Fabrizio Moro – Non mi avete fatto niente  - 12-5-18.ts.jpg">
+  <div class="tecnici-box" id="video_e2cc35dc2f">
+    <div class="riga1">1920x1080 - 38.5 Mb/s - 4 min 4 s</div>
+    <div>1.17 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e2cc35dc2f">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_e2cc35dc2f">Ermal Meta & Fabrizio Moro – Non mi avete fatto niente - Eurovision - (gara) - 12-5-18.mp4 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Ermal Meta">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e2cc35dc2f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e2cc35dc2f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e2cc35dc2f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - 1-5-20.ts_snapshot_00.33.250.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - 1-5-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - 1-5-20.ts_snapshot_00.33.250.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - 1-5-20.ts.jpg">
+  <div class="tecnici-box" id="video_e67ec2f0cd">
+    <div class="riga1">1920x1080 - 8.9 Mb/s - 7 min 56 s</div>
+    <div>0.55 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e67ec2f0cd">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth</div>
+  <div class="notebox" id="note_e67ec2f0cd">Fabrizio Moro - 1-5-20.ts - Pace - Portami via - Rai Tre</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e67ec2f0cd')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e67ec2f0cd')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e67ec2f0cd')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - 1-5-21.ts_snapshot_06.39.837.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - 1-5-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - 1-5-21.ts_snapshot_06.39.837.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - 1-5-21.ts.jpg">
+  <div class="tecnici-box" id="video_0f54213b43">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 9 min 32 s</div>
+    <div>1.31 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_0f54213b43">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_0f54213b43">Fabrizio Moro - 1-5-21.ts - Libero - L'Italia è di tutti - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('0f54213b43')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('0f54213b43')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('0f54213b43')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - 1-5-22.ts_snapshot_10.03.321.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - 1-5-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - 1-5-22.ts_snapshot_10.03.321.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - 1-5-22.ts.jpg">
+  <div class="tecnici-box" id="video_d30ea2ea7e">
+    <div class="riga1">1920x1080 -  - 12 min</div>
+    <div>2.43 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d30ea2ea7e">MPEG Audio - en</div>
+  <div class="notebox" id="note_d30ea2ea7e">Fabrizio Moro - 1-5-22.ts - Non mi avete fatto niente - Libero - Il senso di ogni cosa - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d30ea2ea7e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d30ea2ea7e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d30ea2ea7e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - &  Ultimo - L'eternita' - Power Hits Estate</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - &  Ultimo - L'eternita' - Power Hits Estate - 3-8-18.ts_snapshot_00.32.271.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - &  Ultimo - L'eternita' - Power Hits Estate - 3-8-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - &  Ultimo - L'eternita' - Power Hits Estate - 3-8-18.ts_snapshot_00.32.271.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - &  Ultimo - L'eternita' - Power Hits Estate - 3-8-18.ts.jpg">
+  <div class="tecnici-box" id="video_e99a33ae0e">
+    <div class="riga1">1920x1080 - 13.6 Mb/s - 5 min 19 s</div>
+    <div>0.61 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e99a33ae0e">PCM - 1536 kb/s - it</div>
+  <div class="notebox" id="note_e99a33ae0e">Fabrizio Moro ft. Ultimo - L'eternita' (il mio quartiere) - Power Hits Estate - 3-8-18 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e99a33ae0e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e99a33ae0e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e99a33ae0e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - & Il Tre - Medley - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - & Il Tre - Medley - Sanremo - 9-2-24.ts_snapshot_05.26.216.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - & Il Tre - Medley - Sanremo - 9-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - & Il Tre - Medley - Sanremo - 9-2-24.ts_snapshot_05.26.216.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - & Il Tre - Medley - Sanremo - 9-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_17ec935f61">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 6 min 28 s</div>
+    <div>0.98 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_17ec935f61">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_17ec935f61">Fabrizio Moro - & Il Tre - Medley (Pensa - Portami via - Il senso di ogni cosa) - Sanremo - 9-2-24.ts - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('17ec935f61')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('17ec935f61')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('17ec935f61')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - & Ultimo - L'eternita' - Wind Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - & Ultimo - L'eternita' - Wind Music Awards - 4-6-18.ts_snapshot_03.10.602.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - & Ultimo - L'eternita' - Wind Music Awards - 4-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - & Ultimo - L'eternita' - Wind Music Awards - 4-6-18.ts_snapshot_03.10.602.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - & Ultimo - L'eternita' - Wind Music Awards - 4-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_dfd4dda275">
+    <div class="riga1">1920x1080 - 28 Mb/s - 4 min 42 s</div>
+    <div>0.98 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_dfd4dda275">MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_dfd4dda275">Fabrizio Moro ft. Ultimo - L'eternita' (il mio quartiere) - Wind Music Awards - 4-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dfd4dda275')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dfd4dda275')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dfd4dda275')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Battiti Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Battiti Live - 28-7-19.mkv_snapshot_07.04.096.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Battiti Live - 28-7-19.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Battiti Live - 28-7-19.mkv_snapshot_07.04.096.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Battiti Live - 28-7-19.mkv.jpg">
+  <div class="tecnici-box" id="video_71cb922cc8">
+    <div class="riga1">1920x1080 -  - 17 min 20 s</div>
+    <div>2.88 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_71cb922cc8">MPEG Audio - it</div>
+  <div class="notebox" id="note_71cb922cc8">Fabrizio Moro - Non mi avete fatto niente - Pensa - Portami via - Ho bisogno di credere - Battiti Live - Bari - 28-7-19.mkv - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('71cb922cc8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('71cb922cc8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('71cb922cc8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Capodanno in musica</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Capodanno in musica - 31-12-17.ts_snapshot_03.46.585.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Capodanno in musica - 31-12-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Capodanno in musica - 31-12-17.ts_snapshot_03.46.585.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Capodanno in musica - 31-12-17.ts.jpg">
+  <div class="tecnici-box" id="video_61d4c38a72">
+    <div class="riga1">1920x1080 - 19.9 Mb/s - 5 min 42 s</div>
+    <div>0.85 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_61d4c38a72">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_61d4c38a72">Fabrizio Moro - Libero - Pensa - Portami via - 31-12-17 - Capodanno in musica - Radio Subasio</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('61d4c38a72')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('61d4c38a72')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('61d4c38a72')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Capodanno in musica</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Capodanno in musica - 31-12-19.ts_snapshot_04.25.543.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Capodanno in musica - 31-12-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Capodanno in musica - 31-12-19.ts_snapshot_04.25.543.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Capodanno in musica - 31-12-19.ts.jpg">
+  <div class="tecnici-box" id="video_9b237b31b9">
+    <div class="riga1">1920x1080 - 19.3 Mb/s - 9 min 39 s</div>
+    <div>1.42 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_9b237b31b9">MPEG Audio - 256 kb/s - it<br>MPEG Audio - 256 kb/s - it<br>MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_9b237b31b9">Fabrizio Moro - Capodanno in musica - Non mi avete fatto niente - L'eternità - Portami via - 31-12-19 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9b237b31b9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9b237b31b9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9b237b31b9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Con il cuore</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Con il cuore - 10-6-19.ts_snapshot_03.17.898.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Con il cuore - 10-6-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Con il cuore - 10-6-19.ts_snapshot_03.17.898.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Con il cuore - 10-6-19.ts.jpg">
+  <div class="tecnici-box" id="video_163076d1e5">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 8 min 42 s</div>
+    <div>1.20 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_163076d1e5">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_163076d1e5">Fabrizio Moro - Con il cuore - Portami via - Ho bisogno di credere - 10-6-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('163076d1e5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('163076d1e5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('163076d1e5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - I tuoi particolari - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - I tuoi particolari - Sanremo - 8-2-19.ts_snapshot_03.59.342.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - I tuoi particolari - Sanremo - 8-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - I tuoi particolari - Sanremo - 8-2-19.ts_snapshot_03.59.342.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - I tuoi particolari - Sanremo - 8-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_09dfed9b5c">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 25 s</div>
+    <div>0.91 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_09dfed9b5c">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_09dfed9b5c">Fabrizio Moro - I tuoi particolari - con  Ultimo.ts - 8-2-19 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('09dfed9b5c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('09dfed9b5c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('09dfed9b5c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - L'eternita - Con il cuore</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - L'eternita - Con il cuore - 19-6-18.ts_snapshot_00.14.558.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - L'eternita - Con il cuore - 19-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - L'eternita - Con il cuore - 19-6-18.ts_snapshot_00.14.558.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - L'eternita - Con il cuore - 19-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_beee70045d">
+    <div class="riga1">1920x1080 - 28.6 Mb/s - 4 min 43 s</div>
+    <div>0.98 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_beee70045d">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_beee70045d">Fabrizio Moro - L'eternita (il mio quartiere) - Con il cuore - Assisi - 19-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('beee70045d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('beee70045d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('beee70045d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - La leva calcistica della classe '68 - Sanremo - 9-2-17</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - La leva calcistica della classe '68 - Sanremo - 9-2-17 .ts_snapshot_02.03.069.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - La leva calcistica della classe '68 - Sanremo - 9-2-17 .ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - La leva calcistica della classe '68 - Sanremo - 9-2-17 .ts_snapshot_02.03.069.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - La leva calcistica della classe '68 - Sanremo - 9-2-17 .ts.jpg">
+  <div class="tecnici-box" id="video_d59f1acef3">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 33 s</div>
+    <div>0.86 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d59f1acef3">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_d59f1acef3">Fabrizio Moro - La leva calcistica della classe '68 - Sanremo - 9-2-17 .ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d59f1acef3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d59f1acef3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d59f1acef3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Napoli Pizza Village</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Napoli Pizza Village -1-6-18.ts_snapshot_08.46.996.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Napoli Pizza Village -1-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Napoli Pizza Village -1-6-18.ts_snapshot_08.46.996.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Napoli Pizza Village -1-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_6e33f8065c">
+    <div class="riga1">1920x1080 - 20.1 Mb/s - 27 min 23 s</div>
+    <div>4.12 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6e33f8065c">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_6e33f8065c">Fabrizio Moro - Libero - Sono come sono - L'eternità - Penso - Non mi avete fatto niente - Portami via - Napoli Pizza Village -1-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6e33f8065c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6e33f8065c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6e33f8065c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Olimpico di Roma</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Olimpico di Roma - 16-6-18.mp4_snapshot_00.12.34.220.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Olimpico di Roma - 16-6-18.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Olimpico di Roma - 16-6-18.mp4_snapshot_00.12.34.220.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Olimpico di Roma - 16-6-18.mp4.jpg">
+  <div class="tecnici-box" id="video_fcf54f6a3c">
+    <div class="riga1">1920x1080 - 3.2 Mb/s - 2 h 38 min</div>
+    <div>3.71 GB - 30 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_fcf54f6a3c">AAC - L R - 151 kb/s - en</div>
+  <div class="notebox" id="note_fcf54f6a3c">Fabrizio Moro - Olimpico di Roma - 16-6-18 - RTL 102,5 - <br>Tutto quello che volevi<br>Soluzioni<br>Tu<br>È solo amore<br>Alessandra sarà sempre più bella<br>Il peggio è passato<br>La complicità<br>Fermi con le mani<br>L'essenza<br>L'eternità - (with Ultimo) (Versione "Il Mio Quartiere")<br>Melodia di giugno - (with Ultimo)<br>Sono anni che ti aspetto<br>Intro<br>L'inizio<br>Ognuno ha quel che si merita<br>Sono solo parole<br>Giocattoli<br>Da una sola parte<br>L'indiano<br>Intanto<br>I pensieri di Zo - (Fiorella Mannoia cover) (with Fiorella Mannoia)<br>Acqua - (with Fiorella Mannoia)<br>Eppure mi hai cambiato la vita<br>Sangue nelle vene<br>21 anni<br>Babbo Natale esiste<br>Pensa<br>Non mi avete fatto niente - (with Ermal Meta)<br>Portami via<br>Parole, rumori e giorni<br> Encore:<br>Un'altra vita<br>Libero<br>Sono come sono<br>Pace</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('fcf54f6a3c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('fcf54f6a3c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('fcf54f6a3c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Pensa</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Pensa - 3-6-18.ts_snapshot_02.48.597.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Pensa - 3-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Pensa - 3-6-18.ts_snapshot_02.48.597.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Pensa - 3-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_fa5d901ef6">
+    <div class="riga1">1920x1080 - 14.8 Mb/s - 3 min 9 s</div>
+    <div>0.36 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_fa5d901ef6">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_fa5d901ef6">Fabrizio Moro - Pensa - con Irama - Amici - 3-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('fa5d901ef6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('fa5d901ef6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('fa5d901ef6')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Portami via - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Portami via - Sanremo - 7-2-17.ts_snapshot_02.53.533.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Portami via - Sanremo - 7-2-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Portami via - Sanremo - 7-2-17.ts_snapshot_02.53.533.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Portami via - Sanremo - 7-2-17.ts.jpg">
+  <div class="tecnici-box" id="video_abefc8d070">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 3 s</div>
+    <div>0.75 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_abefc8d070">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_abefc8d070">Fabrizio Moro - Portami via - 1 Serata - 7-2-17.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('abefc8d070')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('abefc8d070')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('abefc8d070')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Portami via - Wind Summer Festival</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Portami via - Wind Summer Festival - 16-9-18.ts_snapshot_03.08.630.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Portami via - Wind Summer Festival - 16-9-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Portami via - Wind Summer Festival - 16-9-18.ts_snapshot_03.08.630.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Portami via - Wind Summer Festival - 16-9-18.ts.jpg">
+  <div class="tecnici-box" id="video_3ba69be432">
+    <div class="riga1">1920x1080 - 26.8 Mb/s - 5 min 15 s</div>
+    <div>1.05 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3ba69be432">MPEG Audio - 256 kb/s - int</div>
+  <div class="notebox" id="note_3ba69be432">Fabrizio Moro - Portami via - Wind Summer Festival - 16-9-18.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3ba69be432')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3ba69be432')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3ba69be432')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Radio Italia Live - 29-6-19.mkv_snapshot_14.07.920.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Radio Italia Live - 29-6-19.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Radio Italia Live - 29-6-19.mkv_snapshot_14.07.920.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Radio Italia Live - 29-6-19.mkv.jpg">
+  <div class="tecnici-box" id="video_49f8846908">
+    <div class="riga1">1920x1080 - 17.1 Mb/s - 14 min 55 s</div>
+    <div>1.86 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_49f8846908">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_49f8846908">Fabrizio Moro - Radio Italia Live - (Palermo) - 29-6-19  - Feed<br>Non mi avete fatto niente - Pensa - Portami via - Ho bisogno di credere</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('49f8846908')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('49f8846908')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('49f8846908')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Seat Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Seat Music Awards - 5-9-20.ts_snapshot_03.54.982.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Seat Music Awards - 5-9-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Seat Music Awards - 5-9-20.ts_snapshot_03.54.982.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Seat Music Awards - 5-9-20.ts.jpg">
+  <div class="tecnici-box" id="video_f873bf2b83">
+    <div class="riga1">1920x1080 - 29.7 Mb/s - 5 min 43 s</div>
+    <div>1.27 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f873bf2b83">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_f873bf2b83">Fabrizio Moro - Il senso di ogni cosa - Portami via - L'eternità - Seat Music Awards - Verona - 5-9-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f873bf2b83')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f873bf2b83')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f873bf2b83')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Sei tu - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Sei tu - Sanremo - 2-2-22.ts_snapshot_00.56.936.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Sei tu - Sanremo - 2-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Sei tu - Sanremo - 2-2-22.ts_snapshot_00.56.936.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Sei tu - Sanremo - 2-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_5ad80338e6">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 28 s</div>
+    <div>0.85 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5ad80338e6">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_5ad80338e6">Fabrizio Moro - Sei tu - Sanremo - 2 serata - 2-2-22.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5ad80338e6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5ad80338e6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5ad80338e6')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Sei tu - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Sei tu - Sanremo - 3-2-22.ts_snapshot_01.32.343.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Sei tu - Sanremo - 3-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Sei tu - Sanremo - 3-2-22.ts_snapshot_01.32.343.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Sei tu - Sanremo - 3-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_35c953ec96">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 3 min 59 s</div>
+    <div>0.76 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_35c953ec96">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_35c953ec96">Fabrizio Moro - Sei tu - Sanremo - 3 serata - 3-2-22.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('35c953ec96')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('35c953ec96')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('35c953ec96')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Sei tu - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Sei tu - Sanremo - 5-2-22.ts_snapshot_03.55.106.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Sei tu - Sanremo - 5-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Sei tu - Sanremo - 5-2-22.ts_snapshot_03.55.106.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Sei tu - Sanremo - 5-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_e63883476e">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 6 s</div>
+    <div>0.85 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e63883476e">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_e63883476e">Fabrizio Moro - Sei tu - Sanremo - 5 serata - 5-2-22.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e63883476e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e63883476e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e63883476e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Tim Music Awards - 9-9-22.ts_snapshot_00.36.804.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Tim Music Awards - 9-9-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Tim Music Awards - 9-9-22.ts_snapshot_00.36.804.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Tim Music Awards - 9-9-22.ts.jpg">
+  <div class="tecnici-box" id="video_8c17c6bce7">
+    <div class="riga1">1920x1080 - 8.6 Mb/s - 3 min 57 s</div>
+    <div>0.27 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8c17c6bce7">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 384 kb/s - oth<br>MPEG Audio - 192 kb/s - en<br>MPEG Audio - 64 kb/s - oth</div>
+  <div class="notebox" id="note_8c17c6bce7">Fabrizio Moro - Il segno di ogni cosa - Tim Music Awards - 9-9-22.ts - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8c17c6bce7')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8c17c6bce7')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8c17c6bce7')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Uomini soli - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Uomini soli - Sanremo - 4-2-22.ts_snapshot_03.33.448.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Uomini soli - Sanremo - 4-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Uomini soli - Sanremo - 4-2-22.ts_snapshot_03.33.448.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Uomini soli - Sanremo - 4-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_cb30037b13">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 29 s</div>
+    <div>1.14 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_cb30037b13">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_cb30037b13">Fabrizio Moro - Uomini soli - Sanremo - 4 serata - 4-2-22.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('cb30037b13')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('cb30037b13')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('cb30037b13')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #177245;" data-stars="0">
+  <div class="card-title" style="color:#0d4429;">Fabrizio Moro - Wind Summer Festival</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fabrizio Moro - Wind Summer Festival - 16-9-18.ts_snapshot_04.35.427.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fabrizio Moro - Wind Summer Festival - 16-9-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fabrizio Moro - Wind Summer Festival - 16-9-18.ts_snapshot_04.35.427.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fabrizio Moro - Wind Summer Festival - 16-9-18.ts.jpg">
+  <div class="tecnici-box" id="video_16da54f8ca">
+    <div class="riga1">1920x1080 - 20 Mb/s - 5 min 15 s</div>
+    <div>0.79 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_16da54f8ca">MPEG Audio - 256 kb/s - int<br>MPEG Audio - 256 kb/s - int</div>
+  <div class="notebox" id="note_16da54f8ca">Fabrizio Moro - Portami via - L'eternità - Wind Summer Festival - 16-9-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#177245;color:#fff;" title="Fabrizio Moro">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('16da54f8ca')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('16da54f8ca')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('16da54f8ca')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

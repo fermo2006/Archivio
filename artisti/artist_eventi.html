@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Eventi</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#eef0f4;">
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#AEB5CA; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Eventi
+  <span style="font-size:0.6em; color:#222; font-weight:normal;">(37 file)</span>
+</h1>
+<input type="text" id="search" placeholder="Cerca titolo...">
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+<div class="grid">
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Artic Monkeys - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Artic Monkeys - Glastonbury - 23-6-23.ts_snapshot_01.41.22.453.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Artic Monkeys - Glastonbury - 23-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Artic Monkeys - Glastonbury - 23-6-23.ts_snapshot_01.41.22.453.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Artic Monkeys - Glastonbury - 23-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_76a9c980d7">
+    <div class="riga1">1920x1080 - 27.9 Mb/s - 1 h 41 min</div>
+    <div>19.74 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_76a9c980d7">MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_76a9c980d7">Artic Monkeys - Glastonbury  23-6-23.ts - Feed<br>Sculptures of Anything Goes<br>Brianstorm<br>Snap Out of It<br>Don't Sit Down 'Cause I've Moved Your Chair<br>Crying Lightning<br>Teddy Picker<br>Cornerstone - (Followed by piano interlude)<br>Why'd You Only Call Me When You're High?<br>Arabella - (Black Sabbath's "War Pigs" outro)<br>Four Out of Five - (New Arrangement)<br>Pretty Visitors - (Key change in the outro)<br>Fluorescent Adolescent<br>Perfect Sense<br>Do I Wanna Know?<br>Mardy Bum<br>There'd Better Be a Mirrorball<br>505 - (with James Ford) (New arrangement)<br>Body Paint - (with James Ford) (Extended outro)<br>Encore:<br>I Wanna Be Yours - (John Cooper Clarke cover) (Star Treatment lyrics recited in outro, first line changed to "I just wanted a jet ski for the moat")<br>I Bet You Look Good on the Dancefloor<br>R U Mine?</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('76a9c980d7')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('76a9c980d7')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('76a9c980d7')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Barry Gibb - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Barry Gibb - Glastonbury - 25-6-17.m2ts_snapshot_01.03.06.850.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Barry Gibb - Glastonbury - 25-6-17.m2ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Barry Gibb - Glastonbury - 25-6-17.m2ts_snapshot_01.03.06.850.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Barry Gibb - Glastonbury - 25-6-17.m2ts.jpg">
+  <div class="tecnici-box" id="video_e6ab91e831">
+    <div class="riga1">1920x1080 - 30.9 Mb/s - 1 h 17 min</div>
+    <div>17.81 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_e6ab91e831">MPEG Audio - 384 kb/s - en<br>MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_e6ab91e831">Barry Gibb - Glastonbury - 25-6-17.m2ts - Feed<br>Jive Talkin' - (Bee Gees song)<br>You Should Be Dancing - (Bee Gees song)<br>Lonely Days - (Bee Gees song)<br>How Can You Mend a Broken Heart? - (Bee Gees song)<br>To Love Somebody - (Bee Gees song)<br>Stayin' Alive - (Bee Gees song)<br>I've Gotta Get a Message to You - (Bee Gees song)<br>How Deep Is Your Love? - (Bee Gees song)<br>Spicks and Specks - (Bee Gees song)<br>Guilty<br>Islands in the Stream - (Bee Gees song)<br>Night Fever / More Than a Woman - (Bee Gees song)<br>Nights on Broadway - (Bee Gees song)<br>Words - (Bee Gees song)<br>Tragedy - (Bee Gees song)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e6ab91e831')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e6ab91e831')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e6ab91e831')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Beyonce - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Beyonce - Glastonbury - 26-6-2011.ts_snapshot_00.04.50.634.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Beyonce - Glastonbury - 26-6-2011.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Beyonce - Glastonbury - 26-6-2011.ts_snapshot_00.04.50.634.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Beyonce - Glastonbury - 26-6-2011.ts.jpg">
+  <div class="tecnici-box" id="video_af7552770d">
+    <div class="riga1">1920x1080 - 45 Mb/s - 1 h 34 min</div>
+    <div>31.32 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_af7552770d">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_af7552770d">Beyonce - Glastonbury - 26-6-11.ts - Feed<br>Crazy in Love - (With a snippet of ‘Come Together’ by The Beatles)<br>Single Ladies (Put a Ring on It)<br>Naughty Girl<br>Baby Boy - (with Tricky)<br>Best Thing I Never Had - (With "Happy Birthday" to Steve Stoute at beginning)<br>End of Time<br>If I Were a Boy - (Snippet of "You Oughta Know" by Alanis Morrisette)<br>Sweet Dreams - (Snippet of "Sweet Dreams (Are Made of This)" by Eurythmics)<br>Why Don't You Love Me<br>Love Hangover - (Backing vocalists)<br>The Beautiful Ones - (Prince cover)<br>Sex on Fire - (Kings of Leon cover)<br>1+1<br>Irreplaceable<br>Destiny's Child Medley<br>Independent Women, Pt. 1 - (Destiny’s Child song)<br>Bootylicious - (Destiny’s Child song)<br>Bug a Boo - (Destiny’s Child song)<br>Telephone - (Lady Gaga cover)<br>Say My Name - (Destiny’s Child song)<br>Jumpin', Jumpin' - (Destiny’s Child song)<br>Survivor - (Destiny’s Child song)<br>At Last - (Harry Warren cover)<br>Run the World (Girls)<br>Halo</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('af7552770d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('af7552770d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('af7552770d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Billy Elliot - The musical live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Billy Elliot - The musical live - 28-9-14.ts_snapshot_00.01.09.491.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Billy Elliot - The musical live - 28-9-14.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Billy Elliot - The musical live - 28-9-14.ts_snapshot_00.01.09.491.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Billy Elliot - The musical live - 28-9-14.ts.jpg">
+  <div class="tecnici-box" id="video_ef67cf64de">
+    <div class="riga1">1920x1080 - 20.4 Mb/s - 3 h 23 min</div>
+    <div>31.49 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ef67cf64de">AC-3 - L R C LFE Ls Rs - 640 kb/s - en</div>
+  <div class="notebox" id="note_ef67cf64de">Billy Elliot - The musical live - 28-9-14.ts - Feed<br>Elliott Hanna (Billy)<br>Ruthie Henshall (Mrs. Wilkinson)<br>Deka Walmsley (Jackie Elliot)<br>Ann Emery (Grandma)<br>Chris Grahamson (Tony Elliot)<br>Zach Atkinson (Michael Caffrey)<br>Liam Mower (Older Billy)<br>David Muscat (Mr. Braithwaite)<br>Claudia Bradley (Mrs. Elliot)<br>Howard Crossley (George)<br>Demi Lee (Debbie Wilkinson)<br>Alan Mehdizadeh (Big Davey)<br>Liam Sargeant (Small boy)<br>Caspar Meurisse (Tall boy)<br>David Stoller (Scab/Posh Dad)<br>​Ballet Girls: Niamh Bennett, Ella Forman, Imogen Gurney,<br>Lauren Henson, Imogen Kingsley Smith, Erin McIver,<br>Syakira Moeladi, Natasha Pye, Charlotte Ross-Gower,<br>Sophie Smart<br>Show History<br>Billy Elliot The Musical was based on the hit film Billy Elliot,<br>both of which were directed by Stephen Daldry. The film was<br>released in 2000, and the West End musical opened in 2005.<br>The production received rave reviews, won Olivier, Tony,<br>and Helpmann awards for Best Musical, and went on to<br>successful runs on Broadway, and around the world. <br>Billy Elliot the Musical Live<br>Billy Elliot the Musical was filmed on September 28, 2014<br>and broadcast live in 8 different countries.<br>The show was filmed using 12 cameras, providing a variety<br>of angles from the audience and various levels on the stage.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ef67cf64de')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ef67cf64de')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ef67cf64de')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Black Eyed Peas  at the Pyramids in Giza</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Black Eyed Peas  at the Pyramids in Giza - 2-10-21.ts_snapshot_01.39.15.651.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Black Eyed Peas  at the Pyramids in Giza - 2-10-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Black Eyed Peas  at the Pyramids in Giza - 2-10-21.ts_snapshot_01.39.15.651.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Black Eyed Peas  at the Pyramids in Giza - 2-10-21.ts.jpg">
+  <div class="tecnici-box" id="video_8fdd5d7671">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 1 h 42 min</div>
+    <div>14.52 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8fdd5d7671">MPEG Audio - 192 kb/s - en<br>MPEG Audio - 192 kb/s - en<br>MPEG Audio - 192 kb/s - en<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_8fdd5d7671">Black Eyed Peas  at the Pyramids in Giza - 2-10-21.ts - Feed<br>Let's Get It Started<br>Rock That Body<br>Boom Boom Pow<br>Imma Be<br>Pump It<br>MAMACITA<br>RITMO (Bad Boys for Life) - (shortened)<br>GIRL LIKE ME<br>Rockin to the Beat - (Taboo solo)  <br>Bebot<br>PULL UP - (J. Rey Soul song) (J. Rey Soul & will.i.am solo)<br>This Is Love - (will.i.am song) (will.i.am solo)<br>#thatPower - (will.i.am song) (will.i.am solo)<br>Scream & Shout - (will.i.am song) (will.i.am solo) <br>Where Is the Love?<br><br>Note: In person attendance and livestreamed. The Show was cut short due to platform collapse</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8fdd5d7671')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8fdd5d7671')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8fdd5d7671')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">BTS</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/BTS - 12-3-22.ts_snapshot_02.29.59.894.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/BTS - 12-3-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/BTS - 12-3-22.ts_snapshot_02.29.59.894.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/BTS - 12-3-22.ts.jpg">
+  <div class="tecnici-box" id="video_09cec98510">
+    <div class="riga1">1920x1080 - 14 Mb/s - 2 h 31 min</div>
+    <div>15.78 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_09cec98510">MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_09cec98510">BTS - 12-3-22.ts - Feed<br>On<br>Fire<br>Dope<br>Dna<br>Blue & Grey<br>Black Swan<br>Blood Sweat & Tears - (snippet)<br>Fake love<br>Life Goes On<br>Boy With Luv<br>Dynamite - (remix)<br>Butter<br>Telepathy<br>Outro: Wings<br>Stay<br>So What<br>Idol<br>    Encore:<br>Home<br>Anpanman<br>Go Go<br>Permission to Dance<br>Note: This concert was broadcast in select movie theatres around the world<br>from Olympic Stadium, Seoul, South Korea</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('09cec98510')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('09cec98510')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('09cec98510')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Cat Stevens - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Cat Stevens - Glastonbury - 25-6-23.ts_snapshot_01.18.31.208.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Cat Stevens - Glastonbury - 25-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Cat Stevens - Glastonbury - 25-6-23.ts_snapshot_01.18.31.208.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Cat Stevens - Glastonbury - 25-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_62bf1d278b">
+    <div class="riga1">1920x1080 - 27.3 Mb/s - 1 h 18 min</div>
+    <div>15.96 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_62bf1d278b">MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_62bf1d278b">Cat Stevens - Glastonbury - 25-6-23.ts - Feed<br>The Wind<br>Moonshadow<br>I Love My Dog / Here Comes My Baby<br>The First Cut Is the Deepest<br>Matthew & Son<br>Where Do the Children Play?<br>Oh Very Young<br>Hard Headed Woman<br>Sitting<br>Tea for the Tillerman<br>(Remember the Days of the) Old Schoolyard<br>If You Want to Sing Out, Sing Out<br>Morning Has Broken<br>Take the World Apart<br>Here Comes the Sun - (The Beatles cover) <br>Don't Let Me Be Misunderstood - (Nina Simone cover)<br>Highness<br>Peace Train<br>Pagan Run<br>Wild World<br>Father and Son</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('62bf1d278b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('62bf1d278b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('62bf1d278b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Chappell Roan - Reading Festival</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Chappell Roan - Reading Festival - 22-8-25.ts_snapshot_00.26.27.928.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Chappell Roan - Reading Festival - 22-8-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Chappell Roan - Reading Festival - 22-8-25.ts_snapshot_00.26.27.928.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Chappell Roan - Reading Festival - 22-8-25.ts.jpg">
+  <div class="tecnici-box" id="video_9339eedc7d">
+    <div class="riga1">1920x1080 - 28.7 Mb/s - 1 h 4 min</div>
+    <div>13.49 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_9339eedc7d">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_9339eedc7d">Chappell Roan - Reading Festival - 22-8-25.ts - Feed<br>at Little John's Farm, Reading<br>Super Graphic Ultra Modern Girl - (extended intro)<br>Femininomenon<br>After Midnight<br>Naked in Manhattan<br>Guilty Pleasure<br>Casual - (preceded by band introductions)<br>The Subway<br>HOT TO GO!<br>Barracuda - (Heart cover)<br>Picture You<br>Love Me Anyway<br>The Giver<br>Red Wine Supernova<br>Coffee<br>Good Luck, Babe!<br>My Kink Is Karma - (Chappell: "I dedicate this song to my ex, who is in the crowd tonight")<br>Pink Pony Club</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9339eedc7d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9339eedc7d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9339eedc7d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Chic - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Chic - Glastonbury - 25-6-17.m2ts_snapshot_01.02.26.257.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Chic - Glastonbury - 25-6-17.m2ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Chic - Glastonbury - 25-6-17.m2ts_snapshot_01.02.26.257.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Chic - Glastonbury - 25-6-17.m2ts.jpg">
+  <div class="tecnici-box" id="video_3e098cd439">
+    <div class="riga1">1920x1080 - 31 Mb/s - 1 h 6 min</div>
+    <div>15.26 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_3e098cd439">MPEG Audio - 384 kb/s - en<br>MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_3e098cd439">Chic - Glastonbury - 25-6-17.m2ts - Feed<br>Everybody Dance<br>I Want Your Love<br>I'm Coming Out - (Diana Ross cover)<br>Upside Down - (Diana Ross cover)<br>He's the Greatest Dancer - (Sister Sledge cover)<br>We Are Family - (Sister Sledge cover)<br>My Feet Keep Dancing<br>Get Lucky - (Daft Punk cover)<br>Let's Dance - (David Bowie cover)<br>Le Freak<br>Good Times / Rapper's Delight</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3e098cd439')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3e098cd439')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3e098cd439')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Duran Duran - Isle of Wight Festival</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Duran Duran - Isle of Wight Festival - 19-9-21.ts_snapshot_00.02.28.987.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Duran Duran - Isle of Wight Festival - 19-9-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Duran Duran - Isle of Wight Festival - 19-9-21.ts_snapshot_00.02.28.987.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Duran Duran - Isle of Wight Festival - 19-9-21.ts.jpg">
+  <div class="tecnici-box" id="video_0d2743b826">
+    <div class="riga1">1920x1080 - 29.3 Mb/s - 1 h 15 min</div>
+    <div>17.92 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_0d2743b826">MPEG Audio - 384 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls X R LFE Rs X - 1291 kb/s - de<br>Dolby E - X X X L X X X R - 505 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_0d2743b826">Duran Duran - Isle of Wight Festival - 19-9-21.ts - Feed<br>Invisible<br>The Reflex<br>Notorious<br>Anniversary<br>Come Undone <br>A View to a Kill<br>Pressure Off<br>Friends of Mine<br>Planet Earth<br>Ordinary World<br>Tonight United<br>(Reach Up for the) Sunrise<br>White Lines (Don't Don't Do It) - (Grandmaster Melle Mel cover)<br>Girls on Film / Acceptable in the 80's<br>   Encore:<br>Save a Prayer<br>Perfect Day / The Wild Boys<br>Rio</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('0d2743b826')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('0d2743b826')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('0d2743b826')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Elton John - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Elton John - Glastonbury - 25-6-23.ts_snapshot_00.05.28.597.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Elton John - Glastonbury - 25-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Elton John - Glastonbury - 25-6-23.ts_snapshot_00.05.28.597.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Elton John - Glastonbury - 25-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_2078c38a7a">
+    <div class="riga1">1920x1080 - 27.6 Mb/s - 2 h</div>
+    <div>24.79 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_2078c38a7a">MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_2078c38a7a">Elton John - Glastonbury - 25-6-23.ts - Feed<br>Pinball Wizard - (The Who cover) (first time since 2009)<br>The Bitch Is Back<br>Bennie and the Jets<br>Daniel<br>Goodbye Yellow Brick Road<br>I Guess That's Why They Call It the Blues<br>Philadelphia Freedom<br>Are You Ready for Love - (with Jacob Lusk) (+ London Community Gospel Choir; first time since 2014)<br>Sad Songs (Say So Much) - (with London Community Gospel Choir)<br>Someone Saved My Life Tonight<br>Until I Found You - (Stephen Sanchez cover) (with Stephen Sanchez) (first time played by E.J.)<br>Your Song<br>Candle in the Wind - (with video clips of Marilyn Monroe on the screen)<br>Tiny Dancer - (with Brandon Flowers) (BF sings "I thank the Lord for the people I have found" from "Mona Lisas & Mad Hatters" as last line)<br>Don't Go Breaking My Heart - (Elton John & Kiki Dee song) (with Rina Sawayama)<br>Crocodile Rock<br>Saturday Night's Alright for Fighting<br>I'm Still Standing<br>Cold Heart - (remix version; Dua Lipa on backing track)<br>Don't Let the Sun Go Down on Me - (dedicated to George Michael, on what would have been his 60th birthday)<br>Rocket Man (I Think It's Going to Be a Long, Long Time) - (extended outro)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2078c38a7a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2078c38a7a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2078c38a7a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Etam Live Show 2018</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Etam Live Show 2018.ts_snapshot_27.23.470.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Etam Live Show 2018.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Etam Live Show 2018.ts_snapshot_27.23.470.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Etam Live Show 2018.ts.jpg">
+  <div class="tecnici-box" id="video_07eef4bf36">
+    <div class="riga1">1920x1080 - 15.4 Mb/s - 27 min 36 s</div>
+    <div>3.33 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_07eef4bf36">MPEG Audio - 320 kb/s - fr<br>MPEG Audio - 320 kb/s - fr<br>MPEG Audio - 320 kb/s - de<br>MPEG Audio - 256 kb/s - fr</div>
+  <div class="notebox" id="note_07eef4bf36">Etam Live Show 2018.ts - Feed<br>5 great women on stage : Cardi B, Jain, Zara Larsson, Jorja Smith, IamDDB. <br>80 amazing top models  : Constance Jablonski, Joan Smalls, Camille Rowe,Valery Kauffman, Joana Sanz, Melodie Vaxelaire, <br>Sophie Longford, Monica Cima, Gabrielle Caunesil,Angela Ruiz, Daniela De Jesus, Sofia Resing, Ilona Smet</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('07eef4bf36')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('07eef4bf36')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('07eef4bf36')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">FOX Presents the iHeart Living Room Concert for America</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/FOX Presents the iHeart Living Room Concert for America.ts_snapshot_59.59.022.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/FOX Presents the iHeart Living Room Concert for America.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/FOX Presents the iHeart Living Room Concert for America.ts_snapshot_59.59.022.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/FOX Presents the iHeart Living Room Concert for America.ts.jpg">
+  <div class="tecnici-box" id="video_b949898e57">
+    <div class="riga1">1280x720 - 8.8 Mb/s - 59 min 59 s</div>
+    <div>4.19 GB - 60 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b949898e57">AC-3 - L R C LFE Ls Rs - 448 kb/s - en<br>AC-3 - L R - 192 kb/s - es</div>
+  <div class="notebox" id="note_b949898e57">FOX Presents the iHeart Living Room Concert for America.ts - FOX<br>Performers and performances on iHeart Living Room Concert for America - 20-3-20<br>Alicia Keys - Underdog<br>Backstreet Boys - I Want It That Way<br>Billie Joe Armstrong - Boulevard of Broken Dreams<br>Billie Eilish & Finneas O'Connell  - Bad Guy<br>Camila Cabello & Shawn Mendes (on guitar) - My Oh My<br>Tim McGraw - Something Like That<br>Dave Grohl - My Hero<br>Sam Smith - How Do You Sleep?<br>H.E.R. - Keep Holding On<br>Demi Lovato - Skyscraper<br>Mariah Carey - Always Be My Baby<br>Elton John - Don't Let the Sun Go Down on Me<br>Appearances<br>Melissa McCarthy and Ben Falcone<br>Ellen DeGeneres<br>Ryan Seacrest<br>Lady Gaga<br>Lizzo<br>Ciara and Russell Wilson<br><br>The iHeart Living Room Concert for America was a concert special held on March 29, 2020, by iHeartMedia in response to the COVID-19 pandemic; to provide relief and support to the public in an effort to combat the spread of COVID-19. The special aired on Fox and was simulcast across their sister cable networks, along with a number of iHeartRadio broadcast radio stations and within its mobile app<br>The concert was hosted by Elton John, and it served as a partial replacement for the original timeslot for the 2020 iHeartRadio Music Awards, which was initially delayed to a later date and later cancelled due to the COVID-19 pandemic.It also served as a benefit for Feeding America and the First Responders Children's Foundation.The entire production utilized video conferencing and video apps from each artist and band who appeared to compile the special.<br><br>John, himself, volunteered to host the special, despite not having a piano in his Los Angeles home. Originally, Fox and iHeart were in talks with an undisclosed comedian to host the special, but it fell through.<br><br>It initially saw donations of nearly $8 million (and counting) raised for the charities.[6] This was credited from not only numerous fan contributions, but also $500,000 from corporate partner Procter & Gamble, which Fox matched, and also additional funds raised by Fox employees and corporate partner PricewaterhouseCoopers.It was later reported that special eventually raised more $10 million for the charities as well.<br><br><br>Broadcast<br>The special was broadcast at 9pm EST on Fox and was simulcast on Fox Corporation-owned networks Fox News, Fox Business, Fox Sports 2, and Fox Deportes. It was also broadcast on a majority of iHeartRadio broadcast radio stations, including its mobile app.<br><br>In Canada, the special was simulcast on Much, MTV, and CP24, wherein its broadcast benefits the Canadian Red Cross<br><br>On Fox, the special scored 5.5 million viewers. It also scored 1.5 in the key 18-49 ratings demographic, beating American Idol as most watched show for the evening in this demographic. Overall, the special scored 8.7 million viewers.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b949898e57')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b949898e57')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b949898e57')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Gary Barlow's Big Ben Bash - Fireworks 2013</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Gary Barlow's Big Ben Bash - Fireworks 2013.ts_snapshot_00.36.52.348.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Gary Barlow's Big Ben Bash - Fireworks 2013.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Gary Barlow's Big Ben Bash - Fireworks 2013.ts_snapshot_00.36.52.348.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Gary Barlow's Big Ben Bash - Fireworks 2013.ts.jpg">
+  <div class="tecnici-box" id="video_109ed26e1b">
+    <div class="riga1">1920x1080 - 44.5 Mb/s - 1 h 23 min</div>
+    <div>27.68 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_109ed26e1b">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - cy</div>
+  <div class="notebox" id="note_109ed26e1b">Gary Barlow's Big Ben Bash - Fireworks - 31-12-13.ts - Feed<br>2013<br>Since I Saw You Last<br>Greatest Day - (Take That song)<br>The Flood - (Take That song)<br>Face to Face<br>Don't Stop Me Now - (Queen cover) (With Alfie Boe)<br>Swing Medley<br>Sure - (Take That song)<br>Everything Changes - (Take That song)<br>Could It Be Magic - (Barry Manilow cover)<br>A Million Love Songs - (Take That song)<br>Rule the World - (Take That song)<br>2014<br>Auld Lang Syne - (Robert Burns cover)<br>Shine - (Take That song)<br>Let Me Go<br>Back for Good - (Take That song)<br>Never Forget - (Take That song)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('109ed26e1b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('109ed26e1b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('109ed26e1b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Global Citizen Festival Mandela 100</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Global Citizen Festival Mandela 100.ts_snapshot_00.00.02.089.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Global Citizen Festival Mandela 100.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Global Citizen Festival Mandela 100.ts_snapshot_00.00.02.089.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Global Citizen Festival Mandela 100.ts.jpg">
+  <div class="tecnici-box" id="video_9c4a8e35f2">
+    <div class="riga1">1920x1080 - 30.5 Mb/s - 1 h 30 min</div>
+    <div>20.26 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_9c4a8e35f2">MPEG Audio - 192 kb/s - en<br>MPEG Audio - 192 kb/s - fr<br>MPEG Audio - 192 kb/s - de<br>MPEG Audio - 192 kb/s - el</div>
+  <div class="notebox" id="note_9c4a8e35f2">Global Citizen Festival Mandela 100 - 2-12-18.ts - Feed<br>Chris Martin<br>Rainbow - (Kacey Musgraves cover) (with Kacey Musgraves)<br>E-Lo - (Los Unidades cover) (with Pharrell Williams)<br>Happy - (Pharrell Williams cover) (with Pharrell Williams)<br>Timbuktu - (Cassper Nyovest cover) (with Cassper Nyovest)<br>Ed Sheeran<br>Castle on the Hill<br>The A Team<br>Bloodstream<br>Thinking Out Loud <br>Shape of You  <br>You Need Me, I Don't Need You<br>Eddie Vedder<br>Porch - (Pearl Jam song)<br>Long Road - (Pearl Jam song) (with Soweto Gospel Choir)<br>Better Man - (Pearl Jam song) (with Soweto Gospel Choir)<br>Imagine - (John Lennon cover)<br>Jay- & Beyoncé<br>Holy Grail<br>Part II (On the Run)<br>'03 Bonnie & Clyde<br>Beach Interlude - ("When The Lights Are Low" by The Paragons)<br>Apeshit - (The Carters cover)<br>Nice - - (The Carters cover) (with Pharrell Williams)  <br>La-La-La (Excuse Me Miss Again)<br>I Just Wanna Love U (Give It 2 Me) (with Pharrell Williams)<br>Drunk in Love<br>Empire State of Mind - introduced by a snippet of Frank Sinatra's version of New York, New York  <br>XO<br>Perfect - (Ed Sheeran cover) (with Ed Sheeran) (Perfect Duet version)  <br>Ave Maria - (Franz Schubert cover)<br>Halo<br>Jamaica Interlude - ("Bad" by The Bug)<br>No Church in the Wild<br>Niggas in Paris<br>Beach Is Better<br>Formation<br>Run the World (Girls)<br>Public Service Announcement<br>Ballet Interlude - ("Four Women" by Nina Simone)<br>The Story of O.J.<br>Déjà Vu<br>Show Me What You Got<br>Crazy in Love<br>Freedom<br>Young Forever<br>Kacey Musgraves<br>Rainbow - with Chris Martin<br>Pharrell Williams<br>Freedom</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9c4a8e35f2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9c4a8e35f2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9c4a8e35f2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Guns N' Roses - Glastonbury 2023</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Guns N' Roses - Glastonbury 2023.ts_snapshot_00.54.26.117.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Guns N' Roses - Glastonbury 2023.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Guns N' Roses - Glastonbury 2023.ts_snapshot_00.54.26.117.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Guns N' Roses - Glastonbury 2023.ts.jpg">
+  <div class="tecnici-box" id="video_1db8b59247">
+    <div class="riga1">3840x2160 -  - 2 h 28 min</div>
+    <div>25.64 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1db8b59247">AAC - L R</div>
+  <div class="notebox" id="note_1db8b59247">Guns N' Roses - Glastonbury 2023.ts - Feed<br>Pyramid Stage - Worthy Farm, Pilton, England <br>It's So Easy<br>Bad Obsession<br>Chinese Democracy<br>Slither - (Velvet Revolver cover)<br>Welcome to the Jungle<br>Mr. Brownstone<br>Pretty Tied Up<br>Double Talkin' Jive<br>Estranged<br>Live and Let Die - (Wings cover)<br>Reckless Life<br>T.V. Eye - (The Stooges cover) (Duff on vocals)<br>Down on the Farm - (UK Subs cover)<br>Rocket Queen<br>Absurd<br>Civil War - (Jimi Hendrix's "Voodoo Child" outro)<br>You Could Be Mine - (followed by band introductions)<br>Slash Guitar Solo<br>Sweet Child o' Mine<br>November Rain<br>Patience<br>Hard Skool<br>Knockin' on Heaven's Door - (Bob Dylan cover) (Alice Cooper’s “Only Women Bleed” intro)<br>Nightrain<br>Paradise City - (with Dave Grohl) (on guitar & backing vocals)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1db8b59247')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1db8b59247')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1db8b59247')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Homefest</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Homefest.ts_snapshot_00.14.501.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Homefest.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Homefest.ts_snapshot_00.14.501.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Homefest.ts.jpg">
+  <div class="tecnici-box" id="video_73485dbacd">
+    <div class="riga1">1920x1080 - 6.9 Mb/s - 45 min 37 s</div>
+    <div>2.47 GB - 30 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_73485dbacd">AC-3 - L R C LFE Ls Rs - 384 kb/s - en<br>AC-3 - M - 128 kb/s - es</div>
+  <div class="notebox" id="note_73485dbacd">Homefest.ts - CBS<br>30-3-2020<br>James Corden<br>Andrea Bocelli<br>BTS<br>Billie Eilish<br>Will Ferrell<br>Noah Kieserman<br>Stephanie La Rochelle<br>John Legend<br>Dua Lipa<br>Ben Platt</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('73485dbacd')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('73485dbacd')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('73485dbacd')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Italia Loves Emilia</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Italia Loves Emilia - 22-9-2012.ts_snapshot_00.10.56.455.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Italia Loves Emilia - 22-9-2012.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Italia Loves Emilia - 22-9-2012.ts_snapshot_00.10.56.455.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Italia Loves Emilia - 22-9-2012.ts.jpg">
+  <div class="tecnici-box" id="video_7b98c3bc0c">
+    <div class="riga1">1920x1080 - 7.7 Mb/s - 4 h 25 min</div>
+    <div>16.59 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7b98c3bc0c">AC-3 - L R - 384 kb/s - it<br>AC-3 - L R - 384 kb/s</div>
+  <div class="notebox" id="note_7b98c3bc0c">Italia Loves Emilia - 22-9-12.ts - Primafila<br>Zucchero Fornaciari - Un soffio caldo, Baila, Chocabeck<br>Zucchero Fornaciari, Elisa, Fiorella Mannoia e Jeff Beck - Madre dolcissima<br>Nomadi - Ancora ci sei, Io voglio vivere<br>Nomadi & Claudio Baglioni - Io vagabondo (che non sono altro)<br>Giorgia - Il mio giorno migliore, Di sole e d'azzurro<br>Giorgia & Jovanotti - Tu mi porti su<br>Tiziano Ferro - La differenza tra me e te, Indietro, Sere nere<br>Fiorella Mannoia - Io non ho paura, Quello che le donne non dicono<br>Fiorella Mannoia & Jovanotti - Clandestino<br>Fiorella Mannoia & Giuliano Sangiorgi - Anna e Marco<br>Renato Zero - Cercami, Resisti, I migliori anni della nostra vita<br>Negramaro - Mentre tutto scorre<br>Negramaro, Elisa & Jovanotti - Via le mani dagli occhi<br>Negramaro - Nuvole e lenzuola<br>Elisa & Giuliano Sangiorgi - Ti vorrei sollevare<br>Elisa - Labyrinth<br>Elisa & Luciano Ligabue - Gli ostacoli del cuore<br>Claudio Baglioni - Strada facendo, La vita è adesso<br>Claudio Baglioni & Giuliano Sangiorgi - Via<br>Litfiba - Barcollo, Gioconda<br>Litfiba & Luciano Ligabue - Tex<br>Litfiba, Luciano Ligabue, Fiorella Mannoia, Jovanotti & Claudio Baglioni - Il mio nome è mai più<br>Biagio Antonacci - Non vivo più senza te, Se è vero che ci sei, Liberatemi<br>Jovanotti - La notte dei desideri, Il più grande spettacolo dopo il Big Bang<br>Jovanotti & Renato Zero - Amico<br>Luciano Ligabue - Marlon Brando è sempre lui<br>Luciano Ligabue & Zucchero Fornaciari - Non è tempo per noi<br>Luciano Ligabue - Il meglio deve ancora venire<br>Tutti gli artisti - A muso duro<br>Evento trasmesso da Sky Primafila</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7b98c3bc0c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7b98c3bc0c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7b98c3bc0c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Italia Loves Romagna</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Italia Loves Romagna - 24-6-23.ts_snapshot_00.13.13.427.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Italia Loves Romagna - 24-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Italia Loves Romagna - 24-6-23.ts_snapshot_00.13.13.427.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Italia Loves Romagna - 24-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_4b56e09a16">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 4 h 18 min</div>
+    <div>35.69 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4b56e09a16">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_4b56e09a16">Italia Loves Romagna - 24-6-23.ts - Feed<br>Intro di Oma Jali - Oh, Doctor Jesus (cover di Ella Fitzgerald)<br>Zucchero Fornaciari - Partigiano reggiano, Per colpa di chi?<br>Zucchero Fornaciari e Salmo - Diavolo in me<br>Salmo - 90min<br>Irama e Rkomi - 5 gocce, Luna piena<br>Fiorella Mannoia - Combattente, Che sia benedetta<br>Laura Pausini - Romagna mia, Benvenuto, Simili<br>Laura Pausini e Giorgia - You've Got a Friend<br>Tananai - Tango, Abissale<br>Elisa - Anche fragile, Gli ostacoli del cuore<br>Andrea Bocelli con Zucchero - Miserere<br>Andrea Bocelli - Con te partirò<br>Giorgia - Oronero, Il mio giorno migliore, Di sole e d’azzurro<br>Luciano Ligabue - Il giorno di dolore che uno ha, Tra palco e realtà<br>Elodie - Vertigine, Due<br>Gianni Morandi - Apri tutte le porte, Uno su mille<br>Emma - Trattengo il fiato, Amami, Cercavo amore, Io sono bella<br>Max Pezzali - Nessun rimpianto, Con un deca<br>Madame - Voce, Il bene nel male<br>Negramaro - Mentre tutto scorre, Nuvole e lenzuola<br>Negramaro con Rkomi - Estate<br>Blanco - Blu celeste, Notti in bianco<br>Elisa e Ligabue - A modo tuo<br>Tananai e Max Pezzali - Gli anni<br>Rkomi ed Elodie - La coda del diavolo<br>Fiorella Mannoia ed Emma - Il peso del coraggio<br>Tananai e Ligabue - Piccola stella senza cielo<br>Irama ed Elisa - Ovunque sarai<br>Max Pezzali e Ligabue - Leggero<br>Gianni Morandi, Fiorella Mannoia ed Elodie - Vita, C'era un ragazzo che come me amava i Beatles e i Rolling Stones</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4b56e09a16')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4b56e09a16')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4b56e09a16')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Jess Glynne - Isle of Wight</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Jess Glynne - Isle of Wight - 22-6-25.ts_snapshot_53.15.063.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Jess Glynne - Isle of Wight - 22-6-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Jess Glynne - Isle of Wight - 22-6-25.ts_snapshot_53.15.063.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Jess Glynne - Isle of Wight - 22-6-25.ts.jpg">
+  <div class="tecnici-box" id="video_887f9a46cf">
+    <div class="riga1">1920x1080 - 30.1 Mb/s - 59 min 41 s</div>
+    <div>14.42 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_887f9a46cf">MPEG Audio - 384 kb/s - de<br>MPEG Audio - 64 kb/s - de<br>Dolby E - L C Ls X R LFE Rs X - 1291 kb/s - de<br>Dolby E - X X X L X X X R - 505 kb/s - de</div>
+  <div class="notebox" id="note_887f9a46cf">Jess Glynne - Isle of Wight - 22-6-25.ts - Feed<br>at Seaclose Park, Newport<br>Don't Be So Hard on Yourself<br>Right Here<br>These Days - (Rudimental cover)<br>Rollin<br>I'll Be There<br>Thursday<br>Ain't Got Far to Go<br>Take Me Home<br>So Real (Warriors) - (Too Many Zooz cover)<br>Real Love - (Clean Bandit cover)<br>Rather Be - (Clean Bandit cover)<br>Hold My Hand</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('887f9a46cf')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('887f9a46cf')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('887f9a46cf')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Keane - Isle Of Wight</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Keane - Isle Of Wight - 22-6-24.mkv_snapshot_00.55.01.000.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Keane - Isle Of Wight - 22-6-24.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Keane - Isle Of Wight - 22-6-24.mkv_snapshot_00.55.01.000.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Keane - Isle Of Wight - 22-6-24.mkv.jpg">
+  <div class="tecnici-box" id="video_e9e4a3b7bc">
+    <div class="riga1">1920x1080 -  - 1 h</div>
+    <div>14.63 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_e9e4a3b7bc">MPEG Audio - 384 kb/s - en<br>FLAC - L R C LFE Lb Rb - en</div>
+  <div class="notebox" id="note_e9e4a3b7bc">Keane - Isle Of Wight - 22-6-24.mkv - Feed<br>at Seaclose Park, Newport, England <br>Can't Stop Now<br>Silenced by the Night<br>Bend and Break<br>Nothing in My Way<br>Spiralling<br>We Might as Well Be Strangers<br>The Way I Feel<br>You Are Young<br>Everybody's Changing<br>A Bad Dream<br>Perfect Symmetry<br>Is It Any Wonder?<br>This Is the Last Time<br>Crystal Ball<br>Somewhere Only We Know<br>Bedshaped<br>Sovereign Light Café</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e9e4a3b7bc')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e9e4a3b7bc')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e9e4a3b7bc')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">KISS - 2020 Goodbye - Dubai</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/KISS - 2020 Goodbye - Dubai - 31-12-20.mkv_snapshot_00.00.33.870.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/KISS - 2020 Goodbye - Dubai - 31-12-20.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/KISS - 2020 Goodbye - Dubai - 31-12-20.mkv_snapshot_00.00.33.870.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/KISS - 2020 Goodbye - Dubai - 31-12-20.mkv.jpg">
+  <div class="tecnici-box" id="video_dd7f5ded69">
+    <div class="riga1">1920x1080 - 29.1 Mb/s - 3 h 11 min</div>
+    <div>39.08 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_dd7f5ded69">MPEG Audio - 128 kb/s - en</div>
+  <div class="notebox" id="note_dd7f5ded69">KISS - 2020 Goodbye - Dubai - 31-12-20.mkv - Feed<br>at Atlantis, The Palm Jumeirah, United Arab Emirates <br>Detroit Rock City<br>Shout It Out Loud<br>Deuce<br>Say Yeah<br>I Love It Loud<br>Heaven's on Fire<br>Tears Are Falling<br>War Machine<br>Lick It Up - (With elements of The Who's “Won’t Get Fooled Again”)<br>Calling Dr. Love<br>100,000 Years - (Censored lyrics changed to "Must have been a trip while I was gone")<br>Drum Solo<br>Cold Gin<br>Guitar Solo<br>Bass Solo<br>God of Thunder - (Censored lyrics changed to "I was born with a fever" and "Will slowly rob you of your sacred soul")<br>Psycho Circus<br>Parasite<br>Love Gun<br>I Was Made for Lovin' You<br>Black Diamond<br>Encore:<br>Beth<br>Strutter - (Tour debut)<br>Do You Love Me<br>Rock and Roll All Nite<br>God Gave Rock 'n' Roll to You II</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dd7f5ded69')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dd7f5ded69')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dd7f5ded69')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Liam Gallagher - TRNSMT</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Liam Gallagher - TRNSMT - 12-7-24.ts_snapshot_12.58.343.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Liam Gallagher - TRNSMT - 12-7-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Liam Gallagher - TRNSMT - 12-7-24.ts_snapshot_12.58.343.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Liam Gallagher - TRNSMT - 12-7-24.ts.jpg">
+  <div class="tecnici-box" id="video_130dbfaeae">
+    <div class="riga1">1920x1080 - 33 Mb/s - 59 min 5 s</div>
+    <div>14.06 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_130dbfaeae">MPEG Audio - 320 kb/s - en</div>
+  <div class="notebox" id="note_130dbfaeae">Liam Gallagher - TRNSMT - 12-7-24.ts - Feed<br>Glasgow Green, Glasgow<br>Rock 'n' Roll Star<br>Columbia<br>Shakermaker<br>Up in the Sky<br>Digsy's Dinner<br>Bring It On Down<br>Cloudburst<br>Half the World Away<br>D'Yer Wanna Be a Spaceman?<br>Fade Away<br>Lock All the Doors - (Noel Gallagher’s High Flying Birds cover) <br>Whatever<br>Cigarettes & Alcohol<br>Married With Children<br>Supersonic<br>Slide Away<br>Live Forever<br>Encore:<br>I Am the Walrus - (The Beatles cover)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('130dbfaeae')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('130dbfaeae')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('130dbfaeae')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Neil Young - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Neil Young - Glastonbury - 28-6-25.ts_snapshot_00.04.16.273.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Neil Young - Glastonbury - 28-6-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Neil Young - Glastonbury - 28-6-25.ts_snapshot_00.04.16.273.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Neil Young - Glastonbury - 28-6-25.ts.jpg">
+  <div class="tecnici-box" id="video_b6cb29366d">
+    <div class="riga1">1920x1080 - 27.4 Mb/s - 1 h 52 min</div>
+    <div>22.95 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_b6cb29366d">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_b6cb29366d">Neil Young - Glastonbury - 28-6-25.ts - Feed<br>Pyramid Stage at Worthy Farm, Pilton<br>Sugar Mountain<br>Be the Rain<br>When You Dance, I Can Really Love<br>Cinnamon Girl<br>Fuckin' Up<br>Hey Hey, My My (Into the Black)<br>The Needle and the Damage Done<br>Harvest Moon<br>Looking Forward - (Crosby, Stills, Nash & Young cover) (On Hank Williams' guitar)<br>Sun Green<br>Love and Only Love<br>Like a Hurricane<br>Name of Love - (Crosby, Stills, Nash & Young cover)<br>Old Man<br>Encore:<br>Rockin' in the Free World<br>Throw Your Hatred Down<br>Greensleeves</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b6cb29366d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b6cb29366d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b6cb29366d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Noel Gallagher's High Flying Birds - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Noel Gallagher's High Flying Birds - Glastonbury - 25-6-22.ts_snapshot_00.34.03.950.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Noel Gallagher's High Flying Birds - Glastonbury - 25-6-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Noel Gallagher's High Flying Birds - Glastonbury - 25-6-22.ts_snapshot_00.34.03.950.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Noel Gallagher's High Flying Birds - Glastonbury - 25-6-22.ts.jpg">
+  <div class="tecnici-box" id="video_47ae7b3edc">
+    <div class="riga1">1920x1080 - 30.5 Mb/s - 1 h 9 min</div>
+    <div>15.76 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_47ae7b3edc">MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_47ae7b3edc">Noel Gallagher's High Flying Birds - Glastonbury - 25-6-22.ts - Feed<br>at Worthy Farm, Pilton<br>Fort Knox<br>Holy Mountain<br>It's a Beautiful World<br>She Taught Me How to Fly<br>We're on Our Way Now<br>Black Star Dancing<br>Dead in the Water<br>Little by Little<br>The Importance of Being Idle<br>Whatever<br>Wonderwall<br>Half the World Away - Dedicated to "The Royle Family"<br>Stop Crying Your Heart Out - Dedicated to The England National Football Team<br>AKA... What a Life! - Dedicated to all Manchester City supporters<br>Don't Look Back in Anger</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('47ae7b3edc')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('47ae7b3edc')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('47ae7b3edc')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Notre Dame Reopening Concert</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Notre Dame Reopening Concert - 7-12-24.ts_snapshot_00.12.17.497.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Notre Dame Reopening Concert - 7-12-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Notre Dame Reopening Concert - 7-12-24.ts_snapshot_00.12.17.497.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Notre Dame Reopening Concert - 7-12-24.ts.jpg">
+  <div class="tecnici-box" id="video_5ed5e0aa8e">
+    <div class="riga1">3840x2160 - 55.3 Mb/s - 2 h 9 min</div>
+    <div>53.97 GB - 50 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_5ed5e0aa8e">MPEG Audio - 384 kb/s<br>MPEG Audio - 384 kb/s<br>MPEG Audio - 384 kb/s<br>MPEG Audio - 384 kb/s</div>
+  <div class="notebox" id="note_5ed5e0aa8e">Notre Dame Reopening Concert - 7-12-24.ts - Feed<br>Notre-Dame de Paris (Excerpts) (Arr. Pierre Bertrand-Cagnes)<br>Richard Cocciante<br>Garou (Singer), Orchestre Philharmonique de Radio France (Orchestra)<br><br>Amazing Grace<br>William Walker<br>Pretty Yende (Soprano), Orchestre Philharmonique de Radio France (Orchestra)<br><br>Improvisation<br>Thierry Escaich<br><br>Jerusalema<br>Kgaogelo Moagi, Nomcebo Zikode<br>Angélique Kidjo (Singer), Orchestre Philharmonique de Radio France (Orchestra)<br><br>Hallelujah<br>Leonard Cohen<br>Vianney (Singer), Orchestre Philharmonique de Radio France (Orchestra)<br><br>Symphony No. 3 in C minor, Op. 78 "Organ Symphony": III. Maestoso – Più allegro – Molto allegro<br>Camille Saint-Saëns<br>Olivier Latry (Organ), Orchestre Philharmonique de Radio France (Orchestra)<br><br>Notre-Dame de Paris: Act I: Ave Maria païen (Arr. Ibrahim Maalouf)<br>Richard Cocciante<br>Hiba Tawaji (Singer), Orchestre Philharmonique de Radio France (Orchestra)<br><br>Vesperae solennes de confessore, K. 339: V. "Laudate Dominum"<br>Wolfgang Amadeus Mozart<br>Julie Fuchs (Soprano), Maîtrise de Notre-Dame (Choir), Orchestre Philharmonique de Radio France (Orchestra)<br><br>Piano Concerto No. 2 in G Minor, Op. 22: III. Presto<br>Camille Saint-Saëns<br>Lang Lang (Piano), Orchestre Philharmonique de Radio France (Orchestra)<br><br>Le Pont<br>Yo-Yo Ma<br>Yo-Yo Ma (Cello), Marion Cotillard (Narrator)<br><br>Orchestral Suite No. 3 in D Major, BWV 1068: II. Air<br>Johann Sebastian Bach<br>Daniel Lozakovich (Violin), Orchestre Philharmonique de Radio France (Orchestra)<br><br>La romance de Paris<br>Charles Trenet<br>Clara Luciani (Singer), Orchestre Philharmonique de Radio France (Orchestra)<br><br>Ave Maria, D. 839 (Arr. William Ryden for High Voice and Orchestra)<br>Franz Schubert<br>Benjamin Bernheim (Tenor), Orchestre Philharmonique de Radio France (Orchestra)<br><br>Concerto in D Minor, BWV. 974: II. Adagio (Arr. Alessandro Marcello)<br>Johann Sebastian Bach<br>Khatia Buniatishvili (Piano)<br><br>Requiem, Op. 48: IV. Pie Jesu<br>Gabriel Fauré<br>Ariane Delacroix (Soprano), Orchestre Philharmonique de Radio France (Orchestra)<br><br>Cello Suite No. 1 in G Major, BWV 1007: I. Prelude<br>Johann Sebastian Bach<br>Yo-Yo Ma (Cello)<br><br>Happy<br>Pharrell Williams<br><br>Yes Lord<br>Ezekiel Williams (Organ)<br><br>JOY<br>Melvette Armond (Singer), Ezekiel Williams (Organ)<br><br>Symphony No. 5 in C Minor, Op. 67: I. Allegro con brio<br>Ludwig van Beethoven<br>Orchestre Philharmonique de Radio France (Orchestra)<br><br>Monumental tour<br>Michael Canitrot<br><br>Gustavo Dudamel conducts the Orchestre Philharmonique de Radio France<br><br>Among the music legends taking part in this historic and joyful event are Angélique Kidjo and Pharrell Williams and, from the classical world, Benjamin Bernheim, Khatia Buniatishvili,<br>Renaud Capuçon, Lang Lang, Olivier Latry, Daniel Lozakovich, Yo-Yo Ma,<br>Nadine Sierra and Pretty Yende<br><br>Deutsche Grammophon will livestream the concert on STAGE+<br><br>Notre-Dame de Paris will reopen its doors this weekend, having been restored to its former glory in just five years after a raging fire destroyed its 800-year-old wooden roof frame and caused its iconic spire to collapse on 15 April 2019.<br><br>On the afternoon of 7 December 2024 the Archbishop of Paris, Laurent Ulrich, will lead the reopening service, in the presence of President Emmanuel Macron, as well as many more heads of state and other distinguished guests. This ceremony, which will include the reawakening of the cathedral’s great organ, will be followed by a spectacular concert of pop, rock, world and classical music, designed to share the joy of reopening with an international audience and to thank all those who made the restoration possible.<br><br>A breathtaking line-up of global superstars are set to take part, from Pharrell Williams and Angélique Kidjo, to classical luminaries including opera stars Nadine Sierra, Pretty Yende and Benjamin Bernheim, pianists Lang Lang and Khatia Buniatishvili, organist Olivier Latry, violinists Renaud Capuçon and Daniel Lozakovich, and cellist Yo-Yo Ma. Gustavo Dudamel will conduct the Orchestre Philharmonique de Radio France. The artists will perform either inside Notre-Dame or in the square in front of the building’s western façade, which will be illuminated by a dazzling lightshow.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5ed5e0aa8e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5ed5e0aa8e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5ed5e0aa8e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Olivia Rodrigo - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Olivia Rodrigo - Glastonbury - 29-6-25.ts_snapshot_01.23.38.848.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Olivia Rodrigo - Glastonbury - 29-6-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Olivia Rodrigo - Glastonbury - 29-6-25.ts_snapshot_01.23.38.848.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Olivia Rodrigo - Glastonbury - 29-6-25.ts.jpg">
+  <div class="tecnici-box" id="video_4315dcab96">
+    <div class="riga1">1920x1080 - 27.5 Mb/s - 1 h 26 min</div>
+    <div>17.66 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_4315dcab96">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_4315dcab96">Olivia Rodrigo - Glastonbury - 29-6-25.ts - Feed<br>at Worthy Farm, Pilton - Pyramid Stage<br>Obsessed<br>Ballad Of A Homeschooled Girl<br>Vampire<br>Drivers License<br>Traitor<br>Bad Idea Right?<br>Love Is Embarrassing<br>Pretty Isn’t Pretty<br>Happier<br>Enough For You<br>Friday I’m In Love (The Cure cover with Robert Smith)<br>Just Like Heaven (The Cure cover with Robert Smith)<br>So American<br>Jealousy, Jealousy<br>Favorite Crime<br>Deja Vu<br>Ring Of Fire - (Video intro)<br>Brutal <br>All-American Bitch<br>Good 4 U<br>Get Him Back!</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4315dcab96')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4315dcab96')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4315dcab96')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">One Love Manchester</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/One Love Manchester - 4-6-17.ts_snapshot_03.26.14.495.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/One Love Manchester - 4-6-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/One Love Manchester - 4-6-17.ts_snapshot_03.26.14.495.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/One Love Manchester - 4-6-17.ts.jpg">
+  <div class="tecnici-box" id="video_5425b6de8d">
+    <div class="riga1">1920x1080 - 28.1 Mb/s - 3 h 27 min</div>
+    <div>43.53 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5425b6de8d">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_5425b6de8d">One Love Manchester - 4-6-17.ts - Feed<br>at Emirates Old Trafford, Manchester<br>Marcus Mumford – Timshel<br>Take That – Shine<br>Take That – Giants<br>Take That – Rule the World<br>Robbie Williams – Strong (Manchester We're Strong)<br>Robbie Williams – Angels<br>Pharrell Williams – Get Lucky (accompanied by Marcus Mumford and Bae dancers Mette Towley and Ai Shimatsu)<br>Pharrell Williams and Miley Cyrus – Happy (accompanied by Bae dancers Mette Towley and Ai Shimatsu)<br>Miley Cyrus – Inspired<br>Niall Horan – Slow Hands<br>Niall Horan – This Town<br>Ariana Grande – Be Alright<br>Ariana Grande – Break Free<br>Stevie Wonder – Love's in Need of Love Today (video)<br>Little Mix – Wings<br>Ariana Grande and Victoria Monét – Better Days<br>The Black Eyed Peas and Ariana Grande – Where Is the Love?<br>Imogen Heap – Hide and Seek<br>Ariana Grande and Parrs Wood High School Choir – My Everything<br>Ariana Grande and Mac Miller – The Way<br>Mac Miller and Ariana Grande – Dang!<br>Ariana Grande and Miley Cyrus – Don't Dream It's Over<br>Ariana Grande – Side to Side<br>Katy Perry – Part of Me<br>Katy Perry – Roar<br>Justin Bieber – Love Yourself<br>Justin Bieber – Cold Water<br>Ariana Grande – Love Me Harder<br>Coldplay and Ariana Grande – Don't Look Back in Anger<br>Coldplay – Fix You<br>Coldplay – Viva la Vida<br>Coldplay – Something Just Like This<br>Liam Gallagher – Rock 'n' Roll Star<br>Liam Gallagher – Wall of Glass<br>Liam Gallagher and Coldplay – Live Forever<br>Ariana Grande and all other artists – One Last Time<br>Ariana Grande – Somewhere Over the Rainbow<br>Broadcasts<br>The concert was broadcast live on BBC One, BBC Radio and Capital FM networks.Television coverage on BBC One was presented by Sara Cox and Ore Oduba, with Nick Grimshaw and Anita Rani hosting from backstage and within the crowd. BBC Radio coverage consisted of a simultaneous broadcast, hosted by Scott Mills, Jo Whiley, Phil Williams and Becky Want, on BBC Radio 1, BBC Radio 2, BBC Radio 5 Live and BBC Radio Manchester respectively. BBC World Service also transmitted the concert live. Outside broadcasting facilities were provided by Arena Television, and BBC Radio Outside Broadcasts.<br><br>The BBC announced that it would broadcast the entire concert even if it overran its intended three-hour duration, which it did by approximately 20 minutes.<br><br>One Love Manchester was a benefit concert and British television special on 4 June 2017, organised by American singer Ariana Grande, Simon Moran, Melvin Benn, and Scooter Braun, in response to the bombing after Grande's concert at Manchester Arena two weeks earlier.It took place at Old Trafford Cricket Ground,and was attended by 55,000 people. Guest stars included Justin Bieber, the Black Eyed Peas, Coldplay, Miley Cyrus, Mac Miller, Marcus Mumford, Niall Horan, Little Mix, Katy Perry, Take That, Imogen Heap, Victoria Monét, Pharrell Williams, Robbie Williams, U2 and Liam Gallagher.<br><br>Proceeds from the event went to the We Love Manchester Emergency Fund established by Manchester City Council and the British Red Cross to help the victims and their families. The British Red Cross received more than £10 million in donations in the 12 hours following the concert. Networks from at least 50 countries broadcast the concert live, which was simultaneously streamed live on various platforms, including Twitter, Facebook, and YouTube. New York's Vulture.com ranked the event as the No. 1 concert of 2017.<br><br>Background<br>Main article: Manchester Arena bombing<br>See also: Reactions to the Manchester Arena bombing<br>On 22 May 2017, a suicide bomb attack was carried out at Manchester Arena in Manchester, England, following a performance by American singer Ariana Grande as part of her Dangerous Woman Tour. 22 of the concert-goers and parents who were at the entrance waiting to pick up their children following the show were killed, and 1,017 were injured.<br><br>Within a few hours of the bombing, Grande herself posted on Twitter: "broken. from the bottom of my heart, i am so so sorry. i don't have words."The tweet briefly became the most-liked tweet in history. Grande subsequently suspended her tour and flew to her mother's home in Boca Raton, Florida. On 26 May, she announced that she would host a benefit concert in Manchester for the victims of the attack.<br><br>Development and planning<br>Event tickets were made available on 1 June 2017 for £40, and sold with no booking fees. These tickets sold out within 6 minutes of going on sale.Fans who were at the concert of 22 May could apply to attend at no cost. The application ended on 31 May at 17:00, but was extended till 22:00 to allow as many people at the concert on the 22nd to apply to be there as possible.Metrolink offered free travel for concertgoers to and from the Old Trafford tram stop. Uber also said that fares for passengers travelling to and from the concert will be donated to charity.<br><br>Following the London Bridge attack that occurred the day before the show, Greater Manchester Police announced that security would be tighter than planned. They also advised attendees not to bring bags into the venue for security reasons.<br><br>Tickets for the concert were found to be listed for sale on the online auction site eBay, at prices above the original sale price. However, eBay responded by removing these listings from their site.<br><br>Main event<br>A minute's silence was held before Marcus Mumford opened the concert, at the request of Mumford, in memory of those killed both in Manchester and in London.<br><br>After Grande's first performance of the night, Stevie Wonder appeared via video link. After Heap's performance, a video of prominent Manchester footballer David Beckham reading a poem dedicated to the city was played. Videos of other artists and celebrities, including Halsey, Bastille, Anne-Marie, Demi Lovato, Jennifer Hudson, Blossoms, Chance the Rapper, Camila Cabello, The Chainsmokers, DJ Khaled, Little Mix, Circa Waves, Kendall Jenner, Clean Bandit, Dua Lipa, Sean Paul, Nick Grimshaw, Kings of Leon, Sam Smith, Rita Ora, Shawn Mendes, Twenty One Pilots, Paul McCartney, U2 and the players of Manchester United and Manchester City declaring their solidarity with Manchester were also shown.<br><br>Liam Gallagher, lead singer of Manchester-based rock band Oasis, made a surprise appearance near the end of the concert. He had previously stated his desire to perform but indicated a conflict with the Rock im Park festival in Germany. He flew in straight from his performance in Germany.[30] Coincidentally, he was also scheduled to perform at the Rock am Ring festival two days prior, but the rest of that festival day was cancelled before his scheduled performance due to terror suspicions.<br><br>Usher was due to appear but did not perform due to parental duties. He appeared alongside other musicians in the pre-recorded video sending well wishes to Manchester</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5425b6de8d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5425b6de8d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5425b6de8d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Paul McCartney - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Paul McCartney - Glastonbury - 25-6-22.ts_snapshot_00.01.57.483.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Paul McCartney - Glastonbury - 25-6-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Paul McCartney - Glastonbury - 25-6-22.ts_snapshot_00.01.57.483.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Paul McCartney - Glastonbury - 25-6-22.ts.jpg">
+  <div class="tecnici-box" id="video_fa20a80c55">
+    <div class="riga1">1920x1080 - 29.7 Mb/s - 2 h 40 min</div>
+    <div>35.16 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_fa20a80c55">MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_fa20a80c55">Paul McCartney - Glastonbury - 25-6-22.ts - Feed<br>at Worthy Farm, Pilton<br>Can't Buy Me Love<br>Junior's Farm<br>Letting Go<br>Got to Get You Into My Life<br>Come On to Me<br>Let Me Roll It<br>Getting Better<br>Let 'Em In<br>My Valentine<br>Nineteen Hundred and Eighty-Five<br>Maybe I'm Amazed<br>I've Just Seen a Face<br>In Spite of All the Danger - (The Quarrymen song)<br>Love Me Do<br>Dance Tonight<br>Blackbird<br>Here Today<br>New<br>Lady Madonna<br>Fuh You<br>Being for the Benefit of Mr. Kite!<br>Something<br>Ob-La-Di, Ob-La-Da<br>You Never Give Me Your Money<br>She Came in Through the Bathroom Window<br>Get Back<br>I Saw Her Standing There - (with Dave Grohl)<br>Band on the Run -(with Dave Grohl)<br>Glory Days - (with Bruce Springsteen)<br>I Wanna Be Your Man - (with Bruce Springsteen)<br>Let It Be<br>Live and Let Die<br>Hey Jude<br>Encore:<br>I've Got a Feeling - (virtual duet with John Lennon)<br>Helter Skelter<br>Golden Slumbers<br>Carry That Weight<br>The End - (with Dave Grohl) (also with Bruce Springsteen)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('fa20a80c55')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('fa20a80c55')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('fa20a80c55')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Rod Stewart - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Rod Stewart - Glastonbury - 29-6-25.ts_snapshot_01.23.58.752.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Rod Stewart - Glastonbury - 29-6-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Rod Stewart - Glastonbury - 29-6-25.ts_snapshot_01.23.58.752.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Rod Stewart - Glastonbury - 29-6-25.ts.jpg">
+  <div class="tecnici-box" id="video_d9e9fa50dc">
+    <div class="riga1">1920x1080 - 27.6 Mb/s - 1 h 28 min</div>
+    <div>18.23 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_d9e9fa50dc">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_d9e9fa50dc">Rod Stewart - Glastonbury - 29-6-25.ts - Feed<br>at Worthy Farm, Pilton, England<br>Scotland the Brave<br>Tonight I'm Yours (Don't Hurt Me)<br>Having a Party - (Sam Cooke cover)<br>Some Guys Have All the Luck - (The Persuaders cover)<br>Love Train - (The O’Jays cover)<br>The First Cut Is the Deepest - (Cat Stevens cover)<br>Tonight's the Night (Gonna Be Alright)<br>Forever Young - (with Riverdance interlude)<br>You Wear It Well<br>Maggie May - (includes a snippet of Gasoline Alley)<br>Young Turks<br>It's a Heartache - (Bonnie Tyler cover)<br>I'd Rather Go Blind - (Etta James cover)<br>Da Ya Think I'm Sexy?<br>Lady Marmalade - (The Eleventh Hour cover) (Sung by backing singers)<br>I Don't Want to Talk About It - (Crazy Horse cover)<br>If You Don't Know Me by Now - (Harold Melvin & The Blue Notes cover) (with Mick Hucknall)<br>Baby Jane<br>Proud Mary - (Creedence Clearwater Revival cover) (Sung by backing singers)<br>Stay With Me - (Faces song) (with Ronnie Wood)<br>Hot Legs - (with Lulu) (and Ronnie Wood)<br>Sailing - (The Sutherland Brothers Band cover)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d9e9fa50dc')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d9e9fa50dc')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d9e9fa50dc')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Seventeen - World Tour in Japan</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Seventeen - World Tour in Japan - 29-11-25.ts_snapshot_04.03.23.757.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Seventeen - World Tour in Japan - 29-11-25.ts_(COPY_0001).jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Seventeen - World Tour in Japan - 29-11-25.ts_snapshot_04.03.23.757.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Seventeen - World Tour in Japan - 29-11-25.ts_(COPY_0001).jpg">
+  <div class="tecnici-box" id="video_27805fdb81">
+    <div class="riga1">1920x1080 - 20.2 Mb/s - 4 h 3 min</div>
+    <div>36.45 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_27805fdb81">MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_27805fdb81">Seventeen - World Tour in Japan - 29-11-25.ts - Feed<br>Act I<br>HBD - (with "Bad Influence" intro)<br>THUNDER<br>Domino<br>Network Love - (Joshua, Jun, The8 & Vernon)<br>Act II<br>VCR<br>Trigger - (Dino solo)<br>Gemini - (Jun solo)<br>Shining Star - (Vernon solo)<br>SOS<br>F*ck My Life<br>LOVE, MONEY, FAME<br>Darl+ing<br>Act III<br>VCR<br>Fortunate Change - (Joshua solo)<br>Happy Virus - (DK solo)<br>Raindrops - (Seungkwan solo)<br>VCR<br>Skyfall - (The8 solo)<br>Shake It Off - (Mingyu solo)<br>Jungle - (S.Coups solo)<br>Act IV<br>HOT<br>HIGHLIGHT - (Japanese ver.)<br>Rock<br>HIT<br>Rock with you - (Japanese ver.)<br>Encore:<br>Bongbongee 10-Minute DJ Set<br>A-TEEN<br>9-TEEN<br>Hitori Janai<br>Ai no Chikara<br>Eyes on you<br>God of Music<br>Fighting - (BSS cover)<br>Left & Right<br>Ima -Ashita Sekai ga Owatte mo-<br>CALL CALL CALL!<br>Circles<br>Ready to love<br>Headliner<br>Encore 2:<br>VERY NICE<br>Encore 3:<br>Super</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('27805fdb81')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('27805fdb81')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('27805fdb81')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Shania Twain - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Shania Twain - Glastonbury - 30-6-24.ts_snapshot_00.31.06.316.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Shania Twain - Glastonbury - 30-6-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Shania Twain - Glastonbury - 30-6-24.ts_snapshot_00.31.06.316.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Shania Twain - Glastonbury - 30-6-24.ts.jpg">
+  <div class="tecnici-box" id="video_337e4c599e">
+    <div class="riga1">1920x1080 - 30.4 Mb/s - 1 h 17 min</div>
+    <div>17.62 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_337e4c599e">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_337e4c599e">Shania Twain - Glastonbury - 30-6-24.ts - Feed<br>at Worthy Farm, Pilton<br>That Don't Impress Me Much<br>Don't Be Stupid (You Know I Love You)<br>You Win My Love<br>Up!<br>I'm Gonna Getcha Good!<br>You're Still the One<br>Forever and for Always<br>Come on Over<br>Any Man of Mine<br>Giddy Up!<br>Whose Bed Have Your Boots Been Under?<br>Honey, I'm Home<br>From This Moment On<br>(If You're Not in It for Love) I'm Outta Here!<br>Man! I Feel Like a Woman!</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('337e4c599e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('337e4c599e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('337e4c599e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Sza - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sza - Glastonbury - 30-6-24.ts_snapshot_00.01.33.391.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sza - Glastonbury - 30-6-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sza - Glastonbury - 30-6-24.ts_snapshot_00.01.33.391.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sza - Glastonbury - 30-6-24.ts.jpg">
+  <div class="tecnici-box" id="video_6fba9f9cae">
+    <div class="riga1">1920x1080 - 30.2 Mb/s - 1 h 24 min</div>
+    <div>19.02 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_6fba9f9cae">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_6fba9f9cae">Sza - Glastonbury - 30-6-24.ts - Feed<br>at Worthy Farm, Pilton<br>Cave World<br>PSA<br>Love Galore<br>Go Gina - (new mix ft. vocals and backing track from The Notorious B.I.G, "Juicy" and "Big Poppa")<br>Broken Clocks<br>All the Stars<br>Prom<br>Crybaby - (Unreleased song)<br>Garden (Say It Like Dat)<br>Drew Barrymore<br>F2F<br>Robot World<br>Forgiveless<br>Ghost in the Machine<br>Blind<br>Shirt<br>Kiss Me More - (Doja Cat cover)<br>Kiss - (Prince cover) (Snippet)<br>I Hate U<br>Snooze<br>Kill Bill<br>Low<br>Tree World<br>Supermodel / Special<br>Open Arms<br>Nobody Gets Me<br>Normal Girl<br>Saturn<br>Rich Baby Daddy - (Drake cover)<br>The Weekend<br>Good Days<br>20 Something</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6fba9f9cae')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6fba9f9cae')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6fba9f9cae')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Taylor Swift - The Eras Tour Extended 2023</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Taylor Swift - The Eras Tour Extended 2023.mkv_snapshot_00.00.55.326.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Taylor Swift - The Eras Tour Extended 2023.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Taylor Swift - The Eras Tour Extended 2023.mkv_snapshot_00.00.55.326.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Taylor Swift - The Eras Tour Extended 2023.mkv.jpg">
+  <div class="tecnici-box" id="video_e1eda8ccd8">
+    <div class="riga1">3832x1600 - 20.4 Mb/s - 3 h</div>
+    <div>26.80 GB - 24 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e1eda8ccd8">E-AC-3 - L R C LFE Ls Rs - 768 kb/s - en</div>
+  <div class="notebox" id="note_e1eda8ccd8">Taylor Swift - The Eras Tour Extended 2023.mkv<br><br>Intro<br>LOVER ERA<br>Miss Americana & the Heartbreak Prince (estratto)<br>Cruel Summer<br>The Man<br>You Need to Calm Down<br>Lover<br>The Archer (EXTENDED)<br><br>FEARLESS ERA<br>Fearless<br>You Belong With Me<br>Love Story<br><br>EVERMORE ERA<br>Willow<br>Marjorie<br>Champagne Problems<br>Tolerate It<br><br>REPUTATION ERA<br>...Ready for It?<br>Delicate<br>Don't Blame Me<br>Look What You Made Me Do<br><br>SPEAK NOW ERA<br>Enchanted<br>Long Live (EXTENDED)<br><br>RED ERA<br>22<br>We Are Never Ever Getting Back Together<br>I Knew You Were Trouble<br>All Too Well (10 Minute Version)<br><br>FOLKLORE ERA<br>The 1<br>Betty<br>The Last Great American Dynasty<br>August<br>Illicit Affairs (estratto)<br>My Tears Ricochet<br>Cardigan (TAYLOR'S VERSION)<br><br>1989 ERA<br>Style<br>Blank Space<br>Shake It Off<br>Wildest Dreams (EXTENDED)<br>Bad Blood<br><br>ACOUSTIC SET<br>Our Song<br>You're on Your Own, Kid<br><br>MIDNIGHTS ERA<br>Lavender Haze<br>Anti-Hero<br>Midnight Rain<br>Vigilante Shit<br>Bejeweled<br>Mastermind<br>Karma<br><br>CREDITS<br>Long Live/End Credits</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e1eda8ccd8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e1eda8ccd8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e1eda8ccd8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">The Killers - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/The Killers - Glastonbury- 29-6-19.ts_snapshot_00.40.58.155.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/The Killers - Glastonbury- 29-6-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/The Killers - Glastonbury- 29-6-19.ts_snapshot_00.40.58.155.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/The Killers - Glastonbury- 29-6-19.ts.jpg">
+  <div class="tecnici-box" id="video_1d6d0cc3f9">
+    <div class="riga1">1920x1080 - 32.1 Mb/s - 1 h 47 min</div>
+    <div>25.48 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_1d6d0cc3f9">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_1d6d0cc3f9">The Killers - Glastonbury- 29-6-19.ts - Feed<br>at Worthy Farm, Pilton<br>Luck Be a Lady - (Frank Loesser song) (Frank Sinatra version)<br>Jenny Was a Friend of Mine<br>Somebody Told Me<br>Spaceman<br>The Way It Was<br>Shot at the Night<br>The Man - (With "The Marlboro Man" intro)<br>Smile Like You Mean It<br>For Reasons Unknown<br>Bling (Confession of a King) - (Preceded by a snippet of "Human")<br>Glamorous Indie Rock & Roll<br>A Dustland Fairytale<br>Runaways<br>Read My Mind - (Snippet of "Lean on Me" by Bill Withers in outro)<br>All These Things That I've Done<br>When You Were Young<br>Encore:<br>You Were Always on My Mind - (Gwen McCrae cover) (with Pet Shop Boys)<br>Human - (with Pet Shop Boys)<br>This Charming Man - (The Smiths cover) (with Johnny Marr)<br>Mr. Brightside - (with Johnny Marr)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1d6d0cc3f9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1d6d0cc3f9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1d6d0cc3f9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">U2 - Glastonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/U2 - Glastonbury  24-6-2011.ts_snapshot_00.38.55.410.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/U2 - Glastonbury  24-6-2011.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/U2 - Glastonbury  24-6-2011.ts_snapshot_00.38.55.410.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/U2 - Glastonbury  24-6-2011.ts.jpg">
+  <div class="tecnici-box" id="video_78eeaf7765">
+    <div class="riga1">1920x1080 - 45 Mb/s - 1 h 43 min</div>
+    <div>34.54 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_78eeaf7765">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_78eeaf7765">U2 - Glastonbury  24-6-11.ts - Feed<br>at Worthy Farm, Pilton<br>Space Oddity - (David Bowie song) (Intro music)<br>Even Better Than the Real Thing - (Fish Out Of Water Remix version)<br>The Fly<br>Mysterious Ways - (with "Independent Women" snippet)<br>Until the End of the World<br>One<br>Where the Streets Have No Name - (with "Jerusalem" Intro with "Can't Take My Eyes Off You" snippet)<br>I Will Follow<br>I Still Haven't Found What I'm Looking For - (with "Movin' On Up" snippet)<br>Stay (Faraway, So Close!)<br>Beautiful Day - (with "Rain" snippet)<br>Elevation<br>Get on Your Boots - (with "She Loves You" snippet)<br>Vertigo - (with "GarageLand" snippet)<br>Sunday Bloody Sunday<br>Bad - (with "Jerusalem" snippet)<br>Pride (In the Name of Love)<br>Encore:<br>With or Without You - (with "Love Will Tear Us Apart" snippet)<br>Moment of Surrender - (with "Yellow" Intro)<br>Out of Control - (with "Pretty Vacant" Intro)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('78eeaf7765')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('78eeaf7765')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('78eeaf7765')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Who - Glanstonbury</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Who - Glanstonbury - 28-6-15.ts_snapshot_00.03.24.190.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Who - Glanstonbury - 28-6-15.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Who - Glanstonbury - 28-6-15.ts_snapshot_00.03.24.190.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Who - Glanstonbury - 28-6-15.ts.jpg">
+  <div class="tecnici-box" id="video_308db0304b">
+    <div class="riga1">1920x1080 - 30.4 Mb/s - 1 h 4 min</div>
+    <div>14.97 GB - ?? fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_308db0304b">MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_308db0304b">Who - Glanstonbury - 28-6-15.ts - Feed<br>Who Are You<br>The Seeker<br>The Kids Are Alright<br>I Can See for Miles<br>My Generation<br>Pictures of Lily<br>Behind Blue Eyes<br>Bargain<br>Join Together<br>You Better You Bet<br>Love, Reign O'er Me<br>Eminence Front<br>Amazing Journey<br>Sparks<br>Pinball Wizard<br>See Me, Feel Me<br>Baba O'Riley<br>Won't Get Fooled Again</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('308db0304b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('308db0304b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('308db0304b')">Note</button>
+  </div>
+</div>
+
+</div>
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+</body>
+</html>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Angelina Mango</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#e8f6f2;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#8fd6bf; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Angelina Mango
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(17 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango  - La noia - Eurovision</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango  - La noia - Eurovision - 10-5-24.ts_snapshot_00.57.942.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango  - La noia - Eurovision - 10-5-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango  - La noia - Eurovision - 10-5-24.ts_snapshot_00.57.942.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango  - La noia - Eurovision - 10-5-24.ts.jpg">
+  <div class="tecnici-box" id="video_636b0e9a3f">
+    <div class="riga1">1920x1080 - 35.3 Mb/s - 4 min 16 s</div>
+    <div>1.22 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_636b0e9a3f">MPEG Audio - 384 kb/s - de<br>MPEG Audio - 384 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1803 kb/s - de<br>MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_636b0e9a3f">Angelina Mango  - La noia - Eurovision - 10-5-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('636b0e9a3f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('636b0e9a3f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('636b0e9a3f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango  - La noia - Eurovision</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango  - La noia - Eurovision - 9-5-24.ts_snapshot_03.28.128.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango  - La noia - Eurovision - 9-5-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango  - La noia - Eurovision - 9-5-24.ts_snapshot_03.28.128.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango  - La noia - Eurovision - 9-5-24.ts.jpg">
+  <div class="tecnici-box" id="video_c4d5f81f3c">
+    <div class="riga1">1920x1080 - 35.3 Mb/s - 4 min 13 s</div>
+    <div>1.20 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_c4d5f81f3c">MPEG Audio - 384 kb/s - de<br>MPEG Audio - 384 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1803 kb/s - de<br>MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_c4d5f81f3c">Angelina Mango  - La noia - Eurovision - 9-5-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c4d5f81f3c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c4d5f81f3c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c4d5f81f3c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango  - La noia - Eurovision - Finale</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango  - La noia - Eurovision - Finale - 12-5-24.ts_snapshot_04.01.850.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango  - La noia - Eurovision - Finale - 12-5-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango  - La noia - Eurovision - Finale - 12-5-24.ts_snapshot_04.01.850.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango  - La noia - Eurovision - Finale - 12-5-24.ts.jpg">
+  <div class="tecnici-box" id="video_33a44d6eee">
+    <div class="riga1">1920x1080 - 35.4 Mb/s - 4 min 15 s</div>
+    <div>1.22 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_33a44d6eee">MPEG Audio - 384 kb/s - de<br>MPEG Audio - 384 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1803 kb/s - de<br>MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_33a44d6eee">Angelina Mango  - La noia - Eurovision - Finale - 12-5-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('33a44d6eee')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('33a44d6eee')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('33a44d6eee')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - Battiti Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - Battiti Live - 7-7-23.ts_snapshot_03.15.569.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - Battiti Live - 7-7-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - Battiti Live - 7-7-23.ts_snapshot_03.15.569.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - Battiti Live - 7-7-23.ts.jpg">
+  <div class="tecnici-box" id="video_f4275da586">
+    <div class="riga1">1920x1080 - 19 Mb/s - 6 min 21 s</div>
+    <div>0.90 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f4275da586">MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_f4275da586">Angelina Mango - Battiti Live - Gallipoli - 7-7-23.ts - Ci pensiamo domani - Voglia di vivere - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f4275da586')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f4275da586')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f4275da586')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - Eurovision</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - Eurovision - 11-5-24..ts_snapshot_01.25.648.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - Eurovision - 11-5-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - Eurovision - 11-5-24..ts_snapshot_01.25.648.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - Eurovision - 11-5-24.ts.jpg">
+  <div class="tecnici-box" id="video_c40aa2c692">
+    <div class="riga1">1920x1080 - 35.3 Mb/s - 4 min 15 s</div>
+    <div>1.22 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_c40aa2c692">MPEG Audio - 384 kb/s - de<br>MPEG Audio - 384 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1803 kb/s - de<br>MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_c40aa2c692">Angelina Mango - Eurovision - Prova - 11-5-24 ore 14.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c40aa2c692')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c40aa2c692')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c40aa2c692')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - Eurovision - Prova</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - Eurovision - Prova - 8-5-24.ts_snapshot_01.00.636.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - Eurovision - Prova - 8-5-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - Eurovision - Prova - 8-5-24.ts_snapshot_01.00.636.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - Eurovision - Prova - 8-5-24.ts.jpg">
+  <div class="tecnici-box" id="video_27054bb2fe">
+    <div class="riga1">1920x1080 - 35.3 Mb/s - 4 min 15 s</div>
+    <div>1.21 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_27054bb2fe">MPEG Audio - 384 kb/s - de<br>MPEG Audio - 384 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1803 kb/s - de<br>MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_27054bb2fe">Angelina Mango - Eurovision - Prova - 8-5-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('27054bb2fe')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('27054bb2fe')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('27054bb2fe')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - La noia - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - La noia - Sanremo - 10-2-24.ts_snapshot_02.35.275.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - La noia - Sanremo - 10-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - La noia - Sanremo - 10-2-24.ts_snapshot_02.35.275.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - La noia - Sanremo - 10-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_2c819f58fd">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 5 min 31 s</div>
+    <div>0.83 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2c819f58fd">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_2c819f58fd">Angelina Mango - La noia - Sanremo - 10-2-24.ts - Serata Finale - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2c819f58fd')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2c819f58fd')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2c819f58fd')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - La noia - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - La noia - Sanremo - 6-2-24.ts_snapshot_01.35.260.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - La noia - Sanremo - 6-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - La noia - Sanremo - 6-2-24.ts_snapshot_01.35.260.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - La noia - Sanremo - 6-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_b3143f161d">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 5 min 11 s</div>
+    <div>0.78 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b3143f161d">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_b3143f161d">Angelina Mango - La noia - Sanremo - 6-2-24.ts - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b3143f161d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b3143f161d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b3143f161d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - La noia - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - La noia - Sanremo - 6-2-24.mpg_snapshot_01.37.290.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - La noia - Sanremo - 6-2-24.mpg.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - La noia - Sanremo - 6-2-24.mpg_snapshot_01.37.290.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - La noia - Sanremo - 6-2-24.mpg.jpg">
+  <div class="tecnici-box" id="video_d2c95e5307">
+    <div class="riga1">1920x1080 - 17.2 Mb/s - 5 min 6 s</div>
+    <div>0.66 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d2c95e5307">MPEG Audio - 320 kb/s</div>
+  <div class="notebox" id="note_d2c95e5307">Angelina Mango - La noia - Sanremo - 6-2-24.mpg - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d2c95e5307')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d2c95e5307')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d2c95e5307')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - La noia - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - La noia - Sanremo - 8-2-24.ts_snapshot_02.41.057.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - La noia - Sanremo - 8-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - La noia - Sanremo - 8-2-24.ts_snapshot_02.41.057.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - La noia - Sanremo - 8-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_dd470fbb81">
+    <div class="riga1">1920x1080 - 20.2 Mb/s - 6 min 11 s</div>
+    <div>0.93 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_dd470fbb81">AC-3 - L R C LFE Ls Rs - 384 kb/s</div>
+  <div class="notebox" id="note_dd470fbb81">Angelina Mango - La noia - Sanremo - 8-2-24.ts -  3a Serata - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dd470fbb81')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dd470fbb81')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dd470fbb81')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - La notte della Taranta</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - La notte della Taranta - 24-8-24.mkv_snapshot_07.41.040.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - La notte della Taranta - 24-8-24.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - La notte della Taranta - 24-8-24.mkv_snapshot_07.41.040.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - La notte della Taranta - 24-8-24.mkv.jpg">
+  <div class="tecnici-box" id="video_a0dad2e472">
+    <div class="riga1">1920x1080 - 14.2 Mb/s - 12 min 31 s</div>
+    <div>1.29 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a0dad2e472">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_a0dad2e472">Angelina Mango - La notte della Taranta - 24-8-24.mkv - Su picculina - La noia - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a0dad2e472')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a0dad2e472')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a0dad2e472')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - La rondine - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - La rondine - Sanremo - 9-2-24.ts_snapshot_01.44.108.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - La rondine - Sanremo - 9-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - La rondine - Sanremo - 9-2-24.ts_snapshot_01.44.108.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - La rondine - Sanremo - 9-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_d01e681571">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 6 min 46 s</div>
+    <div>1.02 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d01e681571">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_d01e681571">Angelina Mango - La rondine - Sanremo - 9-2-24.ts - Rai 4K - Angelina Mango con il quartetto d'archi dell'orchestra di Roma - La rondine - 74 Festival della Canzone Italiana</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d01e681571')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d01e681571')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d01e681571')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - Melodrama - Power Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - Melodrama - Power Hits - 3-9-24.ts_snapshot_00.21.223.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - Melodrama - Power Hits - 3-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - Melodrama - Power Hits - 3-9-24.ts_snapshot_00.21.223.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - Melodrama - Power Hits - 3-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_e1980a53cd">
+    <div class="riga1">1920x1080 - 18.1 Mb/s - 2 min 46 s</div>
+    <div>0.42 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e1980a53cd">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_e1980a53cd">Angelina Mango - Melodrama - Power Hits - 3-9-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e1980a53cd')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e1980a53cd')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e1980a53cd')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - Radio Italia Live - 27-6-24.ts_snapshot_03.55.269.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - Radio Italia Live - 27-6-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - Radio Italia Live - 27-6-24.ts_snapshot_03.55.269.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - Radio Italia Live - 27-6-24.ts.jpg">
+  <div class="tecnici-box" id="video_d6e9aa057a">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 11 min 14 s</div>
+    <div>2.34 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_d6e9aa057a">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_d6e9aa057a">Angelina Mango - Radio Italia - Il concerto - Napoli - 27-6-24.ts - Melodrama - Che t'o dico a fa - La noia - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d6e9aa057a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d6e9aa057a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d6e9aa057a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - Radio Zeta Future Hits</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - Radio Zeta Future Hits - 31-5-24.ts_snapshot_04.33.914.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - Radio Zeta Future Hits - 31-5-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - Radio Zeta Future Hits - 31-5-24.ts_snapshot_04.33.914.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - Radio Zeta Future Hits - 31-5-24.ts.jpg">
+  <div class="tecnici-box" id="video_1e6287884c">
+    <div class="riga1">1920x1080 - 17.9 Mb/s - 6 min 12 s</div>
+    <div>0.92 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_1e6287884c">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_1e6287884c">Angelina Mango - Radio Zeta Future Hits - 31-5-24.ts - La noia - Meledrama - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1e6287884c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1e6287884c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1e6287884c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - Sanremo - 8-2-24 .ts_snapshot_02.27.943.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - Sanremo - 8-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - Sanremo - 8-2-24 .ts_snapshot_02.27.943.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - Sanremo - 8-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_078f514477">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 4 min 58 s</div>
+    <div>0.75 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_078f514477">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_078f514477">Angelina Mango - Sanremo - 8-2-24 .ts - 3 serata - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('078f514477')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('078f514477')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('078f514477')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Angelina Mango - Tim Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Angelina Mango - Tim Music Awards - 13-9-24.ts_snapshot_07.49.499.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Angelina Mango - Tim Music Awards - 13-9-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Angelina Mango - Tim Music Awards - 13-9-24.ts_snapshot_07.49.499.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Angelina Mango - Tim Music Awards - 13-9-24.ts.jpg">
+  <div class="tecnici-box" id="video_7a4cabcb81">
+    <div class="riga1">1920x1080 - 29.1 Mb/s - 8 min 18 s</div>
+    <div>1.81 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7a4cabcb81">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_7a4cabcb81">Angelina Mango - Tim Music Awards - 13-9-24.ts - Fila indiana - Che t'o dico a fa' - Melodrama - La noia  - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7a4cabcb81')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7a4cabcb81')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7a4cabcb81')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

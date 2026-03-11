@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Vari Italiani</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#e8f6f2;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#8fd6bf; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Vari Italiani
+  <span style="font-size:0.6em; color:#222; font-weight:normal;">(49 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Ambra - T'appartengo - XFactor</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ambra - T'appartengo - XFactor - 8-12-22.mkv_snapshot_03.15.120.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ambra - T'appartengo - XFactor - 8-12-22.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ambra - T'appartengo - XFactor - 8-12-22.mkv_snapshot_03.15.120.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ambra - T'appartengo - XFactor - 8-12-22.mkv.jpg">
+
+  <div class="tecnici-box" id="video_33c50a6983">
+    <div class="riga1">1920x1080 - 25.4 Mb/s - 3 min 40 s</div>
+    <div>0.73 GB - 1 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_33c50a6983">PCM - 2304 kb/s - it</div>
+  <div class="notebox" id="note_33c50a6983">Ambra - T'appartengo - XFactor - 8-12-22.mkv - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('33c50a6983')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('33c50a6983')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('33c50a6983')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Anna - Desolee - Power Hits Estate</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Anna - Desolee - Power Hits Estate - 1-9-25.ts_snapshot_00.07.976.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Anna - Desolee - Power Hits Estate - 1-9-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Anna - Desolee - Power Hits Estate - 1-9-25.ts_snapshot_00.07.976.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Anna - Desolee - Power Hits Estate - 1-9-25.ts.jpg">
+
+  <div class="tecnici-box" id="video_542a6bf0c1">
+    <div class="riga1">1920x1080 - 18.6 Mb/s - 3 min 27 s</div>
+    <div>0.53 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_542a6bf0c1">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_542a6bf0c1">Anna - Desolee - Power Hits Estate - 1-9-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('542a6bf0c1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('542a6bf0c1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('542a6bf0c1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Anna Oxa - & Iljard Shaba - Un'emozione da poco - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Anna Oxa - & Iljard Shaba - Un'emozione da poco - Sanremo - 10-2-23.ts_snapshot_01.00.116.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Anna Oxa - & Iljard Shaba - Un'emozione da poco - Sanremo - 10-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Anna Oxa - & Iljard Shaba - Un'emozione da poco - Sanremo - 10-2-23.ts_snapshot_01.00.116.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Anna Oxa - & Iljard Shaba - Un'emozione da poco - Sanremo - 10-2-23.ts.jpg">
+
+  <div class="tecnici-box" id="video_3404a58fd8">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 18 s</div>
+    <div>0.89 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3404a58fd8">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_3404a58fd8">Anna Oxa - & Iljard Shaba - Un'emozione da poco - Sanremo - 10-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3404a58fd8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3404a58fd8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3404a58fd8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Aperol Happy Together Live</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Aperol Happy Together Live.mkv_snapshot_00.09.600.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Aperol Happy Together Live.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Aperol Happy Together Live.mkv_snapshot_00.09.600.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Aperol Happy Together Live.mkv.jpg">
+
+  <div class="tecnici-box" id="video_adfaae5363">
+    <div class="riga1">1920x1080 - 20.7 Mb/s - 54 min 36 s</div>
+    <div>8.15 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_adfaae5363">AC-3 - L R - 256 kb/s</div>
+  <div class="notebox" id="note_adfaae5363">Aperol Happy Together Live.mkv<br>Piazza S. Marco, a Venezia 28-29 giugno 2019<br>La scaletta ha regalato momenti emozionanti per i fan di tutti gli artisti protagonisti del live, <br>da "Torna a casa" dei Måneskin, a "La Favola di Adamo ed Eva" di Max Gazzè, a "Io non abito al mare" <br>di Francesca Michielin, che ha sorpreso il pubblico con un duetto a sorpresa con Carl Brave <br>sulle note di "Fotografia". L'artista romano ha poi duettato anche con il suo concittadino <br>Max Gazzè con "Posso".<br><br>In migliaia a San Marco per Max Gazzè, Francesca Michielin e i Måneskin<br>Tre stili per un unico grande show. Sono Francesca Michielin, i Måneskin e Max Gazzè, <br>i protagonisti della seconda edizione di Aperol Happy Together Live che quest'anno <br>sceglie la sua casa a Venezia e il magnifico contesto di piazza San Marco. "Ho sempre <br>amato le collaborazioni, sono vent'anni che collaboro insieme a tanti altri artisti. <br>In questo caso, avendo questa responsabilità di direttore artistico, ho voluto creare <br>più interazioni proprio per creare delle sinergie anche generazionali". Una specie di <br>dialogo musicale che vuole essere un invito alla condivisione e un ospite a sorpresa, <br>Carl Brave. "Abbiamo strutturato il tutto con dei veri e propri dialoghi tra noi, <br>tra i vari artisti. Abbiamo scelto di, appunto, mescolarci all'interno dei pezzi <br>l'uno dell'altro. Secondo me rende il tutto comunque più interessante ed è anche <br>una sfida, una prova in più e soprattutto anche un divertimento in più, <br>uno stimolo in più". "È raro che un artista suoni a Venezia e in un evento così grande, <br>quindi mi sento molto onorata. Non è una piazza a caso, è piazza San Marco, ha una <br>storia incredibile, tra l'altro una storia di incontri, anche culturali". Canterai <br>tu con Carl Brave? "Sì canto Fotografie, ovviamente, che è il pezzo che ci ha fatti <br>conoscere e sono molto felice perché oltre a essere un artista che stimo, è un <br>carissimo amico". Un grande concerto, realizzato con la collaborazione di Alessandro Cattelan. <br>"Sono un po' uomo spogliatoio, tengo alto il morale". Passi lo Spritz? "Passo lo Spritz a <br>chi ne ha bisogno. No, in realtà in quello che poi si vedrà in televisione faccio un po' <br>da raccordo tra tutti i vari momenti che hanno rappresentato un pò la storia del lavoro <br>di Max, dei ragazzi, insomma, li accolgo dentro questa città meravigliosa, che ci ospita <br>per il concerto. Io in realtà esco, presento ma anche per Max, la Francy e i Måneskin suonare, <br>alzare lo sguardo e vedere la basilica davanti a loro sarà veramente emozionante". <br>Momenti di grande musica da rivivere venerdì 26 luglio 2019 su Sky Uno e su TV 8.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('adfaae5363')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('adfaae5363')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('adfaae5363')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Bella ciao - Musica che unisce</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Bella ciao - Musica che unisce - 31-3-20.ts_snapshot_01.52.167.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Bella ciao - Musica che unisce - 31-3-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Bella ciao - Musica che unisce - 31-3-20.ts_snapshot_01.52.167.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Bella ciao - Musica che unisce - 31-3-20.ts.jpg">
+
+  <div class="tecnici-box" id="video_b3b5e51837">
+    <div class="riga1">1920x1080 - 6.3 Mb/s - 2 min 8 s</div>
+    <div>0.11 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b3b5e51837">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_b3b5e51837">Bella ciao - Musica che unisce - 31-3-20.ts - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b3b5e51837')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b3b5e51837')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b3b5e51837')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Bob Sinclar - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Bob Sinclar - Sanremo - 7-2-24.ts_snapshot_01.36.257.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Bob Sinclar - Sanremo - 7-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Bob Sinclar - Sanremo - 7-2-24.ts_snapshot_01.36.257.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Bob Sinclar - Sanremo - 7-2-24.ts.jpg">
+
+  <div class="tecnici-box" id="video_cbc2b4fc9e">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 4 min 13 s</div>
+    <div>0.64 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_cbc2b4fc9e">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_cbc2b4fc9e">Bob Sinclar - Sanremo - 7-2-24.ts - dal Palco Costa Smeralda - Rai 4k</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('cbc2b4fc9e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('cbc2b4fc9e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('cbc2b4fc9e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Caparezza - Radio Italia Live</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Caparezza - Radio Italia Live - 16-6-18.ts_snapshot_10.54.501.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Caparezza - Radio Italia Live - 16-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Caparezza - Radio Italia Live - 16-6-18.ts_snapshot_10.54.501.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Caparezza - Radio Italia Live - 16-6-18.ts.jpg">
+
+  <div class="tecnici-box" id="video_06ee5ce1c2">
+    <div class="riga1">1920x1080 - 11.9 Mb/s - 15 min 29 s</div>
+    <div>1.40 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_06ee5ce1c2">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_06ee5ce1c2">Caparezza - Radio Italia - Il Concerto - 16-6-18.ts - Caparezza - Una chiave - Ti fa stare bene - Vieni a ballare in Puglia - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('06ee5ce1c2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('06ee5ce1c2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('06ee5ce1c2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Carmen Consoli</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Carmen Consoli - 1-5-22.ts_snapshot_12.36.581.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Carmen Consoli - 1-5-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Carmen Consoli - 1-5-22.ts_snapshot_12.36.581.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Carmen Consoli - 1-5-22.ts.jpg">
+
+  <div class="tecnici-box" id="video_a3ab646fa0">
+    <div class="riga1">1920x1080 -  - 17 min 3 s</div>
+    <div>3.45 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a3ab646fa0">MPEG Audio - en</div>
+  <div class="notebox" id="note_a3ab646fa0">Carmen Consoli - 1-5-22.ts - con Marina Rei alla batteria - Per niente stanca - Besame Giuda - Geisha - Confusa e felice - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a3ab646fa0')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a3ab646fa0')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a3ab646fa0')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Cesare Cremonini - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Cesare Cremonini - Sanremo - 3-2-22.ts_snapshot_22.36.583.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Cesare Cremonini - Sanremo - 3-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Cesare Cremonini - Sanremo - 3-2-22.ts_snapshot_22.36.583.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Cesare Cremonini - Sanremo - 3-2-22.ts.jpg">
+
+  <div class="tecnici-box" id="video_f9b0b9d72a">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 25 min 35 s</div>
+    <div>4.91 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f9b0b9d72a">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_f9b0b9d72a">Cesare Cremonini - Sanremo - 3-2-22.ts   Medley Nessuno vuole essere Robin / Marmellata #25 / Logico #1 / La nuova stella di Broadway / Poetica, La ragazza del futuro e 50 Special - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f9b0b9d72a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f9b0b9d72a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f9b0b9d72a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Coez</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Coez - 1-5-22.ts_snapshot_13.06.148.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Coez - 1-5-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Coez - 1-5-22.ts_snapshot_13.06.148.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Coez - 1-5-22.ts.jpg">
+
+  <div class="tecnici-box" id="video_b8bfe15fec">
+    <div class="riga1">1920x1080 -  - 14 min 57 s</div>
+    <div>3.03 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b8bfe15fec">MPEG Audio - en</div>
+  <div class="notebox" id="note_b8bfe15fec">Coez - 1-5-22.ts - Come nelle canzoni - Occhi rossi - È sempre bello - La musica non c'è - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b8bfe15fec')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b8bfe15fec')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b8bfe15fec')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Colla Zio - & Ditonellapiaga - Salirò - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Colla Zio & Ditonellapiaga - Salirò - Sanremo - 10-2-23.ts_snapshot_02.00.263.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Colla Zio & Ditonellapiaga - Salirò - Sanremo - 10-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Colla Zio & Ditonellapiaga - Salirò - Sanremo - 10-2-23.ts_snapshot_02.00.263.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Colla Zio & Ditonellapiaga - Salirò - Sanremo - 10-2-23.ts.jpg">
+
+  <div class="tecnici-box" id="video_352172ce9c">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 29 s</div>
+    <div>0.93 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_352172ce9c">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_352172ce9c">Colla Zio & Ditonellapiaga - Salirò - Sanremo - 10-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('352172ce9c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('352172ce9c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('352172ce9c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Ennio Morricone - Live In Venice</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ennio Morricone - Live In Venice - 10-11-07.mkv_snapshot_00.07.09.763.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ennio Morricone - Live In Venice - 10-11-07.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ennio Morricone - Live In Venice - 10-11-07.mkv_snapshot_00.07.09.763.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ennio Morricone - Live In Venice - 10-11-07.mkv.jpg">
+
+  <div class="tecnici-box" id="video_6b668005d5">
+    <div class="riga1">1280x720 - 6.1 Mb/s - 1 h 49 min</div>
+    <div>6.14 GB - 30 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6b668005d5">DTS - C L R Ls Rs LFE - 1509 kb/s - en<br>AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_6b668005d5">Ennio Morricone - Live In Venice - 10-11-07.mkv<br>- You Tube<br>Intro <br>Deborah's Theme <br>Addio Monti <br>Vatel <br>H2S <br>Il Clan dei Siciliani <br>Metti una Sera a Cena <br>Uno che Grida Amore <br>Maddalena <br>Il Buono, Il Brutto, Il Cattivo <br>C'era una Volta il West <br>Giù la Testa <br>L'estasi dell'Oro <br>La Battaglia di Algeri <br>Indagine su un Cittadino al di Sopra di Ogni Sospetto<br>Sostiene Pereira <br>La Classe Operaia Va in Paradiso <br>Vittime di Guerra <br>Abolisson <br>Il Deserto dei Tartari <br>Riccardo III <br>Il Deserto dei Tartari - Reprise <br>Gabriel's Oboe <br>Falls <br>On Earth as it is in Heaven <br>Cinema Paradiso <br>Here's to You</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6b668005d5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6b668005d5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6b668005d5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Enrico Brignano - Tim Music Awards</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Enrico Brignano - TIM Music Awards - 15-9-23.ts_snapshot_03.42.029.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Enrico Brignano - Tim Music Awards - 15-9-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Enrico Brignano - TIM Music Awards - 15-9-23.ts_snapshot_03.42.029.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Enrico Brignano - Tim Music Awards - 15-9-23.ts.jpg">
+
+  <div class="tecnici-box" id="video_24d95bf8c4">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 9 min 1 s</div>
+    <div>1.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_24d95bf8c4">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_24d95bf8c4">Enrico Brignano - TIM Music Awards - 15-9-23.ts - Arena di Verona - (1 serata) - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('24d95bf8c4')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('24d95bf8c4')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('24d95bf8c4')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Enzo Avitabile - & James Senese - Tutta n'ata storia - Pino è</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Enzo Avitabile con James Senese - Tutta n'ata storia - Pino è -- 7-6-18.ts_snapshot_01.09.328.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Enzo Avitabile con James Senese - Tutta n'ata storia - Pino è -- 7-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Enzo Avitabile con James Senese - Tutta n'ata storia - Pino è -- 7-6-18.ts_snapshot_01.09.328.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Enzo Avitabile con James Senese - Tutta n'ata storia - Pino è -- 7-6-18.ts.jpg">
+
+  <div class="tecnici-box" id="video_8424884cfc">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 4 min 57 s</div>
+    <div>0.67 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8424884cfc">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_8424884cfc">Enzo Avitabile con James Senese - Tutta n'ata storia - Pino è -- 7-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8424884cfc')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8424884cfc')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8424884cfc')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Filippo Graziani - Ottanta - Buon compleanno Ivan</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Filippo Graziani - Ottanta - Buon compleanno Ivan .mkv_snapshot_00.47.37.118.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Filippo Graziani - Ottanta - Buon compleanno Ivan .mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Filippo Graziani - Ottanta - Buon compleanno Ivan .mkv_snapshot_00.47.37.118.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Filippo Graziani - Ottanta - Buon compleanno Ivan .mkv.jpg">
+
+  <div class="tecnici-box" id="video_f2a9498acb">
+    <div class="riga1">3840x2160 -  - 2 h 5 min</div>
+    <div>9.39 GB - 30 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f2a9498acb">AAC - L R</div>
+  <div class="notebox" id="note_f2a9498acb">Filippo Graziani - Ottanta - Buon compleanno Ivan .mkv<br>Roma Summer Fest 2025 - Casa del Jazz<br>Give you all my love<br>Il campo della fiera<br>Oh mamma mia<br>Al Festival slow folk di b-Milano<br>Parla tu<br>Agnese<br>Canzone per Susy<br>La rabbia<br>Maledette malelingue<br>La canzone dei marinai<br>Scappo di casa<br>Fuoco sulla collina<br>Doctor Jekyll and Mr. Hyde<br>Monna Lisa<br>Il chitarrista<br>Pigro<br>Lugano addio<br>Taglia la testa al gallo<br>Prudenza mai<br>Firenze<br>All things must pass<br>Tommy Graziani - batteria<br>Francesco Cardelli - basso<br>Massimo Marches - chitarre<br>Stefano Zambardino - tastiere<br>Riccardo Cardelli - strumenti vari<br>- You Tube</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f2a9498acb')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f2a9498acb')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f2a9498acb')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Francesco Guccini - Note di viaggio</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Francesco Guccini - Note di viaggio.mkv_snapshot_00.02.37.200.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Francesco Guccini - Note di viaggio.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Francesco Guccini - Note di viaggio.mkv_snapshot_00.02.37.200.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Francesco Guccini - Note di viaggio.mkv.jpg">
+
+  <div class="tecnici-box" id="video_a3578ee470">
+    <div class="riga1">1920x1080 -  - 1 h 28 min</div>
+    <div>10.65 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a3578ee470">AAC - L R</div>
+  <div class="notebox" id="note_a3578ee470">Francesco Guccini - Note di viaggio.mkv<br>Francesco Guccini<br>Elisa<br>Luciano Ligabue<br>Carmen Consoli<br>Giuliano Sangiorgi<br>Nina Zilli<br>Malika Ayane<br>Francesco Gabbani<br>Dario Brunori<br>Samuele Bersani<br>Il documentario racconta il dietro le quinte di "Note di viaggio" di Francesco Guccini, uno dei progetti musicali più ambiziosi e riusciti degli ultimi anni.  - SkyArte</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a3578ee470')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a3578ee470')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a3578ee470')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Francesco Renga - & Casadilego - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Francesco Renga - & Casadilego - Sanremo - 4-3-21.ts_snapshot_04.24.258.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Francesco Renga - & Casadilego - Sanremo - 4-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Francesco Renga - & Casadilego - Sanremo - 4-3-21.ts_snapshot_04.24.258.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Francesco Renga - & Casadilego - Sanremo - 4-3-21.ts.jpg">
+
+  <div class="tecnici-box" id="video_a673f41f70">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 28 s</div>
+    <div>0.93 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a673f41f70">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_a673f41f70">Francesco Renga - & Casadilego - Sanremo - 4-3-21.ts - Feed - Rivisiterà Una ragione di più di Ornella Vanoni , uscito nel 1969. Con Renga sul palco ci sarà Elisa Coclite in arte Casadilego, vincitrice di “X Factor”</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a673f41f70')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a673f41f70')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a673f41f70')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Fred De Palma - & Eiffel 65 - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Fred De Palma - & Eiffel 65 - Medley degli Eiffel 65  - Sanremo - 9-2-24.ts_snapshot_00.20.099.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Fred De Palma - & Eiffel 65 - Sanremo - 9-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Fred De Palma - & Eiffel 65 - Medley degli Eiffel 65  - Sanremo - 9-2-24.ts_snapshot_00.20.099.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Fred De Palma - & Eiffel 65 - Sanremo - 9-2-24.ts.jpg">
+
+  <div class="tecnici-box" id="video_6bac188484">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 4 min 29 s</div>
+    <div>0.68 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6bac188484">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_6bac188484">Fred De Palma - & Eiffel 65 - Sanremo - 9-2-24.ts - Medley degli Eiffel 65 - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6bac188484')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6bac188484')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6bac188484')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Ghali - Casa mia - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ghali - Casa mia - Sanremo - 10-2-24.ts_snapshot_00.49.795.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ghali - Casa mia - Sanremo - 10-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ghali - Casa mia - Sanremo - 10-2-24.ts_snapshot_00.49.795.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ghali - Casa mia - Sanremo - 10-2-24.ts.jpg">
+
+  <div class="tecnici-box" id="video_af90c30c35">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 6 min 17 s</div>
+    <div>0.95 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_af90c30c35">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_af90c30c35">Ghali - Casa mia - Sanremo - 10-2-24.ts - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('af90c30c35')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('af90c30c35')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('af90c30c35')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Gigi D'Agostino - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Gigi D'Agostino - Sanremo - 9-2-24.ts_snapshot_03.08.249.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Gigi D'Agostino - Sanremo - 9-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Gigi D'Agostino - Sanremo - 9-2-24.ts_snapshot_03.08.249.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Gigi D'Agostino - Sanremo - 9-2-24.ts.jpg">
+
+  <div class="tecnici-box" id="video_f5467b3d4e">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 4 min 20 s</div>
+    <div>0.65 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f5467b3d4e">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_f5467b3d4e">Gigi D'Agostino - Sanremo - 9-2-24.ts - In collegamento da Palco Costa Smeralda - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f5467b3d4e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f5467b3d4e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f5467b3d4e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Giovanni Allevi - Tomorrow - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Giovanni Allevi - Tomorrow - Sanremo - 7-2-24.mpg_snapshot_03.56.727.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Giovanni Allevi - Tomorrow - Sanremo - 7-2-24.mpg.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Giovanni Allevi - Tomorrow - Sanremo - 7-2-24.mpg_snapshot_03.56.727.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Giovanni Allevi - Tomorrow - Sanremo - 7-2-24.mpg.jpg">
+
+  <div class="tecnici-box" id="video_aacb69d10a">
+    <div class="riga1">1920x1080 - 17.2 Mb/s - 17 min 4 s</div>
+    <div>2.20 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_aacb69d10a">MPEG Audio - 320 kb/s</div>
+  <div class="notebox" id="note_aacb69d10a">Giovanni Allevi - Tomorrow - Sanremo - 7-2-24.mpg - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('aacb69d10a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('aacb69d10a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('aacb69d10a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Giuliano Sangiorgi - & Emma - Quanno chiove - Pino è</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Emma - & Sangiorgi - Quanno chiove - Pino è - 7-6-18.ts_snapshot_03.17.538.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Emma - & Sangiorgi - Quanno chiove - Pino è - 7-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Emma - & Sangiorgi - Quanno chiove - Pino è - 7-6-18.ts_snapshot_03.17.538.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Emma - & Sangiorgi - Quanno chiove - Pino è - 7-6-18.ts.jpg">
+
+  <div class="tecnici-box" id="video_f175aff7ff">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 6 min 5 s</div>
+    <div>0.83 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f175aff7ff">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_f175aff7ff">Giuliano Sangiorgi - & Emma - Quanno chiove - Pino è - 7-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f175aff7ff')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f175aff7ff')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f175aff7ff')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Giò Di Tonno - Il tempo delle cattedrali - Con il cuore</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Giò Di Tonno - Il tempo delle cattedrali - Con il cuore - 10-6-19.ts_snapshot_02.09.166.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Giò Di Tonno - Il tempo delle cattedrali - Con il cuore - 10-6-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Giò Di Tonno - Il tempo delle cattedrali - Con il cuore - 10-6-19.ts_snapshot_02.09.166.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Giò Di Tonno - Il tempo delle cattedrali - Con il cuore - 10-6-19.ts.jpg">
+
+  <div class="tecnici-box" id="video_b21c7adf2f">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 4 min 9 s</div>
+    <div>0.58 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b21c7adf2f">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_b21c7adf2f">Giò Di Tonno - Il tempo delle cattedrali - Con il cuore - 10-6-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b21c7adf2f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b21c7adf2f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b21c7adf2f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Grease - Compagnia della Rancia - Tim Music Awards</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Grease - Compagnia della Rancia - TIM Music Awards - 15-9-23.ts_snapshot_01.43.553.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Grease - Compagnia della Rancia - Tim Music Awards - 15-9-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Grease - Compagnia della Rancia - TIM Music Awards - 15-9-23.ts_snapshot_01.43.553.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Grease - Compagnia della Rancia - Tim Music Awards - 15-9-23.ts.jpg">
+
+  <div class="tecnici-box" id="video_e7c8bad535">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 3 min 9 s</div>
+    <div>0.66 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e7c8bad535">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_e7c8bad535">Grease - Compagnia della Rancia - TIM Music Awards - 15-9-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e7c8bad535')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e7c8bad535')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e7c8bad535')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">In diretta da Piazza Maggiore a Bologna  - 4 marzo 2013</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/In diretta da Piazza Maggiore a Bologna  - 4 marzo 2013.ts_snapshot_00.00.24.843.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/In diretta da Piazza Maggiore a Bologna  - 4 marzo 2013.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/In diretta da Piazza Maggiore a Bologna  - 4 marzo 2013.ts_snapshot_00.00.24.843.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/In diretta da Piazza Maggiore a Bologna  - 4 marzo 2013.ts.jpg">
+
+  <div class="tecnici-box" id="video_4f5b1efca6">
+    <div class="riga1">1920x1080 - 9.7 Mb/s - 2 h 59 min</div>
+    <div>13.61 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4f5b1efca6">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - std</div>
+  <div class="notebox" id="note_4f5b1efca6">In diretta da Piazza Maggiore a Bologna  - 4 marzo 2013.ts - Rai 1<br>Amici e colleghi si sono dati appuntamento a Bologna per ricordare il primo anniversario <br>della morte di Lucio Dalla, che proprio oggi avrebbe compiuto 70 anni. Il grande concerto <br>di piazza Maggiore a Bologna sarà trasmesso in diretta da Rai Uno a partire dalle 21.10.<br>A condurre la serata sarà Gianni Morandi.<br>Ecco l'ordine con cui saliranno sul palco gli artisti, gli amici e i colleghi di Lucio <br>Dalla. Per alcuni di loro già si sa quale canzone canteranno (è il caso ad esempio di <br>Andrea Bocelli che naturalmente porterà "Caruso" e di Renato Zero che presenterà un <br>inedito dedicato proprio a Dalla) mentre per altri bisognerà aspettare stasera. <br><br>Gianni Morandi<br>Samuele Bersani – Canzone + Cosa Sarà con Luca Carboni e Ron<br>Mario Biondi – Futura<br>Andrea Bocelli – Caruso<br>Luca Carboni<br>Pierdavide Carone<br>Pino Daniele<br>Gigi D’Alessio<br>Stefano Di Battista<br>Fiorella Mannoia<br>Marco Mengoni – Tu non mi basti mai<br>Negramaro<br>Ron – Henna<br>Paolo Rossi<br>Stadio con Paolo Fresu – L’Ultima Luna<br>Ornella Vanoni con Chiara Galiazzo – Quale allegria<br>Renato Zero – L’anno che verrà + Lu (inedita)<br>Zucchero<br>Il Cile<br>Antonio Maggio<br>Paolo Simoni<br><br>Piazza Maggiore a Bologna ce la fa a malapena a contenere tutti quelle che si sono <br>riversati qui per ricordare Lucio Dalla in quello che avrebbe dovuto essere il suo <br>settantesimo compleanno.<br>Il concerto, trasmesso in diretta da Rai Uno, è stato aperto da un filmato di repertorio <br>che vede un giovanissimo Lucio Dalla sul palco dell'Ariston per cantare "Piazza Grande".<br>Tra gli applausi si fa largo Gianni Morandi, grande amico e collega, che si esibisce sulle <br>note di "Vita", il brano scritto per entrambi da Mogol. Morandi duetta con Renato Zero <br>ne "L'anno che verrà", lasciando poi il palco al cantante romano che ha presentato "Lu", <br>il brano inedito dedicato proprio a Dalla.<br>Marco Mengoni, fresco di vittoria a Sanremo 2013, canta un'emozionante "Tu non mi basti mai", <br>dopo essere stato introdotto dal clarinetto di Stefano Di Battista.<br>Il ricordo di Lucio Dalla commuove ma lo spettacolo è gioia, divertimento, amicizia, <br>proprio come lui avrebbe desiderato.<br>Il Bologna FC si presta a cantare "Attenti al lupo", guidati da Iskra Menarini, <br>storica vocalist di Dalla. Dal sagrato della basilica di San Petronio, Zucchero <br>ha cantato "Ave Maria", seguita poi da una delle canzoni simbolo di Dalla: "4 marzo '43", <br>cantata da Gianni Morandi e Andrea Bocelli. Il cantante ha "ceduto" a Pino Daniele "Caruso" <br>(interpretata magistralmente dal cantautore napoletano), ma non ha resistito dall'<br>accennarne qualche nota, accolto da un'ovazione del pubblico, dopo aver <br>interpretato "Malafemmena".<br>La struggente "Anna e Marco" rivive grande Giuliano Sangiorgi e Fiorella Mannoia, <br>che non ha poi retto alla commozione e ha mostrato tutte le sue lacrime. Insolita <br>la presenza di Gigi D'Alessio, che ha cantato "Disperato erotico stomp", mentre per "Cosa sarà" <br>si sono riuniti tutti insieme Samuele Bersani, Luca Carboni, Stefano Liggi, Angela Baraldi e Ron. <br>Ma ci sono anche Ornella Vanoni in duetto con Chiara di "X Factor", Luca Carboni <br>con "Quale allegria", Samuele Bersani con "Canzone","Pierdavide Carone con "Angelo", <br>Paolo Rossi con "Milano",  Fiorella Mannoia con "Cara" e Giuliano Sangiorgi <br>con "Il Cielo", e naturalmente gli Stadio, che hanno cantato "L'ultima luna".<br>Marco Alemanno, affacciato dal balcone di Palazzo Notai, ha recitato alcuni versi <br>di "Tutta una vita" e di Roberto Roversi. Mario Biondi ha cantato la bellissima "Futura", <br>seguito dai tre giovanissimi artisti Antonio Maggio, Il Cile e Paolo Simone che <br>hanno cantato insieme "Com'è profondo il mare".<br>La serata si conclude, e non poteva essere altro che così, con un'esibizione <br>corale e sentita di "Piazza Grande".</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4f5b1efca6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4f5b1efca6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4f5b1efca6')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Irene Grandi - Se mi vuoi - Pino è</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Irene Grandi - Se mi vuoi - Pino è - 7-6-18.ts_snapshot_01.24.426.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Irene Grandi - Se mi vuoi - Pino è - 7-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Irene Grandi - Se mi vuoi - Pino è - 7-6-18.ts_snapshot_01.24.426.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Irene Grandi - Se mi vuoi - Pino è - 7-6-18.ts.jpg">
+
+  <div class="tecnici-box" id="video_4ce5fb7222">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 4 min 59 s</div>
+    <div>0.68 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4ce5fb7222">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_4ce5fb7222">Irene Grandi - Se mi vuoi - Pino è - 7-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4ce5fb7222')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4ce5fb7222')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4ce5fb7222')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Lazza -  & Emma  - La fine - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Lazza -  & Emma  - La fine - Sanremo - 10-2-23.ts_snapshot_02.06.847.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Lazza -  & Emma  - La fine - Sanremo - 10-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Lazza -  & Emma  - La fine - Sanremo - 10-2-23.ts_snapshot_02.06.847.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Lazza -  & Emma  - La fine - Sanremo - 10-2-23.ts.jpg">
+
+  <div class="tecnici-box" id="video_dc170e3308">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 41 s</div>
+    <div>0.97 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_dc170e3308">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_dc170e3308">Lazza -  & Emma  - La fine - Sanremo - 10-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dc170e3308')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dc170e3308')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dc170e3308')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Le vibrazioni - Dov'e' - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Le vibrazioni - Dov'e' - Sanremo - 8-2-20.ts_snapshot_03.21.639.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Le vibrazioni - Dov'e' - Sanremo - 8-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Le vibrazioni - Dov'e' - Sanremo - 8-2-20.ts_snapshot_03.21.639.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Le vibrazioni - Dov'e' - Sanremo - 8-2-20.ts.jpg">
+
+  <div class="tecnici-box" id="video_7edb518110">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 4 min 38 s</div>
+    <div>0.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7edb518110">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_7edb518110">Le vibrazioni - Dov'e' - Sanremo - 8-2-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7edb518110')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7edb518110')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7edb518110')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Luca Barbarossa -  Ritornerai</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Luca Barbarossa -  Ritornerai - 1-5-20.ts_snapshot_00.47.856.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Luca Barbarossa -  Ritornerai - 1-5-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Luca Barbarossa -  Ritornerai - 1-5-20.ts_snapshot_00.47.856.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Luca Barbarossa -  Ritornerai - 1-5-20.ts.jpg">
+
+  <div class="tecnici-box" id="video_9df8e36ef1">
+    <div class="riga1">1920x1080 - 7.6 Mb/s - 3 min 1 s</div>
+    <div>0.18 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_9df8e36ef1">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth</div>
+  <div class="notebox" id="note_9df8e36ef1">Luca Barbarossa -  Ritornerai - 1-5-20.ts - con Bebo Ferra,Paolo Fresu e Rita Marcotulli -  Rai 3</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9df8e36ef1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9df8e36ef1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9df8e36ef1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Lucio per amico - Ricordando Battisti</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Lucio per amico - Ricordando Battisti.ts_snapshot_00.05.09.063.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Lucio per amico - Ricordando Battisti.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Lucio per amico - Ricordando Battisti.ts_snapshot_00.05.09.063.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Lucio per amico - Ricordando Battisti.ts.jpg">
+
+  <div class="tecnici-box" id="video_306a3d3901">
+    <div class="riga1">1920x1080 - 6.7 Mb/s - 1 h 32 min</div>
+    <div>5.14 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_306a3d3901">MPEG Audio - 192 kb/s - it<br>AC-3 - L R C LFE Ls Rs - 384 kb/s - oth<br>MPEG Audio - 192 kb/s - en<br>MPEG Audio - 64 kb/s - oth</div>
+  <div class="notebox" id="note_306a3d3901">Lucio per amico - Ricordando Battisti.ts - Rai Uno -                                                A 25 anni dalla scomparsa - 2023<br>Chi non conosce le canzoni di Lucio Battisti e chi, ognuno a modo proprio, può dire di non aver <br>avuto Lucio come amico? I suoi brani sono emozioni collettive, momenti da vivere insieme o in <br>solitudine, sogni fatti per sorridere, pensare, piangere, ballare e divertirsi, in grado di <br>trascendere il tempo: tutto questo e molto altro è lo straordinario repertorio di Lucio Battisti. <br>Ma chi è stato davvero questo artista tra i più amati di sempre?  In occasione dei 25 anni <br>dalla scomparsa, arriva su Rai1 e Rai Italia in prima serata, mercoledì 13 settembre, <br>il docufilm evento “Lucio per amico. Ricordando Battisti”,  ideato e scritto da Maite Carpio <br>e prodotto da Garbo Produzioni in collaborazione con Rai Documentari - per provare a raccontare <br>l’avventura umana e artistica di Lucio Battisti, attraverso un vasto e, in alcuni casi, <br>inedito materiale d’archivio italiano e internazionale, unito ai ricordi di chi lo ha <br>conosciuto, primo fra tutti Mogol, il compagno d’arte e d’avventura. <br>Pietruccio Montalbetti, Roby Matano, Gianni Dall’Aglio, Mario Lavezzi, Franco Daldello, <br>Mara Maionchi, Caterina Caselli, Adriano Pappalardo, Franco Mussida e Tony Cicco <br>accompagneranno il telespettatore alla scoperta del ‘mistero Battisti’, figura centrale <br>della cultura musicale di un intero Paese, che ha rifiutato celebrità e visibilità per <br>rimanere fedele a sé stesso. Testimone d’eccezione sarà Giulio Rapetti, in arte Mogol, <br>al centro di un’ampia intervista che ripercorrerà l’amicizia e la lunga collaborazione <br>di questa memorabile coppia creativa.<br>A scandire il racconto, le canzoni che hanno rivoluzionato il panorama musicale italiano, <br>molte eseguite dalla voce dello stesso Battisti, altre con le performance esclusive <br>di Gianluca Grignani, Noemi, Giovanni Caccamo e Giusy Ferreri. Sotto la direzione artistica <br>del Maestro Enrico Melozzi, interpreteranno, ognuno con il proprio stile unico e personale, <br>quattro canzoni - Il tempo di morire, Amarsi un pò, Emozioni e Io Vivrò - <br>quattro successi tratti da un repertorio che rappresenta un unicum nella storia della musica, <br>capace di parlare ancora oggi a intere generazioni.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('306a3d3901')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('306a3d3901')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('306a3d3901')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mina - l'Aliena</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mina - l'Aliena.ts_snapshot_00.17.318.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mina - l'Aliena.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mina - l'Aliena.ts_snapshot_00.17.318.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mina - l'Aliena.ts.jpg">
+
+  <div class="tecnici-box" id="video_8f8b02b69f">
+    <div class="riga1">1920x1080 - 10.8 Mb/s - 40 min 41 s</div>
+    <div>3.49 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8f8b02b69f">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_8f8b02b69f">Mina - l'Aliena.ts - Rai Uno - La Rai celebra la tigre di Cremona con uno speciale dal titolo “Mina L’Aliena”, in occasione dell’uscita del suo nuovo album di inediti dal titolo “Maebe”<br>Mina è Mina e non si discute. Icona, regina indiscussa del bel canto, la tigre di Cremona è tornata alla musica. Un ritorno atteso da milioni di fan ed ammiratori che in queste ore si stanno gustando le dodici tracce inediti che compongono “Maeba“, l’ultimo disco di inediti. In occasione del suo rilascio, la Rai e Vincenzo Mollica hanno deciso di celebrare l’artista con lo speciale “Mina L’Aliena“.<br><br>Mina L’Aliena, lo speciale di Rai 1<br>Lunedì 26 marzo 2018 alle ore 20.30 circa la Rai celebra Mina e Maeba con “Mina L’Aliena“. Una puntata speciale in cui Vincenzo Mollica, con la complicità di Rai 1 e del TG1, vuole condividere con i telespettatori la carriera della regina indiscussa della musica italiana.<br><br>60 indimenticabili anni di carriera che hanno permesso, nonostante l’addio alle scene volontario, di rendere Mina un mito nel panorama musicale internazionale. Un’occasione davvero speciale per raccontare la vita della Tigre di Cremona che quest’anno ha festeggiato tre date importanti. Dai 60 anni di carriera ai 40 anni di ritiro dalle scene fino al suo 78imo compleanno.<br><br>Mina: dal debutto a Maeba<br>Durante lo speciale Vincenzo Mollica ripercorrerà la vita artistica e professionale di un’artista considerata un’aliena nel panorama musicale italiano che si è sempre contraddistinta per unicità e maestria.<br><br>Si partirà dal debutto: correva l’anno 1958 quando una giovanissima donna muoveva i primi passi in tv fino ad arrivare ad oggi. Non mancheranno interviste, video e filmati d’epoca in un crescendo di ricordi e di emozioni. Dal passato al presente, ma anche al futuro con il nuovo album di inediti “Maeba“. Per l’occasione verrà mostrato il videoclip integrale del primo singolo “Volevo scriverti da tanto” estratto dal disco che è già ai vertici di tutte le classifiche di vendita.<br><br>Dodici tracce inediti in cui Mina gioca e sperimenta mixando generi e canzoni. Dalla ballad sofisticata al duetto con Paolo Conte, autore e voce di “A minestrina“, un brano in lingua napoletana. Si tratta di “Una storia d’amore davanti a una minestrina che cuoce: in un mondo dove i settantenni vogliono sembrare trentenni è una bella presa in giro!” ha dichiarato il figlio Massimiliano Pani.<br><br>L’appuntamento con “Mina L’Aliena” è per lunedì 26 marzo 2018 alle ore 20.30 su Rai 1 subito dopo il TG della sera.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8f8b02b69f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8f8b02b69f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8f8b02b69f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">No borders Music Festival</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/No borders Music Festival.ts_snapshot_00.28.177.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/No borders Music Festival.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/No borders Music Festival.ts_snapshot_00.28.177.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/No borders Music Festival.ts.jpg">
+
+  <div class="tecnici-box" id="video_6e4c4976cd">
+    <div class="riga1">1920x1080 -  - 24 min 50 s</div>
+    <div>2.87 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6e4c4976cd">AAC - L R - de</div>
+  <div class="notebox" id="note_6e4c4976cd">No borders Music Festival.ts - 25° edizione del No Borders Music Festival, stasera alle 20.40 su Sky Arte.  Musica e natura sono le protagoniste: in un comprensorio unico, al confine tra Italia, Austria e Slovenia, la kermesse punta a superare qualsiasi barriera linguistica, sociale e geografica, nel segno della sostenibilità ambientale. Ospiti dell’ultima edizione Elisa , Brunori Sas , Diodato , Manu Chao , Mannarino , Remo Anzovino e Mario Biondi!</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6e4c4976cd')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6e4c4976cd')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6e4c4976cd')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Opus - Live is life</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Opus - Live is life - 14-8-18.ts_snapshot_00.13.169.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Opus - Live is life - 14-8-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Opus - Live is life - 14-8-18.ts_snapshot_00.13.169.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Opus - Live is life - 14-8-18.ts.jpg">
+
+  <div class="tecnici-box" id="video_e5fb3409a3">
+    <div class="riga1">1920x1080 - 16.7 Mb/s - 4 min 9 s</div>
+    <div>0.53 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e5fb3409a3">MPEG Audio - 320 kb/s - en<br>MPEG Audio - 320 kb/s - en</div>
+  <div class="notebox" id="note_e5fb3409a3">Opus - Live is life - 14-8-18.ts - Top of the top Sopot Festival - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e5fb3409a3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e5fb3409a3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e5fb3409a3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Patty Pravo - RTL 102.5 Power Hits Estate</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Patty Pravo - RTL 102.5 Power Hits Estate - 1-9-25.ts_snapshot_02.36.290.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Patty Pravo - RTL 102.5 Power Hits Estate - 1-9-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Patty Pravo - RTL 102.5 Power Hits Estate - 1-9-25.ts_snapshot_02.36.290.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Patty Pravo - RTL 102.5 Power Hits Estate - 1-9-25.ts.jpg">
+
+  <div class="tecnici-box" id="video_56c3d04ed7">
+    <div class="riga1">1920x1080 - 18.6 Mb/s - 5 min 5 s</div>
+    <div>0.78 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_56c3d04ed7">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_56c3d04ed7">Patty Pravo - RTL 102.5 Power Hits Estate - 1-9-25.ts - Pazza idea - Ho provato tutto - Dimmi che non vuoi morire - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('56c3d04ed7')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('56c3d04ed7')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('56c3d04ed7')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">PFM -  In Classic - Da Mozart A Celebration</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/P.F.M. -  In Classic - Da Mozart A Celebration.ts_snapshot_00.00.30.000.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/PFM -  In Classic - Da Mozart A Celebration.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/P.F.M. -  In Classic - Da Mozart A Celebration.ts_snapshot_00.00.30.000.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/PFM -  In Classic - Da Mozart A Celebration.ts.jpg">
+
+  <div class="tecnici-box" id="video_3582baedf5">
+    <div class="riga1">1280x720 - 10.0 Mb/s - 1 h 9 min</div>
+    <div>5.34 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3582baedf5">AC-3 - L R C LFE Ls Rs - 448 kb/s - it</div>
+  <div class="notebox" id="note_3582baedf5">PFM -  In Classic - Da Mozart A Celebration.ts<br>Il flauto magico - ouverture<br>Danza Macabre<br>Romeo e Giulietta Danza dei Cavalieri<br>La Grande Pasqua russa<br>Nabucco Ouverture<br>Maestro della Voce<br>Impressioni di Settembre<br>Suite italiana<br>Guglielmo Tell<br><br>Live Broadcast by RSI Radiotelevisione Svizzera (LA2) (Swiss public television) in 2013<br>Premiata Forneria Marconi | PFM In Classic<br><br>Orchestra della Svizzera Italiana - Dir. Pietro Mianiti<br>Festival Jazz Lugano<br><br>Franco Mussida - vocals, guitar<br>Franz di Cioccio - vocals, drums<br>Patrick Djivas - bass<br>with<br>Lucio Fabbri: vocals, keys<br>Alessandro Scaglione: keys<br>Roberto Gualdi: drums</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3582baedf5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3582baedf5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3582baedf5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Pino è - Il viaggio del musicante</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Pino è - Il viaggio del musicante - 20-9-25.ts_snapshot_00.04.52.490.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Pino è - Il viaggio del musicante - 20-9-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Pino è - Il viaggio del musicante - 20-9-25.ts_snapshot_00.04.52.490.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Pino è - Il viaggio del musicante - 20-9-25.ts.jpg">
+
+  <div class="tecnici-box" id="video_78e3bed98a">
+    <div class="riga1">1920x1080 -  - 2 h 58 min</div>
+    <div>26.20 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_78e3bed98a">AAC - L R</div>
+  <div class="notebox" id="note_78e3bed98a">Pino è - Il viaggio del musicante - 20-9-25.ts<br>Rai Uno streaming<br>Fiorella Mannoia + Giuliano Sangiorgi + Emma – Yes I know my way<br>Giuliano Sangiorgi – Je so’ pazzo<br>Giorgia – Se mi vuoi<br>Mahmood – Terra mia<br>Elisa – Quando (duetto virtuale con Pino Daniele)<br>Salmo – Che Dio ti benedica<br>Emma – Stare bene a metà<br>Emma + Giorgia – Vento di passione<br>Francesco De Gregori – Putesse essere allero (con Carlo Gaudiello al pianoforte)<br>Fiorella Mannoia + Stash – Quanno chiove<br>The Kolors (con Stash) – A me me piace ’o blues<br>Noemi – Dubbi non ho<br>Irama – Sara (2001)<br>Ron + Fiorella Mannoia – Resta… resta cu’mmè<br>Diodato – Anna verrà<br>Clementino + Rocco Hunt – O’ scarrafone (1991, con Tullio De Piscopo e Tony Esposito)<br>Raf – Amore senza fine<br>Giuliano Sangiorgi – Mal di te<br>Alex Britti – Io per lei<br>Fiorella Mannoia – Senza ’e t<br>Fiorella Mannoia + Elisa + Geolier – Napule è<br>Enzo Avitabile – Tutta ’nata storia<br>Elodie – Qualcosa arriverà<br>Serena Brancale – Chi tene ’o mare / Sicily / Alleria<br><br>Piazza del Plebiscito si è trasformata nel cuore pulsante di Napoli per accogliere “Pino è – Il viaggio del Musicante”,<br>una serata speciale tutta dedicata a Pino Daniele, a 70 anni dalla nascita e dieci dalla morte del grande <br>cantautore partenopeo. A condurre lo spettacolo, Carlo Conti e Fiorella Mannoia, mentre sul palco si sono <br>alternati artisti che hanno condiviso con Daniele un pezzo di strada oltre a stelle della musica mainstream <br>italiana: da Giorgia a Elisa, da Emma a Mahmood, da Salmo a Giuliano Sangiorgi, fino a Francesco De Gregori, <br>Diodato, Irama, Noemi, The Kolors, Raf, Ron, Alex Britti, Enzo Avitabile, Clementino e Geolier. <br>Non sono mancati i compagni storici di Pino, Gigi De Rienzo, Ernesto Vitolo, Rosario Jermano e Tullio De Piscopo, <br>oltre a un momento speciale con Alessandro Siani. L’apertura è stata affidata ai giovani talenti <br>finalisti del Musicante Award – Premio Pino Daniele, il contest rivolto a chi studia, scrive e interpreta <br>musica pop-rock. La vittoria assoluta è andata a Rossana De Pace, che ha presentato “Madre Padre” <br>e “Stella Cometa”.<br>“Pino è – Il viaggio del Musicante” andrà in onda sabato 20 settembre in prima serata su Rai 1, <br>in streaming su RaiPlay e in simulcast su Rai Radio 2.<br>Ecco la scaletta del concerto con l'ordine degli artisti e delle canzoni portate sul palco.<br><br><br>Il concerto è stato un viaggio attraverso le canzoni di Pino e i duetti tra gli ospiti: <br>Giorgia ed Emma hanno aperto con “Vento di passione”, Mahmood ha reinterpretato “Terra mia”, <br>Salmo ha dato voce a “Che Dio ti benedica”, Elisa ha portato “Quando”, De Gregori ha offerto <br>una versione intensa di “Putesse essere allero”. Momenti corali hanno chiuso la serata, <br>come “Napule è”, affidata a Geolier, Elisa e Fiorella Mannoia.<br>Standing ovation per l’elegante rilettura di "Anna verrà" proposta da Diodato, uno dei momenti <br>più intensi della serata. Spazio poi alle barre inedite di Geolier su "Napule è", reinterpretata <br>insieme a Elisa e Fiorella Mannoia: "Napule è mille culure, ca però restano annascuse. <br>Napule è chillu surrise, fatte doppo che ’e chiagnuto". Il clima si è fatto più festoso con <br>il ballo collettivo scatenato da "'O scarrafone", accompagnato dai due storici percussionisti di <br>Pino Daniele, Tony Esposito e Tullio De Piscopo, insieme a Clementino e Rocco Hunt.<br>Parallelamente allo show, RaiPlay proporrà lo speciale “Pino è – Il viaggio del <br>Musicante Speciale RaiPlay”, condotto da Carolina Di Domenico, con interviste e immagini <br>dal backstage. Rai Radio 2, invece, ha dedicato uno spazio ai giovani finalisti, <br>confermando la natura multimediale del progetto.<br><br>Ma l’evento non è stato soltanto spettacolo. Grazie alla Fondazione Pino Daniele Ets, <br>prosegue l’impegno sociale che il cantautore ha sempre sostenuto: borse di studio per <br>giovani musicisti, attività didattiche contro la povertà educativa e progetti che portano <br>il linguaggio della musica nelle comunità più fragili. La campagna solidale finanzierà <br>inoltre il progetto PREME di Open Associa, volto a sostenere i ragazzi in difficoltà.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('78e3bed98a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('78e3bed98a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('78e3bed98a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Ricchi e Poveri - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ricchi e Poveri - Sanremo - 5-2-20.ts_snapshot_20.02.282.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ricchi e Poveri - Sanremo - 5-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ricchi e Poveri - Sanremo - 5-2-20.ts_snapshot_20.02.282.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ricchi e Poveri - Sanremo - 5-2-20.ts.jpg">
+
+  <div class="tecnici-box" id="video_7a099d6dd9">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 22 min 14 s</div>
+    <div>4.60 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7a099d6dd9">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de<br>MPEG Audio - 256 kb/s - fr</div>
+  <div class="notebox" id="note_7a099d6dd9">Ricchi e Poveri - Sanremo - 5-2-20.ts - L'ultimo amore (versione 2020), La prima cosa bella, Che sarà (eseguita interamente e con Fiorello), Sarà perché ti amo, Mamma Maria - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7a099d6dd9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7a099d6dd9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7a099d6dd9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">RKomi</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/RKomi - 1-5-22.ts_snapshot_04.16.287.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/RKomi - 1-5-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/RKomi - 1-5-22.ts_snapshot_04.16.287.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/RKomi - 1-5-22.ts.jpg">
+
+  <div class="tecnici-box" id="video_700aab9b90">
+    <div class="riga1">1920x1080 -  - 11 min 10 s</div>
+    <div>2.33 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_700aab9b90">MPEG Audio - en<br>MPEG Audio - es<br>MPEG Audio - de</div>
+  <div class="notebox" id="note_700aab9b90">RKomi - 1-5-22.ts - Partire da te - Diecimila voci (con Ariete) - Insuperabile - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('700aab9b90')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('700aab9b90')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('700aab9b90')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Roberto Bolle - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Roberto Bolle - Sanremo - 10-2-24.ts_snapshot_08.54.626.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Roberto Bolle - Sanremo - 10-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Roberto Bolle - Sanremo - 10-2-24.ts_snapshot_08.54.626.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Roberto Bolle - Sanremo - 10-2-24.ts.jpg">
+
+  <div class="tecnici-box" id="video_ee98af0d36">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 10 min 34 s</div>
+    <div>1.60 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ee98af0d36">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_ee98af0d36">Roberto Bolle - Sanremo - 10-2-24.ts - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ee98af0d36')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ee98af0d36')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ee98af0d36')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Ron - Una citta' per cantare</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Ron - Una citta' per cantare.ts_snapshot_02.07.037.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Ron - Una citta' per cantare.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Ron - Una citta' per cantare.ts_snapshot_02.07.037.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Ron - Una citta' per cantare.ts.jpg">
+
+  <div class="tecnici-box" id="video_5b87c3bc86">
+    <div class="riga1">1920x1080 - 20.3 Mb/s - 4 min 14 s</div>
+    <div>0.64 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5b87c3bc86">MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_5b87c3bc86">Ron - Una citta' per cantare.ts - Una Città per Cantare è contenuto nel progetto discografico “LA FORZA DI DIRE SÌ”  <br>Ascolta e Acquista  qui http://lnk.to/LFDDS  e sostieni AISLA (l’Associazione Italiana Sclerosi Laterale Amiotrofica)<br>brano corale cantato da tutti gli artisti partecipanti al disco<br><br>Regia: Marco e Luca Donazzan<br>Montaggio: Luca Donazzan<br><br>«Cantare insieme a tutti questi miei colleghi "Una città per cantare" mi ha fatto capire quanto si potrebbe fare credendo tutti insieme in qualcosa, nello stesso istante – dichiara Ron – Mi piacerebbe che le radio, con la loro grande forza, provassero a trasmettere all’unisono questo sentimento proprio nello stesso istante, trasmettendo il brano proprio allo scoccare della mezzanotte del 3 marzo. In questo modo, potremmo raggiungere tanta gente e vincere persino l'indifferenza, toccando con la nostra voce anche le case con un malato di Sla».<br><br>Ron insieme a:<br>Arisa, Biagio Antonacci, Bianca Atzei, #‎kekkosilvestre, Elio e le Storie Tese, Emma Marrone, Ffrancesco De Gregori, Francesco Renga, Gigi D'Alessio, Giuliano Sangiorgi, Giusy Ferreri, Lorenzo Jovanotti Cherubini, La Scelta, Loredana Bertè, Lorenzo Fragola, Luca Barbarossa, Lucio Dalla, Malika Ayane, Marco Mengoni, Mario Biondi, Max Pezzali, Nek Official, Neri Marcorè, Niccolò Fabi, Pino Daniele, Syria.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5b87c3bc86')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5b87c3bc86')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5b87c3bc86')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sabrina Salerno - Boys - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sabrina Salerno - Boys - Sanremo - 8-2-20.ts_snapshot_01.44.167.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sabrina Salerno - Boys - Sanremo - 8-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sabrina Salerno - Boys - Sanremo - 8-2-20.ts_snapshot_01.44.167.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sabrina Salerno - Boys - Sanremo - 8-2-20.ts.jpg">
+
+  <div class="tecnici-box" id="video_48d18aa1d9">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 3 min 38 s</div>
+    <div>0.68 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_48d18aa1d9">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_48d18aa1d9">Sabrina Salerno - Boys - Sanremo - 8-2-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('48d18aa1d9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('48d18aa1d9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('48d18aa1d9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Santi Francesi - & Skin - Hallelujah - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Santi Francesi - & Skin - Hallelujah - Sanremo - 9-2-24.ts_snapshot_00.57.452.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Santi Francesi - & Skin - Hallelujah - Sanremo - 9-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Santi Francesi - & Skin - Hallelujah - Sanremo - 9-2-24.ts_snapshot_00.57.452.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Santi Francesi - & Skin - Hallelujah - Sanremo - 9-2-24.ts.jpg">
+
+  <div class="tecnici-box" id="video_2d59eea699">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 3 min 58 s</div>
+    <div>0.60 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2d59eea699">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_2d59eea699">Santi Francesi - & Skin - Hallelujah - Sanremo - 9-2-24.ts - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2d59eea699')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2d59eea699')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2d59eea699')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sethu - & Bnkr44 - Charlie fa surf - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sethu - & Bnkr44 - Charlie fa surf - Sanremo - 10-2-23.ts_snapshot_01.01.264.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sethu - & Bnkr44 - Charlie fa surf - Sanremo - 10-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sethu - & Bnkr44 - Charlie fa surf - Sanremo - 10-2-23.ts_snapshot_01.01.264.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sethu - & Bnkr44 - Charlie fa surf - Sanremo - 10-2-23.ts.jpg">
+
+  <div class="tecnici-box" id="video_bdcf87c873">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 14 s</div>
+    <div>0.88 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_bdcf87c873">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_bdcf87c873">Sethu - & Bnkr44 - Charlie fa surf - Sanremo - 10-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('bdcf87c873')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('bdcf87c873')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('bdcf87c873')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Tananai - Booster - XFactor</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Tananai - Booster - XFactor - 7-11-24.ts_snapshot_02.40.536.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Tananai - Booster - XFactor - 7-11-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Tananai - Booster - XFactor - 7-11-24.ts_snapshot_02.40.536.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Tananai - Booster - XFactor - 7-11-24.ts.jpg">
+
+  <div class="tecnici-box" id="video_bf4aa627ca">
+    <div class="riga1">1920x1080 - 25.2 Mb/s - 6 min 2 s</div>
+    <div>1.22 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_bf4aa627ca">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_bf4aa627ca">Tananai - Booster - XFactor - 7-11-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('bf4aa627ca')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('bf4aa627ca')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('bf4aa627ca')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Thegiornalisti - Maradona y Pelé - Seat Music Awards</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Thegiornalisti - Maradona y Pelé - Seat Music Awards - 5-6-19.mkv_snapshot_04.10.320.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Thegiornalisti - Maradona y Pelé - Seat Music Awards - 5-6-19.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Thegiornalisti - Maradona y Pelé - Seat Music Awards - 5-6-19.mkv_snapshot_04.10.320.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Thegiornalisti - Maradona y Pelé - Seat Music Awards - 5-6-19.mkv.jpg">
+
+  <div class="tecnici-box" id="video_b57a2f59f6">
+    <div class="riga1">1920x1080 - 35.4 Mb/s - 7 min 39 s</div>
+    <div>1.95 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b57a2f59f6">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_b57a2f59f6">Thegiornalisti - Maradona y Pelé - Seat Music Awards - 5-6-19.mkv - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b57a2f59f6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b57a2f59f6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b57a2f59f6')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Tre allegri ragazzi morti - Bengala</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Tre allegri ragazzi morti - Bengala - 1-5-21.mp4_snapshot_00.03.382.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Tre allegri ragazzi morti - Bengala - 1-5-21.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Tre allegri ragazzi morti - Bengala - 1-5-21.mp4_snapshot_00.03.382.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Tre allegri ragazzi morti - Bengala - 1-5-21.mp4.jpg">
+
+  <div class="tecnici-box" id="video_7e8d16287b">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 3 min 57 s</div>
+    <div>0.53 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7e8d16287b">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_7e8d16287b">Tre allegri ragazzi morti - Bengala - 1-5-21.mp4 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7e8d16287b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7e8d16287b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7e8d16287b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Va pensiero - Verdi Gala</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Va pensiero - Verdi Gala - 26-2-23 .ts_snapshot_05.30.944.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Va Pensiero - Verdi Gala - 26-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Va pensiero - Verdi Gala - 26-2-23 .ts_snapshot_05.30.944.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Va Pensiero - Verdi Gala - 26-2-23.ts.jpg">
+
+  <div class="tecnici-box" id="video_a09cd42f1c">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 6 min 34 s</div>
+    <div>0.90 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a09cd42f1c">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_a09cd42f1c">Va pensiero - Verdi Gala - 26-2-23.ts - Orchestra e Coro del Teatro Comunale di Bologna - direttore Daniel Oren - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a09cd42f1c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a09cd42f1c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a09cd42f1c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Vittorio Grigolo - Sanremo</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Vittorio Grigolo - Sanremo - 8-2-20.ts_snapshot_05.19.330.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Vittorio Grigolo - Sanremo - 8-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Vittorio Grigolo - Sanremo - 8-2-20.ts_snapshot_05.19.330.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Vittorio Grigolo - Sanremo - 8-2-20.ts.jpg">
+
+  <div class="tecnici-box" id="video_4d3702246c">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 8 min 39 s</div>
+    <div>1.59 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4d3702246c">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_4d3702246c">Vittorio Grigolo - Sanremo - 8-2-20.ts - Medley E lucevan le stelle / Who Wants to Live Forever / Bohemian Rhapsody / The Show Must Go On - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4d3702246c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4d3702246c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4d3702246c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Viva Ezio Bosso</div>
+
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mollica intervista Ezio Bosso - 15-4-2016.ts_snapshot_05.36.243.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Viva Ezio Bosso - 15-4-16.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mollica intervista Ezio Bosso - 15-4-2016.ts_snapshot_05.36.243.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Viva Ezio Bosso - 15-4-16.ts.jpg">
+
+  <div class="tecnici-box" id="video_a29f9be0ee">
+    <div class="riga1">1920x1080 - 6.4 Mb/s - 7 min 51 s</div>
+    <div>0.41 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a29f9be0ee">AC-3 - L R - 448 kb/s - it<br>MPEG Audio - 128 kb/s - en</div>
+  <div class="notebox" id="note_a29f9be0ee">Viva Ezio Bosso - 15-4-2016.ts Mollica intervista Ezio Bosso - TV 7</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a29f9be0ee')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a29f9be0ee')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a29f9be0ee')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

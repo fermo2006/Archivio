@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Fireworks</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#eef0f4;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#AEB5CA; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Fireworks
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(13 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Dubai - 2025</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/New Year's Eve Fireworks Dubai (2024-2025) .mkv_snapshot_07.20.969.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/New Year's Eve Fireworks Dubai (2024-2025) .mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/New Year's Eve Fireworks Dubai (2024-2025) .mkv_snapshot_07.20.969.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/New Year's Eve Fireworks Dubai (2024-2025) .mkv.jpg">
+  <div class="tecnici-box" id="video_41ef054e5c">
+    <div class="riga1">1920x1080 - 14.1 Mb/s - 26 min 17 s</div>
+    <div>2.64 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_41ef054e5c">MPEG Audio - 128 kb/s - en<br>MPEG Audio - 128 kb/s - en</div>
+  <div class="notebox" id="note_41ef054e5c">New Year's Eve Fireworks Dubai (2024-2025).mkv - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('41ef054e5c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('41ef054e5c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('41ef054e5c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Londra - 2015</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Londra - Fuochi - 1-1-15.ts_snapshot_00.44.843.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Londra - Fuochi - 1-1-15.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Londra - Fuochi - 1-1-15.ts_snapshot_00.44.843.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Londra - Fuochi - 1-1-15.ts.jpg">
+  <div class="tecnici-box" id="video_3c1ef73e5f">
+    <div class="riga1">1920x1080 - 19.4 Mb/s - 13 min 40 s</div>
+    <div>2.03 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3c1ef73e5f">MPEG Audio - 384 kb/s - en<br>MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_3c1ef73e5f">Londra - Fuochi - 1-1-15.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3c1ef73e5f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3c1ef73e5f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3c1ef73e5f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Londra - 2016</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Londra - Fuochi - 1-1-16.ts_snapshot_00.59.890.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Londra - Fuochi - 1-1-16.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Londra - Fuochi - 1-1-16.ts_snapshot_00.59.890.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Londra - Fuochi - 1-1-16.ts.jpg">
+  <div class="tecnici-box" id="video_1321b08f6c">
+    <div class="riga1">1920x1080 - 29.2 Mb/s - 12 min 31 s</div>
+    <div>2.76 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_1321b08f6c">MPEG Audio - 384 kb/s - en<br>MPEG Audio - 384 kb/s - fr</div>
+  <div class="notebox" id="note_1321b08f6c">Londra - Fuochi - 1-1-16.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1321b08f6c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1321b08f6c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1321b08f6c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Londra - 2017</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Londra - Fuochi - 1-1-17.ts_snapshot_00.11.296.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Londra - Fuochi - 1-1-17.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Londra - Fuochi - 1-1-17.ts_snapshot_00.11.296.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Londra - Fuochi - 1-1-17.ts.jpg">
+  <div class="tecnici-box" id="video_de3d0ad189">
+    <div class="riga1">1920x1080 - 27.8 Mb/s - 13 min 31 s</div>
+    <div>2.80 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_de3d0ad189">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_de3d0ad189">Londra - Fuochi - 1-1-17.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('de3d0ad189')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('de3d0ad189')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('de3d0ad189')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Londra - 2018</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Londra - Fuochi - 1-1-18.ts_snapshot_00.13.23.687.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Londra - Fuochi - 1-1-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Londra - Fuochi - 1-1-18.ts_snapshot_00.13.23.687.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Londra - Fuochi - 1-1-18.ts.jpg">
+  <div class="tecnici-box" id="video_8bbe4f763e">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 1 h 5 min</div>
+    <div>14.66 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_8bbe4f763e">MPEG Audio - 384 kb/s<br>MPEG Audio - 384 kb/s<br>PCM - 1920 kb/s<br>PCM - 1920 kb/s</div>
+  <div class="notebox" id="note_8bbe4f763e">Londra - Fuochi - 1-1-18.ts - Feed  with London tour</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8bbe4f763e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8bbe4f763e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8bbe4f763e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Londra - 2019</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Londra - Fuochi - 1-1-19.ts_snapshot_01.39.730.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Londra - Fuochi - 1-1-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Londra - Fuochi - 1-1-19.ts_snapshot_01.39.730.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Londra - Fuochi - 1-1-19.ts.jpg">
+  <div class="tecnici-box" id="video_cc8d9ce523">
+    <div class="riga1">1920x1080 - 29 Mb/s - 14 min 12 s</div>
+    <div>3.11 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_cc8d9ce523">MPEG Audio - 384 kb/s - de<br>MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_cc8d9ce523">Londra - Fuochi - 1-1-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('cc8d9ce523')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('cc8d9ce523')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('cc8d9ce523')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Londra - 2020</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Londra - Fuochi - 1-1-20.ts_snapshot_00.18.939.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Londra - Fuochi - 1-1-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Londra - Fuochi - 1-1-20.ts_snapshot_00.18.939.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Londra - Fuochi - 1-1-20.ts.jpg">
+  <div class="tecnici-box" id="video_9bf437b2c6">
+    <div class="riga1">1920x1080 - 28.7 Mb/s - 10 min 20 s</div>
+    <div>2.22 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_9bf437b2c6">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_9bf437b2c6">Londra - Fuochi - 1-1-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9bf437b2c6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9bf437b2c6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9bf437b2c6')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Londra - 2022</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Londra - Fuochi - 1-1-22.mp4_snapshot_01.02.325.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Londra - Fuochi - 1-1-22.mp4.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Londra - Fuochi - 1-1-22.mp4_snapshot_01.02.325.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Londra - Fuochi - 1-1-22.mp4.jpg">
+  <div class="tecnici-box" id="video_32f4d2fa12">
+    <div class="riga1">1920x1080 - 13.2 Mb/s - 13 min 28 s</div>
+    <div>1.27 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_32f4d2fa12">AAC - L R - 316 kb/s - en</div>
+  <div class="notebox" id="note_32f4d2fa12">Londra - Fuochi - 1-1-22.mp4 - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('32f4d2fa12')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('32f4d2fa12')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('32f4d2fa12')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Londra - 2023</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Londra - Fuochi - 1-1-23.mts_snapshot_00.44.247.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Londra - Fuochi - 1-1-23.mts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Londra - Fuochi - 1-1-23.mts_snapshot_00.44.247.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Londra - Fuochi - 1-1-23.mts.jpg">
+  <div class="tecnici-box" id="video_ab48119420">
+    <div class="riga1">1920x1080 - 16.9 Mb/s - 13 min 32 s</div>
+    <div>1.69 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ab48119420">AC-3 - L R - 192 kb/s</div>
+  <div class="notebox" id="note_ab48119420">Londra - Fuochi - 1-1-23.mts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ab48119420')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ab48119420')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ab48119420')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Londra - 2024</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Londra - Fuochi - 1-1-24.ts_snapshot_03.27.007.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Londra - Fuochi - 1-1-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Londra - Fuochi - 1-1-24.ts_snapshot_03.27.007.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Londra - Fuochi - 1-1-24.ts.jpg">
+  <div class="tecnici-box" id="video_b25a898e0c">
+    <div class="riga1">1920x1080 - 32.1 Mb/s - 18 min 10 s</div>
+    <div>4.33 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_b25a898e0c">MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_b25a898e0c">Londra - Fuochi - 1-1-24.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b25a898e0c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b25a898e0c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b25a898e0c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Londra - 2025</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Londra - Fuochi - 1-1-25.ts_snapshot_01.00.211.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Londra - Fuochi - 1-1-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Londra - Fuochi - 1-1-25.ts_snapshot_01.00.211.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Londra - Fuochi - 1-1-25.ts.jpg">
+  <div class="tecnici-box" id="video_db275ace7d">
+    <div class="riga1">1920x1080 - 14.7 Mb/s - 13 min 39 s</div>
+    <div>1.49 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_db275ace7d">AC-3 - L R - 192 kb/s - std</div>
+  <div class="notebox" id="note_db275ace7d">Londra - Fuochi - 1-1-25.ts - Web</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('db275ace7d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('db275ace7d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('db275ace7d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Londra - 2025</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Londra - Fuochi - 1-1-25 - BBC.ts_snapshot_05.38.221.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Londra - Fuochi - 1-1-25 BBC.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Londra - Fuochi - 1-1-25 - BBC.ts_snapshot_05.38.221.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Londra - Fuochi - 1-1-25 BBC.ts.jpg">
+  <div class="tecnici-box" id="video_c4499f79ac">
+    <div class="riga1">1920x1080 - 8.8 Mb/s - 19 min 1 s</div>
+    <div>1.26 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_c4499f79ac">AC-3 - L R - 192 kb/s - en</div>
+  <div class="notebox" id="note_c4499f79ac">Londra - Fuochi - 1-1-25.ts - BBC</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c4499f79ac')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c4499f79ac')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c4499f79ac')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Fireworks - Spain - 2025</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/New Year's Eve Fireworks & Drone Show Spain (2024-2025).mkv_snapshot_00.05.771.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/New Year's Eve Fireworks & Drone Show Spain (2024-2025).mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/New Year's Eve Fireworks & Drone Show Spain (2024-2025).mkv_snapshot_00.05.771.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/New Year's Eve Fireworks & Drone Show Spain (2024-2025).mkv.jpg">
+  <div class="tecnici-box" id="video_3eabf6e208">
+    <div class="riga1">1920x1080 - 18 Mb/s - 12 min 9 s</div>
+    <div>1.57 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3eabf6e208">MPEG Audio - 256 kb/s - ca<br>MPEG Audio - 256 kb/s - two</div>
+  <div class="notebox" id="note_3eabf6e208">New Year's Eve Fireworks & Drone Show Spain (2024-2025).mkv - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3eabf6e208')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3eabf6e208')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3eabf6e208')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

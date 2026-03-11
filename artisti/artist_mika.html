@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Mika</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#e8f6f2;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#8fd6bf; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Mika
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(12 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - & Chiara - XFactor 2013</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika  - Chiara - XFactor 2013.ts_snapshot_02.22.283.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika  - Chiara - XFactor 2013.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika  - Chiara - XFactor 2013.ts_snapshot_02.22.283.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika  - Chiara - XFactor 2013.ts.jpg">
+  <div class="tecnici-box" id="video_4b7797c0f1">
+    <div class="riga1">1920x1080 - 13.3 Mb/s - 3 min 30 s</div>
+    <div>0.36 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4b7797c0f1">AC-3 - L R - 384 kb/s - std<br>AC-3 - L R - 384 kb/s - std</div>
+  <div class="notebox" id="note_4b7797c0f1">Mika  - & Chiara - XFactor 2013.ts - Sturdast - Sky Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4b7797c0f1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4b7797c0f1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4b7797c0f1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - & Laura Pausini - Eurovision</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika - & Laura Pausini - Eurovision - 12-5-22.ts_snapshot_01.54.601.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika - & Laura Pausini - Eurovision - 12-5-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika - & Laura Pausini - Eurovision - 12-5-22.ts_snapshot_01.54.601.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika - & Laura Pausini - Eurovision - 12-5-22.ts.jpg">
+  <div class="tecnici-box" id="video_ed0f720ade">
+    <div class="riga1">1920x1080 - 35.9 Mb/s - 5 min 7 s</div>
+    <div>1.37 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_ed0f720ade">MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_ed0f720ade">Mika - & Laura Pausini - Fragile _ People Have the Power - Eurovision - 12-5-22.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ed0f720ade')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ed0f720ade')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ed0f720ade')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - & Michele Bravi - Seat Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika & Michele Bravi - Seat Music Awards - 5-9-20.ts_snapshot_02.16.112.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika & Michele Bravi - Seat Music Awards - 5-9-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika & Michele Bravi - Seat Music Awards - 5-9-20.ts_snapshot_02.16.112.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika & Michele Bravi - Seat Music Awards - 5-9-20.ts.jpg">
+  <div class="tecnici-box" id="video_307ccb6f61">
+    <div class="riga1">1920x1080 - 29.7 Mb/s - 5 min 18 s</div>
+    <div>1.18 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_307ccb6f61">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_307ccb6f61">Mika - & Michele Bravi - Seat Music Awards - 5-9-20.ts - Feed - Bella d'estate</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('307ccb6f61')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('307ccb6f61')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('307ccb6f61')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - C’est la vie - NRJ Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika - C’est la vie - NRJ Music Awards - 10-11-23.ts_snapshot_00.47.585.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika - C’est la vie - NRJ Music Awards - 10-11-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika - C’est la vie - NRJ Music Awards - 10-11-23.ts_snapshot_00.47.585.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika - C’est la vie - NRJ Music Awards - 10-11-23.ts.jpg">
+  <div class="tecnici-box" id="video_8176220d1d">
+    <div class="riga1">1920x1080 - 18.5 Mb/s - 4 min 27 s</div>
+    <div>0.63 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8176220d1d">MPEG Audio - 384 kb/s - en<br>MPEG Audio - 384 kb/s - en</div>
+  <div class="notebox" id="note_8176220d1d">Mika - C’est la vie - NRJ Music Awards - 10-11-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8176220d1d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8176220d1d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8176220d1d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - Eurovision</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika - 14-5-22 -  Eurovision - 2 prova finale.ts_snapshot_02.10.276.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika -  Eurovision - 14-5-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika - 14-5-22 -  Eurovision - 2 prova finale.ts_snapshot_02.10.276.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika -  Eurovision - 14-5-22.ts.jpg">
+  <div class="tecnici-box" id="video_5bda9a2df3">
+    <div class="riga1">1920x1080 - 35.9 Mb/s - 6 min 21 s</div>
+    <div>1.70 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_5bda9a2df3">MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_5bda9a2df3">Mika - 14-5-22 -  Eurovision - 2 prova finale.ts - Love Today, Grace Kelly, Happy Ending and his fantastic new single Yo-Yo.- Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5bda9a2df3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5bda9a2df3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5bda9a2df3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - Eurovision</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika - 14-5-22 - Eurovision.ts_snapshot_05.25.173.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika - Eurovision - 14-5-22.ts_(COPY_0001).jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika - 14-5-22 - Eurovision.ts_snapshot_05.25.173.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika - Eurovision - 14-5-22.ts_(COPY_0001).jpg">
+  <div class="tecnici-box" id="video_1ece64d0dc">
+    <div class="riga1">1920x1080 - 35.9 Mb/s - 6 min 17 s</div>
+    <div>1.68 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_1ece64d0dc">MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_1ece64d0dc">Mika - Eurovision - 14-5-22.ts - Love Today, Grace Kelly, Happy Ending and his fantastic new single Yo-Yo. - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1ece64d0dc')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1ece64d0dc')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1ece64d0dc')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - Modern Times - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika - Modern Times - XFactor - 13-11-25.ts_snapshot_05.20.461.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika - Modern Times - XFactor - 13-11-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika - Modern Times - XFactor - 13-11-25.ts_snapshot_05.20.461.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika - Modern Times - XFactor - 13-11-25.ts.jpg">
+  <div class="tecnici-box" id="video_1739446736">
+    <div class="riga1">1920x1080 - 27.2 Mb/s - 5 min 34 s</div>
+    <div>1.21 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_1739446736">PCM - 1920 kb/s - it</div>
+  <div class="notebox" id="note_1739446736">Mika - Modern Times - XFactor - 13-11-25.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1739446736')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1739446736')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1739446736')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika - Radio Italia Live - 16-6-18.ts_snapshot_16.18.980.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika - Radio Italia Live - 16-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika - Radio Italia Live - 16-6-18.ts_snapshot_16.18.980.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika - Radio Italia Live - 16-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_c3eeee4a1f">
+    <div class="riga1">1920x1080 - 11.6 Mb/s - 18 min 30 s</div>
+    <div>1.63 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_c3eeee4a1f">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_c3eeee4a1f">Mika - Radio Italia Live -16-6-18.ts - Grace Kelly - Beautiful disaster (con Fedez) - L'italiano - Stardust (con Chiara Galiazzo) Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c3eeee4a1f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c3eeee4a1f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c3eeee4a1f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - Radio Italia Live</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika - Radio Italia Live - 29-6-19.mkv_snapshot_01.44.400.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika - Radio Italia Live - 29-6-19.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika - Radio Italia Live - 29-6-19.mkv_snapshot_01.44.400.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika - Radio Italia Live - 29-6-19.mkv.jpg">
+  <div class="tecnici-box" id="video_cd0b0ae93b">
+    <div class="riga1">1920x1080 - 15.3 Mb/s - 16 min 57 s</div>
+    <div>1.89 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_cd0b0ae93b">MPEG Audio - 384 kb/s - it</div>
+  <div class="notebox" id="note_cd0b0ae93b">Mika - Radio Italia Live - 29-6-19.mkv - Sturdust  - Ice cream - Love today - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('cd0b0ae93b')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('cd0b0ae93b')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('cd0b0ae93b')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika - Sanremo - 6-2-20.ts_snapshot_00.01.948.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika - Sanremo - 6-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika - Sanremo - 6-2-20.ts_snapshot_00.01.948.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika - Sanremo - 6-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_dde253100c">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 13 min 8 s</div>
+    <div>2.45 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_dde253100c">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_dde253100c">Mika - Sanremo - 6-2-20.ts - Feed - Dear Jealousy / Happy Ending, Amore che vieni, amore che vai</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dde253100c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dde253100c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dde253100c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - Tiny Love Reprise - XFactor</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika - Tiny Love Reprise - XFactor - 24-10-19.ts_snapshot_05.35.964.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika - Tiny Love Reprise - XFactor - 24-10-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika - Tiny Love Reprise - XFactor - 24-10-19.ts_snapshot_05.35.964.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika - Tiny Love Reprise - XFactor - 24-10-19.ts.jpg">
+  <div class="tecnici-box" id="video_14326f1367">
+    <div class="riga1">1920x1080 - 27.3 Mb/s - 9 min 41 s</div>
+    <div>2.11 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_14326f1367">PCM - 1920 kb/s - en</div>
+  <div class="notebox" id="note_14326f1367">Mika - Tiny Love Reprise - XFactor - 24-10-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('14326f1367')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('14326f1367')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('14326f1367')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Mika - XFactor - Finale</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Mika - XFactor - Finale - 10-12-20.ts_snapshot_05.09.640.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Mika - XFactor - Finale - 10-12-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Mika - XFactor - Finale - 10-12-20.ts_snapshot_05.09.640.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Mika - XFactor - Finale - 10-12-20.ts.jpg">
+  <div class="tecnici-box" id="video_fab03fd0f6">
+    <div class="riga1">1920x1080 - 25.9 Mb/s - 5 min 59 s</div>
+    <div>1.25 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_fab03fd0f6">PCM - 1920 kb/s - int</div>
+  <div class="notebox" id="note_fab03fd0f6">Mika - XFactor - Finale - 10-12-20.ts - Feed - Greatest Hits Medley</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('fab03fd0f6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('fab03fd0f6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('fab03fd0f6')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

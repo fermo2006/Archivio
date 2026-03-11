@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Met - Opera</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#fdf9e1;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#F8E16C; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Met - Opera
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(29 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Aida</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Aida - 25-1-25.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Aida - 25-1-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Aida - 25-1-25.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Aida - 25-1-25.ts.jpg">
+  <div class="tecnici-box" id="video_fd1fc31eb3">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 43 min</div>
+    <div>28.06 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_fd1fc31eb3">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_fd1fc31eb3">MET - Aida - 25-1-25.ts - Feed<br>Conductor - Yannick Nezet-Seguin<br>Il Re - Harold Wilson<br>Amneris - Judit Kutasi<br>Aida - Angel Blue<br>Radames - Piotr Beczala<br>Ramfis - Morris Robinson<br>Amonasro - Quinn Kelsey<br>Un messaggero - Yongzhao Yu<br>Sacerdotessa - Amanda Batista</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('fd1fc31eb3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('fd1fc31eb3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('fd1fc31eb3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Andrea Chénier</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Andrea Chénier - 13-12-25.ts_snapshot_00.01.41.588.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Andrea Chénier - 13-12-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Andrea Chénier - 13-12-25.ts_snapshot_00.01.41.588.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Andrea Chénier - 13-12-25.ts.jpg">
+  <div class="tecnici-box" id="video_a4ecac363a">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 21 min</div>
+    <div>25.28 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a4ecac363a">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_a4ecac363a">MET - Andrea Chénier - 13-12-25.ts - Feed<br>Conductor - Daniele Rustioni<br>Maddalena di Coigny - Sonya Yoncheva<br>Andrea Chénier - Piotr Beczała<br>Carlo Gérard - Igor Golovatenko<br>Major-Domo - Ben Strong<br>Countess di Coigny - Nancy Fabiola Herrera<br>Bersi - Siphokazi Molteno<br>Fleville - Alexander Birch Elliott<br>Abbé - Tony Stevenson<br>Mathieu - Maurizio Muraro<br>Incredibile - Brenton Ryan<br>Roucher - Guriy Gurev<br>Madelon - Olesya Petrova<br>Dumas - Jeongcheol Cha<br>Fouquier-Tinville - Christopher Job<br>Schmidt - Richard Bernstein<br>Sottotitoli - Inglese - Francese - Italiano - Tedesco - Spagnolo - Polacco - Svedese<br><br>ATTO I<br>primavera 1789 al castello di Coigny vicino a Parigi, Gérard, domestico della Contessa di Coigny, burla l’aristocrazia e le sue usanze. Mentre suo padre ha difficoltà a maneggiare un mobile pesante, Gérard si lamenta di come i padroni di casa maltrattano i domestici (“Son sessant’anni”). Maddalena, la figlia della Contessa, appare e Gérard si rende conto di quanto la ami. La Contessa sgrida Maddalena per non essere pronta per la festa che avrà luogo la sera stessa. Maddalena si lamenta con Bersi, la sua domestica, di quanto siano scomodi i vestiti alla moda, poi corre a vestirsi. Tramite gli ospiti, si presenta Fléville, uno scrittore, che porta con sé il giovane poeta Andrea Chénier. Fléville anima la festa recitando una pastorale scritta apposta per l’occasione. Maddalena sfida Chénier ad improvvisare una poesia (“un dì all’azzurro spazio”). Chénier scandalizza la compagnia criticando l’aristocrazia e la chiesa sulla loro indifferenza alla sofferenza dei poveri. Gérard interrompe la serata quando irrompe con un gruppo di contadini affamati. La Contessa ordina loro di uscire ed invita i suoi ospiti a continuare a divertirsi, ma decidono tutti di andarsene e lasciano la Contessa sola.<br><br><br>ATTO II<br>primavera 1794, a Cours-la-Reine, vicino Parigi. È iniziata la rivoluzione, ed il Regno del Terrore è in piena fioritura. Bersi tenta di ingannare l’Incredibile, una spia di Gérard, dicendogli di essere una figlia della Rivoluzione (“Temer? Perché?”). L’Incredibile non si lascia ingannare e percepisce il poeta Chénier che attende qualcuno al Café Hottot. Chénier è raggiunto dall’amico Roucher che gli porge un finto passaporto finché Chénier possa abbandonare il paese sano e salvo. Ma Chénier non ha intenzione di andarsene finché non scoprirà chi è il mittente delle lettere d’amore che riceve ormai da anni (“Credo a una possanza arcana”). Entra Gérard, seguito da una processione di dignitari. L’Incredibile gli chiede di descrivergli la donna che il primo sta cercando e Gérard gli descrive Maddalena. Nel frattempo, Bersi prega Chénier di aspettare ancora un po’ poiché c’è una persona che vuole incontrarlo. Entra Maddalena, che rivela a Chénier di essere la mittente delle lettere d’amore. I due si promettono di amarsi fino alla morte (“Ora soave”). L’incredibile scorge i due e conduce Gérard verso di loro. Gérard tenta di afferrare Maddalena, ma è ferito da Chénier che tenta di difenderla. Quando Gérard riconosce il poeta, lo lascia andare via chiedendogli di proteggere Maddalena. Quando il popolo chiede a Gérard chi sia stato a ferirlo, questo risponde che il colpevole non era identificabile.<br><br><br>ATTO III<br>24 luglio 1794, nell’aula del tribunale rivoluzionario. Mathieu, un rivoluzionario, tenta senza successo di convincere il popolo a dedicarsi alla causa rivoluzionaria. Gérard lancia un discorso passionale sull’importanza della madre terra. Madelon, una vecchia signora che ha gia perso un figlio ed un nipote per la rivoluzione, offre l’ultimo nipote per la causa (“Son la vecchia Madelon”). Il popolo si disperde ed appare l’Incredibile che insite con Gérard che se questo vuole recuperare la sua benamata Maddalena, prima deve far arrestare il suo amante Chénier. Gérard scrive una lettera di false accuse contro il poeta ed è pieno di rimorso per il sangue che ha fatto versare per arrivare al potere. Si arrende al fatto che la passione sia la sua unica padrona (“Nemico della patria”). Quando pone l’imputazione al tribunale, Maddalena appare e Gérard le rivela il suo amore per lei e l’accusa che ha appena depositato. Maddalena gli promette di essere sua se Gérard riesce a salvare Chénier. Maddalena è una fuggitiva da tempo, sua madre è stata uccisa e la sua casa bruciata (“La mamma morta”). Sensibile all’amore di Maddalena per Chénier, Gérard le promette di fare di tutto per salvarlo. Il tribunale si riunisce, seguito da una massa di gente indisciplinata. Chénier chiede misericordia (“Sì, fui soldato) e Gérard ammette di aver fatto una falsa accusa. Chénier è comunque condannato a morte.<br><br><br>ATTO IV<br>25 luglio 1794, nelle rovine della prigione Saint Lazare a Parigi. Chénier legge un’ultima poesia (“Come un bel dì di maggio”) al suo amico Roucher che poi gli dice addio. Gérard e Maddalena incontrano il carceriere e Maddalena lo paga sotto banco per prendere il posto di un’altra donna condannata a morte. Gérard li lascia per pregare Robespierre di risparmiare Chénier. Maddalena annuncia a Chénier che moriranno insieme. All’alba, i due condividono un ultimo momento insieme (“Vicino a te”) per poi essere condotti verso la ghigliottina.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a4ecac363a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a4ecac363a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a4ecac363a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Arabella</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Arabella - 22-11-25.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Arabella - 22-11-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Arabella - 22-11-25.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Arabella - 22-11-25.ts.jpg">
+  <div class="tecnici-box" id="video_25757d703c">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 56 min</div>
+    <div>29.72 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_25757d703c">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_25757d703c">MET - Arabella - 22-11-25.ts - Feed<br>Conductor - Nicholas Carter<br>Arabella - Rachel Willis-Sorensen<br>Zdenka - Louise Alder<br>Fiakermilli - Julie Roset<br>Countess Adelaide Waldner - Karen Cargill<br>Matteo - Pavol Breslik<br>Mandryka - Tomasz Konieczny<br>Count Waldner - Brindley Sherratt<br>Fortune Teller - Eve Gigliotti<br>Count Elemer - Evan LeRoy Johnson<br>Waiter - Scott Scully<br>Welko - Marc Persing<br>Count Dominik - Ricardo Jose Rivera<br>Count Lamoral - Ben Brady<br>Djura - Craig Montgomery<br>Jankel - Timoty Breese Miller<br><br>ATTO PRIMO<br>Vienna, intorno al 1860. Nella suite d'hotel dei Waldner, la Contessa Adelaide von Waldner <br>consulta una cartomante in merito al dissesto finanziario della sua famiglia. Mentre le due <br>leggono le carte, "Zdenko," il "figlio" dei Waldner (che in realtà è la loro figlia più giovane, <br>Zdenka, che è stata allevata come un maschio per far risparmiare alla famiglia le spese di <br>una seconda figlia femmina), si dà da fare per tenere alla larga i creditori. La cartomante  <br>predice un matrimonio con un uomo ricco per Arabella, la bellissima figlia maggiore dei Waldner. <br>Quando le due donne si ritirano, Zdenka ascolta l'appello accorato di un giovane ufficiale, Matteo, <br>che chiede aiuto nel fare la corte ad Arabella. Egli minaccia di spararsi se il suo amico "Zdenko" <br>non gli darà una mano. Non appena Matteo se ne va, Arabella rientra da una passeggiata. <br>Dopo aver liquidato il suo accompagnatore, Arabella trova dei regali da parte di altri tre <br>suoi spasimanti: i Conti Elemer, Dominik e Lamoral. Benché Zdenka sia segretamente innamorata <br>di Matteo, ella implora la sorella di scegliere lui. Arabella le risponde dicendo di non aver <br>ancora incontrato l'uomo giusto per lei. Compare Elemer, che invita  Arabella a fare un <br>giro in slitta. Lei accetta l'invito e va a cambiarsi, non senza aver prima fatto notare <br>alla sorella uno sconosciuto che, dalla strada, guarda verso la loro finestra. <br>Entra, con fare baldanzoso, il Conte Waldner, che si lamenta per la sua sfortuna alle <br>carte e per tutti i conti da pagare. Egli comunica a sua moglie di aver inviato, in extrema ratio, <br>una fotografia di Arabella a un suo vecchio amico ed ex compagno d'armi, il facoltoso Mandryka. <br>Qualche istante dopo, il nipote di quest'ultimo, anche lui chiamato Mandryka, si fa annunciare. <br>Il giovane ha letto la lettera di Waldner, si è innamorato dell'immagine di Arabella <br>e si è recato a Vienna in luogo dello zio, ormai deceduto, per chiedere la mano della ragazza. <br>Egli parla delle sue magnifiche proprietà in Slavonia e concede a Waldner un prestito. <br>Non appena la stanza rimane vuota, Arabella ricompare, in atteggiamento melanconico. <br>Ella si chiede perché è così insoddisfatta dei suoi spasimanti. I suoi pensieri ben presto <br>si volgono al Ballo dei Fiaccherai, che avrà luogo quella sera. Zdenka la raggiunge, e le due sorelle partono insieme in slitta.<br>ATTO SECONDO<br>Presso la grande scalinata nel foyer della sala da ballo, Waldner presenta Mandryka <br>alla Contessa e Arabella, che riconosce in lui lo sconosciuto che aveva visto fuori <br>dall'hotel, sente un tuffo al cuore. Quando i due rimangono da soli, Mandryka, <br>che è fortemente attratto dalla ragazza, le racconta della morte prematura di sua <br>moglie, delle sue terre e della tradizione tipica della Slavonia di dichiarare il proprio <br>amore con un bicchiere d'acqua. Arabella accetta la dichiarazione di Mandryka e si <br>dichiara a sua volta, ma gli chiede di potersi fermare al ballo per dire addio alla <br>sua fanciullezza. La mascotte dei fiacchieri, Fiakermilli, dichiara Arabella regina <br>del ballo. Mandryka, al settimo cielo, ordina fiori e champagne per tutti, ma si fa <br>da parte perché Arabella possa dire addio ai suoi pretendenti Dominik, Elemer e, <br>infine, Lamoral. Nei suoi giri di valzer intorno alla sala, Arabella non si accorge <br>di Matteo, che chiede disperatamente a Zdenka un segno del presunto amore di <br>Arabella per lui. Zdenka gli consegna una chiave, dicendogli che proviene da <br>Arabella e che apre la porta della sua stanza. Mandryka, che ode lo scambio, <br>è scioccato. Furioso, egli beve smodatamente e amoreggia con Fiakermilli e la Contessa, <br>finché Waldner non ne riprende il comportamento e gli propone di riaccompagnarlo all'hotel.<br>ATTO TERZO<br>Ignara del fatto che Matteo ha passato un'ora nella sua stanza al piano di sopra, <br>Arabella ritorna dal ballo, ripetendo tra sé e sé la descrizione fattale da Mandryka <br>della sua dimora di campagna. Matteo, mentre cerca di andarsene senza farsi scoprire, <br>è sorpreso di trovare Arabella nell'ingresso e non comprende la sua tiepida cordialità, <br>in quanto è convinto di averla tenuta tra le sue braccia fino a un attimo prima. <br>Mandryka arriva con i Waldner e, credendo che Arabella gli sia stata infedele, <br>provoca Waldner per avere soddisfazione dell'onta. Il conseguente duello viene evitato <br>quando Zdenka si presenta al piano di sotto in abiti da notte, confessando di essersi <br>concessa a Matteo per evitare che si suicidasse. Sopraffatta dalla vergogna, ella <br>stessa minaccia il suicidio, ma viene perdonata dai genitori e accolta tra le braccia <br>di Matteo. Mentre ognuno si ritira nelle proprie stanze, Arabella prega Mandryka di far <br>portare un bicchiere d'acqua alla sua stanza. Egli fa come richiesto e rimane nell'ingresso, <br>chiedendosi quali saranno, ora, i sentimenti di lei nei suoi confronti. Arabella ricompare <br>in cima alle scale, tenendo in mano il bicchiere d'acqua, e giura nuovamente fedeltà all'amato.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('25757d703c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('25757d703c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('25757d703c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Carmen</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Carmen - 27-1-24.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Carmen - 27-1-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Carmen - 27-1-24.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Carmen - 27-1-24.ts.jpg">
+  <div class="tecnici-box" id="video_7f0f8e9b2c">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 53 min</div>
+    <div>29.35 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7f0f8e9b2c">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_7f0f8e9b2c">MET - Carmen - 27-1-24.ts - Feed<br>Conductor - Daniele Rustioni<br>Micaela - Angel Blue<br>Carmen - Aigul Akhmetshina<br>Don José - Piotr Beczala<br>Escamillo - Kyle Ketelsen<br>Morales - Benjamin Taylor<br>Zuniga - Wei Wu<br>Frasquita - Sydney Mancasola<br>Mercedes - Briana Hunter<br>Le Dancaire - Michael Adams<br>Le Remendado - Frederick Ballentine</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7f0f8e9b2c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7f0f8e9b2c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7f0f8e9b2c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Champion</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Champion - 29-4-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Champion - 29-4-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Champion - 29-4-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Champion - 29-4-23.ts.jpg">
+  <div class="tecnici-box" id="video_c22f043f63">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 23 min</div>
+    <div>25.59 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_c22f043f63">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_c22f043f63">MET - Champion - 29-4-23.ts - Feed<br>Conductor - Yannick Nezet-Seguin<br>Emile Griffith - Eric Owens<br>Emelda Griffith - Latonia Moore<br>Benny "Kid" Paret - Eric Greene<br>Howie Albert - Paul Groves<br>Luis Rodrigo Griffith - Chauncey Packer<br>Ring Announcer - Lee Wilkof<br>Young Emile Griffith - Ryan Speedo Green<br>Kathy Hagen - Stephanie Blythe<br>Man in Bar - Edward Nelson<br>Cousin Blanche - Krysty Swann<br>Little Emile - Ethan Joseph<br>Lucia Paret - Helena Brown<br>Mano Alfaro - Tshombe Selby<br>Sadie Donastorg Griffith - Brittany Renee<br>Benny Paret, Jr. - Eric Green</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c22f043f63')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c22f043f63')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c22f043f63')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Dead Man Walking</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Dead Man Walking - 21-10-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Dead Man Walking - 21-10-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Dead Man Walking - 21-10-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Dead Man Walking - 21-10-23.ts.jpg">
+  <div class="tecnici-box" id="video_a1819bf078">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 37 min</div>
+    <div>27.26 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a1819bf078">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_a1819bf078">MET - Dead Man Walking - 21-10-23.ts - Feed<br>Conductor - Yannick Nezet-Seguin<br>Sister Helen Prejean - Joyce DiDonato<br>Sister Rose - Latonia Moore<br>Mrs. Patrick De Rocher - Susan Graham<br>Joseph De Rocher - Ryan McKinny</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a1819bf078')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a1819bf078')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a1819bf078')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Die Zauberflote</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Die Zauberflote - 3-6-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Die Zauberflote - 3-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Die Zauberflote - 3-6-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Die Zauberflote - 3-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_9ed9afd1fc">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 35 min</div>
+    <div>27.09 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_9ed9afd1fc">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_9ed9afd1fc">MET - Die Zauberflote - 3-6-23.ts - Feed<br>Conductor - Nathalie Stutzmann<br>Pamina - Erin Morley<br>Queen of the night - Kathryn Lewek<br>Tamino - Lawrence Brownlee<br>Papageno - Thomas Oliemans<br>Sarastro - Stephen Milling</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9ed9afd1fc')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9ed9afd1fc')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9ed9afd1fc')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Falstaff</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Falstaff - 1-4-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Falstaff - 1-4-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Falstaff - 1-4-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Falstaff - 1-4-23.ts.jpg">
+  <div class="tecnici-box" id="video_76a9d48cae">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 13 min</div>
+    <div>24.29 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_76a9d48cae">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_76a9d48cae">MET - Falstaff - 1-4-23.ts - Feed<br>Conductor - Daniele Rustioni<br>Nannetta - Hera Hyesang Park<br>Alice Ford - Ailyn Perez<br>Mistress Quickly - Marie-Nicole Lemieux<br>Meg Page - Jennifer Johnson Cano<br>Fenton - Bogdan Volkov<br>Falstaff - Michael Volle<br>Ford - Christopher Maltman<br>Dr. Caius - Carlo Bosi<br>Bardolfo - Chaunchey Packer<br>Pistola - Richard Bernstein</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('76a9d48cae')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('76a9d48cae')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('76a9d48cae')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Fedora</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Fedora - 14-1-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Fedora - 14-1-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Fedora - 14-1-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Fedora - 14-1-23.ts.jpg">
+  <div class="tecnici-box" id="video_2f801eb267">
+    <div class="riga1">1920x1080 - 17 Mb/s - 2 h 49 min</div>
+    <div>21.36 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2f801eb267">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_2f801eb267">MET - Fedora - 14-1-23.ts - Feed<br>Conductor - Marco Armiliato<br>Fedora - Sonya Yoncheva<br>Contessa Olga Sukarev - Rosa Feola<br>Count Loris Ipanoff - Piotr Beczala<br>Giovanni De Siriex - Lucas Meachem<br>Desire - Tony Stevenson<br>Nicola - Rocky Eugenio Sellers<br>Sergio - Brian Vu<br>Dimitri - Laura Krumm<br>Gretch - Lucia Lucas<br>Loreck - Paul Corona<br>Cirillo - Jeongcheol Cha<br>Michele - Ross Benoliel<br>Baron Rouvel - Scott Scully<br>Dr. Boroff - Richard Bernstein<br>A Peasant Boy - Luka Zylik</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2f801eb267')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2f801eb267')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2f801eb267')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Fidelio</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Fidelio - 15-3-25.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Fidelio - 15-3-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Fidelio - 15-3-25.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Fidelio - 15-3-25.ts.jpg">
+  <div class="tecnici-box" id="video_936be96be2">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 8 min</div>
+    <div>23.59 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_936be96be2">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_936be96be2">MET - Fidelio - 15-3-25.ts - Feed<br>Conductor - Susanna MaLkki<br>Leonore - Lise Davidsen<br>Marzelline - Ying Fang<br>Florestan - David Butt Philip<br>Jaquino - Magnus Dietrich<br>Don Pizarro - Tomasz Konieczny<br>Rocco - Rene Pape<br>Don Fernando - Stephen Milling<br>First Prisoner - Jonghyun Park<br>Second Prisoner - Jeangcheol Cha</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('936be96be2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('936be96be2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('936be96be2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Grounded</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Met - Grounded - 19-10-24.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Grounded - 19-10-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Met - Grounded - 19-10-24.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Grounded - 19-10-24.ts.jpg">
+  <div class="tecnici-box" id="video_5c1a3c5440">
+    <div class="riga1">1920x1080 - 17 Mb/s - 2 h 43 min</div>
+    <div>20.35 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5c1a3c5440">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_5c1a3c5440">MET- Grounded - 19-10-24.ts - Feed<br>Conductor - Yannick Nezet-Seguin<br>Jess - Emily D'Angelo<br>Eric - Ben Bliss<br>Bar Pilot - Earle Patriarco<br>Commander - Greer Grimsley<br>Sam - Lucy Lobue<br>Mission coordinator - Christopher Bozeka<br>Ground control - Thomas Capobianco<br>Joint terminal attack controller - Paul Corona<br>Safety Observer - Christopher Job<br>Judge advocate general - Matthew Anchel<br>Sensor - Also Jess<br>Seat Warmer - Tomotgy Murray<br>Mail employees - Tyler Simpson - Patrick Miller</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5c1a3c5440')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5c1a3c5440')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5c1a3c5440')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - I Puritani</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - I Puritani - 10-1-26.ts_snapshot_00.07.58.628.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - I Puritani - 10-1-26.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - I Puritani - 10-1-26.ts_snapshot_00.07.58.628.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - I Puritani - 10-1-26.ts.jpg">
+  <div class="tecnici-box" id="video_914da8259f">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 47 min</div>
+    <div>28.55 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_914da8259f">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_914da8259f">MET Opera - I Puritani - 10-1-26<br>Conductor - Marco Armiliato<br>Bruno - Tony Stevenson<br>Riccardo - Ricardo Jose Rivera<br>Elvira - Lisette Oropesa<br>Giorgio - Christian Van Horn<br>Arturo - Lawrence Brownlee<br>Gualtiero - David Pittsinger<br>Enrichetta - Eve Gigliotti <br>Young Arturo - DeAundre Addison<br>Young Elvira - Taylor Massa<br>Lord Talbot - Richards E. Waits <br><br>L’Inghilterra è in piena guerra civile (1640, c.a): la nazione è profondamente divisa tra i sostenitori del Parlamento sotto il governo di Oliver Cromwell (Le Testerotonde) e i seguaci del re, fedeli alla monarchia degli Stuart (i Cavalieri). Il re Carlo I è stato decapitato.<br><br>ATTO I, SCENA 1.<br> Plymouth, fortezza puritana, è sotto assalto delle truppe realiste. Da lontano risuona l’annuncio delle nozze di Elvira, figlia di Gualtiero (Lord Walton) lui stesso capitano del forte. Il fidanzato di Elvira, Riccardo (Sir Richard Forth) irrompe lamentandosi che Elvira sia innamorata di un altro, un partigiano degli Stuart (“Ah, per sempre, io ti perdei”). Gualtiero non è disposto a maritare la figlia senza il suo consenso, così Sir Bruno, amico di Riccardo, suggerisce a questo di dimenticare Elvira e di concentrarsi sul comando delle forze militari parlamentari.<br><br>SCENA 2.<br><br>Elvira confida al vecchio zio Giorgio (Sir George Walton) di non amare Riccardo e di preferire la morte allo sposarlo (“Sai come arde”). Giorgio la rassicura, promettendogli di aver convinto il padre ad accettare che lei maritasse il suo amante, Arturo (Lord Arthur Talbot) un sostenitore del re. Un messaggero annuncia l’approccio di Arturo al castello (“A quel suono”).<br><br>SCENA 3.<br><br>Arturo saluta la sua novella sposa (“A te o cara”). Durante i festeggiamenti, Riccardo scorge Enrichetta, la vedova del re Carlo, prigioniera nel castello e presto trasferita a Londra per il suo processo. Rimasto solo con la regina, Arturo le promette di salvarla a costo di morire. Elvira torna, danzando seducentemente con il velo nuziale (“Son vergin vezzosa”) e lo posa scherzosamente sulla testa di Enrichetta. Poi si assenta danzando. Riccardo ha un’idea: nasconde la regina sotto il velo nuziale e senza far rumore, tentano una fuga dal castello. Sono immediatamente bloccati da Riccardo che, geloso di Arturo e sicuro che si tratti di Elvira sotto il velo, è determinato ad ucciderlo. Enrichetta si scopre e rivela la sua identità. Riccardo li lascia fuggire, convinto che sarà appunto questa fuga a rovinare la reputazione di Arturo. Riccardo annuncia agli invitati ed alla sposa che Arturo è fuggito con la regina. Le guardie scattano immediatamente per inseguirli. Elvira è devastata e, sentendosi tradita profondamente, entra in una pazzia.<br><br>ATTO II.<br>I cittadini lamentano la follia di Elvira, che a sua volta è ancora tormentata dal suo amore per Arturo. Riccardo irrompe ed annuncia la cattura di Arturo e la decisione parlamentare di condannarlo a morte. Elvira passeggia senza meta, ricordandosi un passato felice (“Qui la voce”). Nella sua follia, scambia Riccardo per Arturo e ricorda il suo matrimonio (“Vien, diletto”). Giorgio tenta di convincere Riccardo di salvare Arturo. Riccardo esita, ma per l’amore di Elvira, decide di provarci, a condizione che Arturo torni come amico; se mai fosse armato, Riccardo avrà l’obbligo di ucciderlo (“Suoni la tromba”).<br><br>ATTO III.<br>Nel giardino di Elvira. Arturo è tornato a Plymouth per amore di Elvira. La scopre mentre canta una loro canzone d’amore (“A una fonte afflitto”) e continua a bacillare tra il suo amore per lei e la sua fedeltà al re. Arturo si scopre e annuncia a Elvira di essere perdutamente innamorato di lei e solo lei (“Vieni fra queste braccia”). Un gruppo di soldati tenta di arrestare Arturo, ma un messaggero annuncia la sconfitta finale dei realisti e la dichiarazione di amnistia generale per tutti i trasgressori. Le notizie risvegliano Elvira dalla sua pazzia (“Sento, o mio bell’angelo”) e abbraccia Arturo                                           appassionatamente, mentre il popolo si rallegra della pace.                            Sottotitoli - English (eng), German (deu), French (fra), Spanish (spa), Polish (pol), Swedish (swe), Italian (ita)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('914da8259f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('914da8259f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('914da8259f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Il Barbiere di Siviglia</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Il Barbiere di Siviglia - 31-5-25.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Il Barbiere di Siviglia - 31-5-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Il Barbiere di Siviglia - 31-5-25.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Il Barbiere di Siviglia - 31-5-25.ts.jpg">
+  <div class="tecnici-box" id="video_06ad7d6371">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 33 min</div>
+    <div>26.83 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_06ad7d6371">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_06ad7d6371">MET - Il Barbiere di Siviglia - 31-1-25.ts - Feed<br>Conductor - Giacomo Sagripanti<br>Fiorello - Joseph Lim<br>Count Almaviva - Jack Swanson<br>Figaro - Andrey Zhiliknovsky<br>Rosina - Aigul Akhmetshina<br>Dr. Bartolo - Peter Kalman<br>Don Basilio - Alexander Vinogradov<br>Berta - Kathleen O'Mara<br>Office - Jonghyun Park<br>Ambrogio - Jay Dunn</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('06ad7d6371')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('06ad7d6371')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('06ad7d6371')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - La Boheme</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - La Boheme - 8-11-25.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - La Boheme - 8-11-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - La Boheme - 8-11-25.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - La Boheme - 8-11-25.ts.jpg">
+  <div class="tecnici-box" id="video_a2fca2ab76">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 38 min</div>
+    <div>27.39 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a2fca2ab76">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_a2fca2ab76">MET - La Bohème - 8-11-25.ts - Feed<br>Conductor - Keri-Lynn Wilson<br>Mimì- Juliana Grigoryan<br>Rodolfo - Freddie De Tommaso<br>Marcello - Lucas Meachem<br>Musetta - Heidi Stober<br>Schaunard - Sean Michael Plumb<br>Colline - Jongmin Park<br>Benoit - Donald Maxwell<br>Alcindoro - Donald Maxwell<br>Parpignol - Gregory Warren<br><br>sottotitoli - inglese - tedesco - francese - spagnolo - polacco - svedese - italiano</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a2fca2ab76')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a2fca2ab76')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a2fca2ab76')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - La forza del destino</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - La forza del destino - 9-3-24.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - La forza del destino - 9-3-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - La forza del destino - 9-3-24.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - La forza del destino - 9-3-24.ts.jpg">
+  <div class="tecnici-box" id="video_ed1964f206">
+    <div class="riga1">1920x1080 - 17 Mb/s - 4 h 23 min</div>
+    <div>33.02 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ed1964f206">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_ed1964f206">MET - La forza del destino - 9-3-24.ts - Feed<br>Conductor - Yannick Nezet-Seguin<br>Marquis of Calatrava - Soloman Howard<br>Donna Leonora - Lise Davidsen<br>Curra - Stephanie Lauricella<br>Don Alvaro - Brian Jagde<br>Alcalde - Christopher Job<br>Don Carlos di Vargas - Igor Golovatenko<br>Trabuco - Carlo Bosi<br>Preziosilla - Judit Kutasi<br>Fra Melitone - Patrick Carfizzi<br>Padre Guardiano - Soloman Howard<br>Surgeon - Paul Corona<br>Vendors - Patrick Miller - Jeremy Little - Ned Hanlon</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ed1964f206')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ed1964f206')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ed1964f206')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - La rondine</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - La Rondine - di Giacomo Puccini - 20-4-24.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - La Rondine - di Giacomo Puccini - 20-4-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - La Rondine - di Giacomo Puccini - 20-4-24.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - La Rondine - di Giacomo Puccini - 20-4-24.ts.jpg">
+  <div class="tecnici-box" id="video_132dbb440a">
+    <div class="riga1">1920x1080 - 17 Mb/s - 2 h 46 min</div>
+    <div>20.86 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_132dbb440a">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_132dbb440a">MET - La Rondine - di Giacomo Puccini - 20-4-24.ts - Feed<br>Conductor - Speranza Scappucci<br>Magda - Angel Blue<br>Lisette - Emily Pogorelc<br>Ruggero - Jonathan Tetelman<br>Prunier - Bekhzod Davronov<br>Yvette - Magdalena Kuzma<br>Bianca - Amanda Batista<br>Suzy - Sun-Li-Pierce<br>Rambaldo - Alfred Walker<br>Gobin - Scott Scully<br>Perichaud - Cristopher Job<br>Crebillon - Paul Corona<br>Adolf - Patrick Miller<br>Georgette - Chelsea Shephard<br>Gabriella - Mikki Sodergren<br>Lolette - Jasmine Muhammad <br>Rabonnier - Yohan Yi<br>Singer - Ellie Dehn<br>Butler - Jonathan Scott<br>Piano solo - Katelan Tran Terrell</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('132dbb440a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('132dbb440a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('132dbb440a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - La Sonnambula</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - La sonnambula - 18-10-25.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - La Sonnambula - 18-10-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - La sonnambula - 18-10-25.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - La Sonnambula - 18-10-25.ts.jpg">
+  <div class="tecnici-box" id="video_edebe1e021">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 14 min</div>
+    <div>24.49 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_edebe1e021">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_edebe1e021">MET - La sonnambula - 18-10-25.ts - Feed<br>Conductor - Riccardo Frizza<br>Lisa - Sydney Mancasola<br>Alessio - Nicholas Newton<br>Amina - Nadine Sierra<br>Teresa - Deborah Nansteel<br>Notary - Scott Scully<br>Elvino - Xabier Anduaga<br>Count Rodolfo - Alexander Vinogradov<br>Solo dancer - Niara Hardister<br><br><br>Sottotitoli: English - German - Italian - Swedish - Polish - Spanish - French</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('edebe1e021')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('edebe1e021')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('edebe1e021')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Le nozze di Figaro</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Le nozze di Figaro - 26-4-25.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Le nozze di Figaro - 26-4-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Le nozze di Figaro - 26-4-25.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Le nozze di Figaro - 26-4-25.ts.jpg">
+  <div class="tecnici-box" id="video_8bc4d6a2b4">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 37 min</div>
+    <div>27.23 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8bc4d6a2b4">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_8bc4d6a2b4">MET - Le nozze di Figaro - 26-4-25.ts - Feed<br>Conductor - Joana Mallwitz<br>Countess Almaviva - Federica Lombardi<br>Susanna - Olga Kulchynska<br>Cherubino - Sun-Ly Pierce<br>Marcellina - Elizabeth Bishop<br>Count Almaviva - Joshua Hopkins<br>Figaro - Michael Sumuel<br>Dr. Bartolo - Maurizio Muraro</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8bc4d6a2b4')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8bc4d6a2b4')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8bc4d6a2b4')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Les Contes d'Hoffmann</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Les Contes d’Hoffmann - 5-10-24.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Les Contes d’Hoffmann - 5-10-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Les Contes d’Hoffmann - 5-10-24.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Les Contes d’Hoffmann - 5-10-24.ts.jpg">
+  <div class="tecnici-box" id="video_1d73fe5b94">
+    <div class="riga1">1920x1080 - 17 Mb/s - 4 h 4 min</div>
+    <div>30.74 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1d73fe5b94">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_1d73fe5b94">MET - Les Contes d’Hoffmann - 5-10-24.ts - Feed<br>Conductor - Marco Armiliato<br>Hoffmann - Benjamin Bernheim<br>Olimpia - Erin Morley<br>Antonia _ Stella - Pretty Yende<br>Giulietta - Clementine Margaine<br>Lindorf_Coppelius_Dapertutto - Christan Van Horn<br>Muse of Poetry_Nicklausse - Vasilisa Berzhanskaya<br>Andres Cochenille_Frantz Pitichinaccio - Aaron Blake<br>Nathanael Spalanzani - Tony Stevenson<br>Luther_Crespel - Bradley Garvin<br>Antonia's Mother - Eve Gigliotti<br>Hermann Schlemil - Jeongcheol Cha</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1d73fe5b94')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1d73fe5b94')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1d73fe5b94')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Lohengrin</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Lohengrin - 18-3-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Lohengrin - 18-3-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Lohengrin - 18-3-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Lohengrin - 18-3-23.ts.jpg">
+  <div class="tecnici-box" id="video_6dda8218fb">
+    <div class="riga1">1920x1080 - 17 Mb/s - 5 h 27 min</div>
+    <div>41.10 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6dda8218fb">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_6dda8218fb">MET - Lohengrin - 18-3-23.ts - Feed<br>Conductor - Yannick Nezet Seguin<br>Lohengrin - Piotr Beczala<br>Ortrud - Christine Goerke<br>Friedrich von Telramund - Evgeny Nikitin<br>King Heinrich - Gunther Groissbock<br>Ortud - Christine Goerke<br>Elsa von Brabant - Tamara Wilson<br>The King's Herald - Brian Mulligan</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6dda8218fb')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6dda8218fb')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6dda8218fb')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Madame Butterfly</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Madama Butterfly - 11-5-24.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Madama Butterfly - 11-5-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Madama Butterfly - 11-5-24.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Madama Butterfly - 11-5-24.ts.jpg">
+  <div class="tecnici-box" id="video_f74f70f6c6">
+    <div class="riga1">1920x1080 - 16.2 Mb/s - 3 h 23 min</div>
+    <div>24.90 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_f74f70f6c6">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_f74f70f6c6">MET - Madama Butterfly - 11-5-24.ts - Feed<br>Conductor - Xian Zhang<br>Cio-Cio-San - Asmik Grigorian<br>Lieutenant B.F. Pinkerton - Jonathan Tetelman<br>U.S. Consul Sharpless - Lucas Meachem<br>Suzuki - Elizabeth DeShong<br>Goro - Tony Stevenson<br>Bonze - Robert Pomakov<br>Prince Yamadori - Jeongcheol Cha<br>Kate Pinkerton - Briana Hunter<br>Imperial Commissioner - Paul Corona<br>Registrar - Christian Jeong<br>Cio-Cio-San's Mother - Chelsea Shephard<br>Uncle Yakuside - Mark Persing<br>Cio-Cio-San's Cousin - Elizabeth Sciblo<br>Aunt - Rachele Schmiege<br>Cio-Cio-San's Child - Kevin Augustine - Tom Lee - Jonothon Lyons</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('f74f70f6c6')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('f74f70f6c6')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('f74f70f6c6')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Medea</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Medea - 22-10-22.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Medea - 22-10-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Medea - 22-10-22.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Medea - 22-10-22.ts.jpg">
+  <div class="tecnici-box" id="video_c01826ce5d">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 18 min</div>
+    <div>24.96 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_c01826ce5d">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_c01826ce5d">MET - Medea - 22-10-22.ts - Feed<br>Conductor - Carlo Rizzi<br>Medea - Sondra Radvanovsky<br>Giasone - Matthew Polenzani<br>Neris - Ekaterina Gubanova<br>Glauce - Janai Brugger<br>Creonte - Michele Pertusi<br>Handmaidens - Brittany Renee e Sarah Larsen<br>Leader of the King's Guard - Christopher Job<br>Medea's Children - Axel Newville e Magnus Newville</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c01826ce5d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c01826ce5d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c01826ce5d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Nabucco</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Nabucco - 6-1-24.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Nabucco - 6-1-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Nabucco - 6-1-24.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Nabucco - 6-1-24.ts.jpg">
+  <div class="tecnici-box" id="video_86dcdcbef7">
+    <div class="riga1">1920x1080 - 17 Mb/s - 2 h 57 min</div>
+    <div>22.30 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_86dcdcbef7">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_86dcdcbef7">MET - Nabucco - 6-1-24.ts - Feed<br>Conductor - Daniele Callegari<br>Abigaille – Liudmyla Monastyrska<br>Fenena – Maria Barakova<br>Ismaele – SeokJong Baek<br>Nabucco – George Gagnidze<br>Zaccaria – Dmitry Belosselskiy<br>Anna – Brittany Olivia Logan<br>Abdallo – Scott Scully<br>High Priest of Baal – Le Bu</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('86dcdcbef7')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('86dcdcbef7')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('86dcdcbef7')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Romeo & Juliette</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Romeo et Juliette - 23-3-24.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Romeo et Juliette - 23-3-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Romeo et Juliette - 23-3-24.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Romeo et Juliette - 23-3-24.ts.jpg">
+  <div class="tecnici-box" id="video_653c0e2d2f">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 32 min</div>
+    <div>26.69 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_653c0e2d2f">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_653c0e2d2f">MET - Romeo et Juliette - 23-3-24.ts - Feed<br>Conductor - Yannick Nezet-Seguin<br>Juliette - Nadine Sierra<br>Stephano - Samanta Hankey<br>Romeo - Benjamin Bernheim<br>Tybalt - Frederick Ballantine<br>Mercutio - Will Liverman<br>Frere Laurent - Alfred Walker<br>Paris - Daniel Rich<br>Capulet - Nathan Berg<br>Gertrude - Eve Gigliotti <br>Gregorio - Jeongcheol Cha<br>Benvolio - Thomas capobianco<br>Duke of Verona - Richard Bernstein<br>C. Graham Berwind, III Chorus Master - Donald Palumbo</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('653c0e2d2f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('653c0e2d2f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('653c0e2d2f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Salome</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Salome - 17-5-25.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Salome - 17-5-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Salome - 17-5-25.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Salome - 17-5-25.ts.jpg">
+  <div class="tecnici-box" id="video_fb2bd57d67">
+    <div class="riga1">1920x1080 - 17 Mb/s - 2 h 2 min</div>
+    <div>15.47 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_fb2bd57d67">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_fb2bd57d67">MET - Salome - 17-5-25.ts - Feed<br>Conductor - Yannick Nezet-Seguin <br>Narraboth - Piotr Buszewski<br>Page - Tamara Mumford<br>Soldiers - Harold Wilson_Richard Bernstein<br>Jochanaan - Peter Mattei<br>Cappadocian - Jeongcheol Cha<br>Salome - Elza Van Den Heever<br>Servant - Scott Scully<br>Herod - Gerhard Siegel<br>Herodias - Michelle DeYoung<br>Jews - Bille Bruley_Thomas Capobianco_Alex Boyer_Bernard Holcomb_Robert Pomakov<br>Nazarenes - Le Bu_Yeongtaek Yang</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('fb2bd57d67')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('fb2bd57d67')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('fb2bd57d67')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - The Hours</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - The Hours - 10-12-22.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - The Hours - 10-12-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - The Hours - 10-12-22.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - The Hours - 10-12-22.ts.jpg">
+  <div class="tecnici-box" id="video_9ef3207a5c">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 43 min</div>
+    <div>28.07 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_9ef3207a5c">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_9ef3207a5c">MET - The Hours - 10-12-22.ts - Feed<br>Director - Yannick Nezet-Seguin<br>Clarissa Vaughan - Renée Fleming<br>Laura Brown - Kelli O’Hara<br>Virginia Woolf - Joyce DiDonato<br>Barbara / Mrs. Latch - Kathleen Kim<br>Kitty/Vanessa - Sylvia D’Eramo<br>Sally - Denyce Graves<br>Man Under the Arch / Hotel Clerk - John Holiday<br>Louis - William Burden<br>Leonard Woolf - Sean Panikkar<br>Richard - Kyle Ketelsen<br>Dan Brown - Brandon Cedel</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9ef3207a5c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9ef3207a5c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9ef3207a5c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - The Rosenkavalier</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - Der Rosenkavalier - 15-4-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Der Rosenkavalier - 15-4-23.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - Der Rosenkavalier - 15-4-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Der Rosenkavalier - 15-4-23.mkv.jpg">
+  <div class="tecnici-box" id="video_c73b73e662">
+    <div class="riga1">1920x1080 - 17 Mb/s - 4 h 46 min</div>
+    <div>34.62 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_c73b73e662">Vorbis - 320 kb/s</div>
+  <div class="notebox" id="note_c73b73e662">MET - Der Rosenkavalier - 15-4-23.mkv - Feed<br>Conductor - Simone Young<br>Marschallin - Lise Davidsen<br>Sophie - Erin Morley<br>Octavian - Samantha Hankey<br>Baron Ochs - Gunther Groissbock</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c73b73e662')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c73b73e662')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c73b73e662')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - Tosca</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Met - Tosca - 23-11-24.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - Tosca - 23-11-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Met - Tosca - 23-11-24.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - Tosca - 23-11-24.ts.jpg">
+  <div class="tecnici-box" id="video_e5ced35e58">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 17 min</div>
+    <div>24.79 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e5ced35e58">AC-3 - L R C LFE Ls Rs - 448 kb/s - en</div>
+  <div class="notebox" id="note_e5ced35e58">Met - Tosca - 23-11-24.ts - Feed<br>Conductor - Yannick Nezet-Seguin<br>Cesare Angelotti - Kevin Short<br>Sacristan - Patrick Carfizzi<br>Mario Cavaradossi - Freddie De Tommaso<br>Floria Tosca - Lisa Davidsen<br>Baron Scarpia - Quinn Kelsey<br>Spoletta - Tony Stevenson<br>Sciarrone - Christopher Job<br>Shepherd Boy - Luka Zylik<br>Jailer - William Guanbo Su</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e5ced35e58')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e5ced35e58')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e5ced35e58')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #F8E16C;" data-stars="0">
+  <div class="card-title" style="color:#948740;">The Metropolitan Opera - X The life and times of Malcolm X</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/MET - X The life and times of Malcolm X - 18-11-23.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/MET - X The life and times of Malcolm X - 18-11-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/MET - X The life and times of Malcolm X - 18-11-23.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/MET - X The life and times of Malcolm X - 18-11-23.ts.jpg">
+  <div class="tecnici-box" id="video_ab10fa4d98">
+    <div class="riga1">1920x1080 - 17 Mb/s - 3 h 47 min</div>
+    <div>28.50 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ab10fa4d98">AC-3 - L R C LFE Ls Rs - 448 kb/s</div>
+  <div class="notebox" id="note_ab10fa4d98">MET - X The life and times of Malcolm X - 18-11-23.ts - Feed<br>Conductor - Kazem Abdullah<br>Louise/Betty - Leah Hawkins<br>Ella / Queen Mother - Raehann Bryce-Davis<br>Elijah/Street - Victor Ryan Robertson<br>Malcolm - Will Liverman<br>Reginald - Michael Sumuel<br>Garvey Preacher - Edwin Jhamaal Davis<br>Neighbor - Jasmine Muhammad<br>Postman - Elliot Paige<br>Friend - Adam Richardson<br>Social Worker - Tracy Cox<br>Young Malcolm - Bryce Christian Thompson<br>Policeman - Gregory Warren - Marco Jordao - Ross Benoliel<br>Muezzin - Tshombe Selby<br>Ally - David Morgans<br>Blonde/Girlfriend - Maddie Parrish<br>Reporters - Tyler Simpson - Tracy Cox - Gregory Warren - Daniel Clark Smith - Ross Benoliel</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#F8E16C;color:#222;" title="MET - Opera">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ab10fa4d98')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ab10fa4d98')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ab10fa4d98')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

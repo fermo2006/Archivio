@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Wiener Philharmoniker</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#f9f4fe;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#E1CCFC; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Wiener Philharmoniker
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(5 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #E1CCFC;" data-stars="0">
+  <div class="card-title" style="color:#877a97;">Wiener Philharmoniker -  Neujahrskonzert 2026</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Wiener Philharmoniker - Neujahrskonzert 2026.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Wiener Philharmoniker - Neujahrskonzert 2026.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Wiener Philharmoniker - Neujahrskonzert 2026.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Wiener Philharmoniker - Neujahrskonzert 2026.ts.jpg">
+  <div class="tecnici-box" id="video_842262e79a">
+    <div class="riga1">1920x1080 - 27.4 Mb/s - 3 h 5 min</div>
+    <div>39.97 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_842262e79a">MPEG Audio - 384 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 384 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_842262e79a">Neujahrskonzert 2026 - Wiener Philharmoniker.ts - Feed<br>Dirigent - Yannick Nezet-Seguin<br>Johann Strauss II: Ouverture dell’operetta “Indigo und die vierzig Räuber”<br>Carl Michael Ziehrer: Donausagen. Walzer, op. 446<br>Joseph Lanner: Malapou-Galoppe, op. 148<br>Eduard Strauss: Brausteufelchen. Polka schnell, op. 154<br>Johann Strauss II.; Fledermaus-Quadrille, op. 363<br>Johann Strauss I.: Der Karneval in Paris. Galopp, op. 100<br>Franz von Suppè: Ouverture dell’operetta “Die schöne Galathée”<br>Josephine Weinlich: Sirenen Lieder. Polka mazur, op. 13<br>Josef Strauss: Frauenwürde. Walzer, op. 277<br>Johann Strauss II.: Diplomaten-Polka. Polka française, op. 448<br>Florence Price: Rainbow Waltz<br>Hans Christian Lumbye: Københavns Jernbane-Damp-Galop<br>Johann Strauss II.: Rosen aus dem Süden. Walzer, op. 388<br>Johann Strauss II.: Egyptischer Marsch, op. 335<br>Josef Strauss: Friedenspalmen. Walzer, op. 207<br><br>Quando l’Orchestra Filarmonica di Vienna celebra musicalmente il nuovo anno, il mondo intero si ferma a guardarla. Il 1° gennaio 2026 Yannick Nézet-Séguin assumerà la direzione d’orchestra nella Sala d’Oro del Musikverein. La musica di Johann Strauss II, della sua famiglia e dei suoi contemporanei accompagnerà con allegria il passaggio al nuovo anno. Durante l’intervallo del film, il Balletto di Stato di Vienna intrattiene il pubblico con intermezzi di danza.<br>Quello che è probabilmente il concerto più famoso al mondo viene trasmesso in televisione e in streaming in oltre 150 paesi per 50 milioni di spettatrici e spettatori. Per poter assistere dal vivo a Vienna serve un po’ di fortuna, perché ogni anno, a causa della forte richiesta, i biglietti vengono sorteggiati sul sito web dell’Orchestra Filarmonica di Vienna. <br>In alternativa, è possibile recarsi in uno dei luoghi di proiezione pubblica a Vienna: ad esempio in Stephansplatz, una delle tappe del Percorso di San Silvestro, la diretta viene trasmessa all’aperto. Anche in Riesenradplatz, al Prater, il 1° gennaio la diretta dal Musikverein ha inizio sempre alle 11:15. Nel 2026 anche il MAK – Museo di Arti Applicate di Vienna invita alla proiezione, dal momento che è qui che sono state girate le scene di balletto per il filmato dell’intervallo del 2026.<br>Il concerto di Capodanno dell’Orchestra Filarmonica di Vienna riunisce il meglio del meglio: il programma musicale gioioso e vivace, ma a volte anche contemplativo, con composizioni della dinastia Strauss e delle loro contemporanee e dei loro contemporanei, garantisce un buon inizio dell’anno nuovo. Dal valzer alla polka, è la musica più viennese che sia mai stata scritta, interpretata in modo egregio da musicisti di altissimo livello.<br><br>Il 2025 è un anno speciale: tutta Vienna celebra il 200º anniversario di nascita del re del valzer, Johann Strauss figlio (1825-1899), con mostre, concerti, balli ed eventi. Ma anche oltre l’Anno di Strauss 2025, la sua musica risuonerà ogni anno il 1° gennaio. Un punto fisso del programma del Concerto di Capodanno dell’Orchestra Filarmonica di Vienna: il capolavoro di Strauss, il valzer Sul bel Danubio blu, che ha ormai raggiunto lo status di pezzo cult come bis. Il cornista solista intona le prime battute di un mito. Come da tradizione, il brano viene interrotto all’inizio e l’Orchestra Filarmonica di Vienna saluta il pubblico con l’augurio “Prosit Neujahr!” (Buon anno!). Nel programma del 2026 sono previsti cinque brani di Johann Strauss figlio. <br><br>Quest’anno, al concerto di Capodanno, l’Orchestra Filarmonica di Vienna suonerà due opere di compositrici donne: le Sirenen Lieder della direttrice d’orchestra, compositrice e musicista Josephine Weinlich (che negli anni ‘60 dell’Ottocento fondò a Vienna la prima orchestra femminile d'Europa, suscitando grande scalpore a livello internazionale) e il Rainbow Waltz di Florence Price (1887-1953; la prima donna afroamericana ad affermarsi negli Stati Uniti come compositrice di musica classica).<br>I punti salienti del Concerto di Capodanno sono le esibizioni di danza di alto livello del Balletto di Stato di Vienna con costumi di stilisti contemporanei, riprese in luoghi incantevoli come palazzi e giardini imperiali.<br>L’Orchestra Filarmonica di Vienna è tra le più quotate nell’Olimpo delle migliori orchestre internazionali. Anche i direttori d’orchestra appartengono all’elite dei migliori di tutto il mondo. Ogni anno l'orchestra è diretta da una persona diversa. Tra i direttori ospiti hanno figurato Mariss Jansons (2016), Gustavo Dudamel (2017), Andris Nelsons (2020), Daniel Barenboim (2022), Franz Welser-Möst (2023), Christian Thielemann (2024) e Riccardo Muti (2025).<br><br>Nel 2026 la direzione passerà al canadese Yannick Nézet-Séguin, rappresentante della giovane generazione di direttrici e direttori d’orchestra. Come direttore musicale del Metropolitan Opera di New York, ma anche come direttore di grandi orchestre internazionali come la Philadelphia Orchestra, Nézet-Séguin sa unire i generi che compongono il linguaggio musicale dell’Orchestra Filarmonica di Vienna. Egli dirigerà per la prima volta il Concerto di Capodanno, anche se in realtà la sua collaborazione con l’Orchestra Filarmonica di Vienna risale al 2010. Di particolare rilievo è stato il Concerto di una Notte d’Estate 2023 sotto la sua direzione musicale.<br>Il concerto di Capodanno è ospitato dal Musikverein, il centro più importante della musica classica a Vienna. La Sala Grande viene chiamata anche Sala d’Oro ed è considerata non solo una delle più belle al mondo, ma anche una delle migliori sotto l’aspetto dell’acustica. Per il concerto di Capodanno la sala costruita nello stile storicizzante ispirato all’antichità classica, viene meravigliosamente addobbata con una profusione di fiori. Colonne, cariatidi e i rilievi sui frontoni alludono al fatto che qui sia stato eretto un tempio per la musica.<br>Ogni anno il 1° gennaio<br>Inizio: ore 11.15<br>Trasmissione in diretta su ORF2 e Ö1, nonché via TV e streaming in oltre 150 paesi in tutto il mondo</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#E1CCFC;color:#222;" title="Opere e Concerti Classici">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('842262e79a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('842262e79a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('842262e79a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #E1CCFC;" data-stars="0">
+  <div class="card-title" style="color:#877a97;">Wiener Philharmoniker - Neujahrskonzert 2025</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Wiener Philharmoniker - Neujahrskonzert 2025.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Wiener Philharmoniker - Neujahrskonzert 2025.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Wiener Philharmoniker - Neujahrskonzert 2025.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Wiener Philharmoniker - Neujahrskonzert 2025.ts.jpg">
+  <div class="tecnici-box" id="video_cc57af801a">
+    <div class="riga1">1920x1080 - 24 Mb/s - 2 h 32 min</div>
+    <div>32.79 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_cc57af801a">MPEG Audio - 384 kb/s - en<br>Dolby E - L C Ls R LFE Rs - 1436 kb/s - en<br>MPEG Audio - 384 kb/s - en<br>Dolby E - L C Ls R LFE Rs - 1436 kb/s - en</div>
+  <div class="notebox" id="note_cc57af801a">Neujahrskonzert 2025 - Wiener Philharmoniker - 1-1-25.ts - Feed<br>Direttore - Riccardo Muti<br>Orchestra - Wiener Philharmoniker<br>Programma<br>Johann Strauß I.<br>Freiheits-Marsch, op. 226<br>Josef Strauß<br>Dorfschwalben aus Österreich. Walzer, op. 164<br>Johann Strauß II.<br>Demolirer-Polka. Polka francaise, op. 269<br>Johann Strauß II.<br>Lagunen-Walzer, op. 411<br>Eduard Strauß<br>Luftig und duftig. Polka schnell, op. 206<br>Johann Strauß II.<br>Ouvertüre zur Operette "Der Zigeunerbaron"<br>Johann Strauß II.<br>Accelerationen. Walzer, op. 234<br>Josef Hellmesberger (Sohn)<br>Fidele Brüder. Marsch aus der Operette "Das Veilchenmädchen" (prima esecuzione in un Neujahrskonzert)<br>Constanze Geiger<br>Ferdinandus-Walzer, op. 10 [Arr. W. Dörner] (prima esecuzione in un Neujahrskonzert)<br>Johann Strauß II.<br>Entweder - oder! Polka schnell, op. 403<br>Josef Strauß<br>Transactionen. Walzer, op. 184<br>Johann Strauß II.<br>Annen-Polka, op. 117<br>Johann Strauß II.<br>Tritsch-Tratsch. Polka schnell, op. 214<br>Johann Strauß II.<br>Wein, Weib und Gesang. Walzer, op. 333</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#E1CCFC;color:#222;" title="Opere e Concerti Classici">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('cc57af801a')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('cc57af801a')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('cc57af801a')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #E1CCFC;" data-stars="0">
+  <div class="card-title" style="color:#877a97;">Wiener Philharmoniker - Summer Concert</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Wiener Philharmoniker - Summer Concert - 8-6-24.ts.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Wiener Philharmoniker - Summer Concert - 8-6-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Wiener Philharmoniker - Summer Concert - 8-6-24.ts.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Wiener Philharmoniker - Summer Concert - 8-6-24.ts.jpg">
+  <div class="tecnici-box" id="video_939342a846">
+    <div class="riga1">1920x1080 - 22.2 Mb/s - 1 h 18 min</div>
+    <div>13.37 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_939342a846">MPEG Audio - 384 kb/s - de<br>MPEG Audio - 384 kb/s - de</div>
+  <div class="notebox" id="note_939342a846">Vienna Philharmonic Summer Concert - 8-6-24.ts - Feed<br>Schönbrunn Palace, Schlosspark, Vienna, Austria<br>Conductor - Andris Nelsons<br>Orchestra - Vienna Philharmonic<br>Soprano - Lise Davidsen<br>Richard Wagner<br>Ride of the Valkyries from the Opera Die Walkure<br>Richard Wagner<br>Dich, teure Halle, grub ich wieder, Aria of Elisabeth from the Opera Tannhäuser<br>Bedrich Smetana<br>Vltava [Moldau], from Má vlast [My Fatherland] [No. 2]<br>Bedrich Smetana<br>Polka from the Opera Dve Vdovy [The Two Widows] [Act 2, Finale]<br>Bedrich Smetana<br>Dance of the Comedians from Prodaná nevěsta (The Bartered Bride)<br>Giuseppe Verdi<br>Overture to the Opera La forza del destino<br>Giuseppe Verdi<br>Pace, pace mio Dio, Aria of Leonora from the Opera La forza del destino [Act 4]<br>Augusta Holmès<br>La nuit et l’amour. Interlude from Ludus pro patria<br>Aram Iljitsch Chatschaturjan<br>Sabre Dance from the Ballet Gajaneh<br>Dmitri Schostakowitsch<br>Waltz No. 2 from the Suite for Variety Orchestra</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#E1CCFC;color:#222;" title="Opere e Concerti Classici">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('939342a846')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('939342a846')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('939342a846')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #E1CCFC;" data-stars="0">
+  <div class="card-title" style="color:#877a97;">Wiener Philharmoniker - Summer Concert</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Wiener Philharmoniker - Summer Concert - 8-6-23.ts.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Wiener Philharmoniker - Summer Concert - 8-6-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Wiener Philharmoniker - Summer Concert - 8-6-23.ts.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Wiener Philharmoniker - Summer Concert - 8-6-23.ts.jpg">
+  <div class="tecnici-box" id="video_03bbc7d1f5">
+    <div class="riga1">1920x1080 - 21.6 Mb/s - 1 h 35 min</div>
+    <div>18.97 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_03bbc7d1f5">MPEG Audio - 384 kb/s - de<br>PCM - 1920 kb/s - de<br>MPEG Audio - 384 kb/s - de<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_03bbc7d1f5">Vienna Philharmonic Summer Concert  - Schonbrunn - 8-6-23.ts - Feed<br>Conductor - Yannick Nezet-Seguin<br>von Georges Bizet Suite Nr. 1 aus der Oper Carmen<br>von Bizet Habanera aus Carmen, 1. Akt, Nr.5<br>von Lili Boulanger D‘un matin de printemps<br>von Hector Berlioz Ouverture Le Corsaire, op. 21<br>von Charles Gounod O ma lyre immortelle Arie aus der Oper Sapho, 3. Akt, Nr. 19<br>von Maurice Ravel Daphnis et Chloe, Suite Nr. 2<br>von Charles-Camille Saint-Saens Mon cour s’ouvre a ta voix,<br>Arie aus der Oper Samson et Dalila<br>von Maurice Ravel Bolero mit einem Ballett der<br>Jugendkompanie der Ballettakademie<br>der Wiener Staatsoper<br>Zum Abschluss des Konzerts erklingt dann traditionell<br>der Walzer Wiener Blut von Johann Strauss</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#E1CCFC;color:#222;" title="Opere e Concerti Classici">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('03bbc7d1f5')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('03bbc7d1f5')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('03bbc7d1f5')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #E1CCFC;" data-stars="0">
+  <div class="card-title" style="color:#877a97;">Wiener Philharmoniker - Summer Concert - Prove</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Wiener Philharmoniker - Summer Concert - Prove - 7-6-24.ts.png" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Wiener Philharmoniker - Summer Concert - Prove - 7-6-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Wiener Philharmoniker - Summer Concert - Prove - 7-6-24.ts.png">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Wiener Philharmoniker - Summer Concert - Prove - 7-6-24.ts.jpg">
+  <div class="tecnici-box" id="video_c5f400fd26">
+    <div class="riga1">1920x1080 - 20.8 Mb/s - 1 h 28 min</div>
+    <div>17.35 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_c5f400fd26">MPEG Audio - 384 kb/s - de<br>PCM - 1920 kb/s - de<br>MPEG Audio - 384 kb/s - de<br>MPEG Audio - 384 kb/s - de<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_c5f400fd26">Vienna Philharmonic Summer Concert - Rehearsals - 7-6-24.ts - Feed<br>Schönbrunn Palace, Schlosspark, Vienna, Austria<br>Conductor - Andris Nelsons<br>Orchestra - Vienna Philharmonic<br>Soprano - Lise Davidsen<br>Richard Wagner<br>Ride of the Valkyries from the Opera Die Walkure<br>Richard Wagner<br>Dich, teure Halle, grub ich wieder, Aria of Elisabeth from the Opera Tannhäuser<br>Bedrich Smetana<br>Vltava [Moldau], from Má vlast [My Fatherland] [No. 2]<br>Bedrich Smetana<br>Polka from the Opera Dve Vdovy [The Two Widows] [Act 2, Finale]<br>Bedrich Smetana<br>Dance of the Comedians from Prodaná nevěsta (The Bartered Bride)<br>Giuseppe Verdi<br>Overture to the Opera La forza del destino<br>Giuseppe Verdi<br>Pace, pace mio Dio, Aria of Leonora from the Opera La forza del destino [Act 4]<br>Augusta Holmès<br>La nuit et l’amour. Interlude from Ludus pro patria<br>Aram Iljitsch Chatschaturjan<br>Sabre Dance from the Ballet Gajaneh<br>Dmitri Schostakowitsch<br>Waltz No. 2 from the Suite for Variety Orchestra</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#E1CCFC;color:#222;" title="Opere e Concerti Classici">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c5f400fd26')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c5f400fd26')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c5f400fd26')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

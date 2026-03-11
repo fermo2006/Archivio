@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Sanremo</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#e8f6f2;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#8fd6bf; color:#222; padding:8px 30px; border-radius:12px; margin:0;">
+  Sanremo
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(23 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Alessandro Gervasi</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Alessandro Gervasi - 12-2-25.mkv_snapshot_01.27.507.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Alessandro Gervasi - 12-2-25.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Alessandro Gervasi - 12-2-25.mkv_snapshot_01.27.507.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Alessandro Gervasi - 12-2-25.mkv.jpg">
+  <div class="tecnici-box" id="video_3cb3e238b1">
+    <div class="riga1">1920x1080 - 27.2 Mb/s - 6 min 5 s</div>
+    <div>1.17 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_3cb3e238b1">MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s<br>MPEG Audio - 256 kb/s</div>
+  <div class="notebox" id="note_3cb3e238b1">Sanremo - Alessandro Gervasi - 12-2-25.mkv - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('3cb3e238b1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('3cb3e238b1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('3cb3e238b1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Cinquetti - Bella - Leali</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Cinquetti - Bella - Leali - 3-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Cinquetti - Bella - Leali - 3-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Cinquetti - Bella - Leali - 3-3-21.ts.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Cinquetti - Bella - Leali - 3-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_a624819b90">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 13 min 58 s</div>
+    <div>2.90 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a624819b90">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_a624819b90">Sanremo - Cinquetti - Bella - Leali - 3-3-21.ts - Gigliola Cinquetti Non ho l'età (per amarti) e Dio, come ti amo - Fausto Leali: Mi manchi e Io amo - Marcella Bella: Senza un briciolo di testa e Montagne verdi - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a624819b90')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a624819b90')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a624819b90')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Diletta Leotta - Sciuri</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Diletta Leotta - Sciuri -  8-2-20.ts_snapshot_01.39.830.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Diletta Leotta - Sciuri -  8-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Diletta Leotta - Sciuri -  8-2-20.ts_snapshot_01.39.830.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Diletta Leotta - Sciuri -  8-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_d45cac3096">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 3 min 20 s</div>
+    <div>0.62 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d45cac3096">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_d45cac3096">Sanremo - Diletta Leotta - Sciuri -  8-2-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d45cac3096')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d45cac3096')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d45cac3096')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Drusilla Foer</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Drusilla Foer - 3-2-22.ts_snapshot_07.45.647.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Drusilla Foer - 3-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Drusilla Foer - 3-2-22.ts_snapshot_07.45.647.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Drusilla Foer - 3-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_5c7273eabc">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 11 min 54 s</div>
+    <div>2.28 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5c7273eabc">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_5c7273eabc">Sanremo - Drusilla Foer - 3-2-22.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5c7273eabc')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5c7273eabc')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5c7273eabc')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Drusilla Foer - & Pegah</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Drusilla Foer - & Pegah - 8-2-23.ts_snapshot_04.48.782.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Drusilla Foer - & Pegah - 8-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Drusilla Foer - & Pegah - 8-2-23.ts_snapshot_04.48.782.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Drusilla Foer - & Pegah - 8-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_2f4fb54c87">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 7 min 1 s</div>
+    <div>1.45 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2f4fb54c87">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_2f4fb54c87">Sanremo - Drusilla Foer - & Pegah - 8-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2f4fb54c87')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2f4fb54c87')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2f4fb54c87')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Fogli - Vallesi - Zarrillo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Fogli - Vallesi - Zarrillo - 6-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Fogli - Vallesi - Zarrillo - 6-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Fogli - Vallesi - Zarrillo - 6-3-21.ts.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Fogli - Vallesi - Zarrillo - 6-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_cf261cf81f">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 11 min 44 s</div>
+    <div>2.44 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_cf261cf81f">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_cf261cf81f">Sanremo - Fogli - Vallesi - Zarrillo - 6-3-21.ts                                                 Michele Zarrillo: La notte dei pensieri e Cinque giorni<br>Paolo Vallesi: La forza della vita<br>Riccardo Fogli: Storie di tutti i giorni - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('cf261cf81f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('cf261cf81f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('cf261cf81f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - I Cugini di Campagna - & Paolo Vallesi</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - I Cugini di Campagna - & Paolo Vallesi - 10-2-23.ts_snapshot_02.59.924.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - I Cugini di Campagna - & Paolo Vallesi - 10-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - I Cugini di Campagna - & Paolo Vallesi - 10-2-23.ts_snapshot_02.59.924.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - I Cugini di Campagna - & Paolo Vallesi - 10-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_5a75dda6d7">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 36 s</div>
+    <div>1.16 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5a75dda6d7">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_5a75dda6d7">Sanremo - I Cugini di Campagna - & Paolo Vallesi - 10-2-23.ts - La forza della vita - Anima mia - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5a75dda6d7')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5a75dda6d7')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5a75dda6d7')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Luisa Ranieri</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Luisa Ranieri - 11-2-23.ts_snapshot_01.42.437.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Luisa Ranieri - 11-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Luisa Ranieri - 11-2-23.ts_snapshot_01.42.437.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Luisa Ranieri - 11-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_00438b50f2">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 54 s</div>
+    <div>1.02 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_00438b50f2">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_00438b50f2">Sanremo - Luisa Ranieri - 11-2-23.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('00438b50f2')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('00438b50f2')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('00438b50f2')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Maria Chiara Giannetta</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Maria Chiara Giannetta - 4-2-22.ts_snapshot_01.58.873.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Maria Chiara Giannetta - 4-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Maria Chiara Giannetta - 4-2-22.ts_snapshot_01.58.873.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Maria Chiara Giannetta - 4-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_7d23d13d8c">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 17 s</div>
+    <div>0.89 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7d23d13d8c">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_7d23d13d8c">Sanremo - Maria Chiara Giannetta - 4-2-22.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7d23d13d8c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7d23d13d8c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7d23d13d8c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Maria Chiara Giannetta - &  Maurizio Lastrico</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Maria Chiara Giannetta - &  Maurizio Lastrico - 4-2-22.ts_snapshot_05.26.890.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Maria Chiara Giannetta - &  Maurizio Lastrico - 4-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Maria Chiara Giannetta - &  Maurizio Lastrico - 4-2-22.ts_snapshot_05.26.890.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Maria Chiara Giannetta - &  Maurizio Lastrico - 4-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_0ff22d28bd">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 7 min 15 s</div>
+    <div>1.51 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_0ff22d28bd">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_0ff22d28bd">Sanremo - Maria Chiara Giannetta - &  Maurizio Lastrico - 4-2-22.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('0ff22d28bd')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('0ff22d28bd')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('0ff22d28bd')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Premiazione</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Premiazione - 6-3-21.ts_snapshot_06.46.845.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Premiazione - 6-3-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Premiazione - 6-3-21.ts_snapshot_06.46.845.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Premiazione - 6-3-21.ts.jpg">
+  <div class="tecnici-box" id="video_41c462d740">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 14 min 31 s</div>
+    <div>3.02 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_41c462d740">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_41c462d740">Sanremo - Premiazione - 6-3-21.ts - Maneskin - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('41c462d740')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('41c462d740')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('41c462d740')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Premiazione</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Premiazione - 11-2-23.ts_snapshot_02.21.623.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Premiazione - 11-2-23.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Premiazione - 11-2-23.ts_snapshot_02.21.623.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Premiazione - 11-2-23.ts.jpg">
+  <div class="tecnici-box" id="video_7831819b47">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 11 min 13 s</div>
+    <div>2.33 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_7831819b47">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_7831819b47">Sanremo - Premiazione - 11-2-23.ts - Marco Mengoni - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('7831819b47')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('7831819b47')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('7831819b47')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Premiazione</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Premiazione - 10-2-24.ts_snapshot_01.52.094.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Premiazione - 10-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Premiazione - 10-2-24.ts_snapshot_01.52.094.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Premiazione - 10-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_ba4a542bf9">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 10 min 30 s</div>
+    <div>1.59 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ba4a542bf9">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_ba4a542bf9">Sanremo - Premiazione - 10-2-24.ts - Angelina Mango - Rai 4K</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ba4a542bf9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ba4a542bf9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ba4a542bf9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Premiazione</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Premiazione - 15-2-25.ts_snapshot_06.50.769.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Premiazione - 15-2-25.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Premiazione - 15-2-25.ts_snapshot_06.50.769.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Premiazione - 15-2-25.ts.jpg">
+  <div class="tecnici-box" id="video_48bbbb0ec8">
+    <div class="riga1">1920x1080 - 25.7 Mb/s - 14 min 31 s</div>
+    <div>3.03 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_48bbbb0ec8">MPEG Audio - 256 kb/s - de<br>MPEG Audio - 256 kb/s - de<br>Dolby E - L C Ls R LFE Rs - 1438 kb/s - de<br>MPEG Audio - 256 kb/s - de</div>
+  <div class="notebox" id="note_48bbbb0ec8">Sanremo - Premiazione - 15-2-25.ts - Olly - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('48bbbb0ec8')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('48bbbb0ec8')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('48bbbb0ec8')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Premiazione</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Premiazione - 5-2-22.ts_snapshot_06.20.469.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Premiazione - 5-2-22.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Premiazione - 5-2-22.ts_snapshot_06.20.469.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Premiazione - 5-2-22.ts.jpg">
+  <div class="tecnici-box" id="video_a74cd0c253">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 14 min 20 s</div>
+    <div>2.98 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a74cd0c253">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_a74cd0c253">Sanremo - Premiazione - 5-2-22.ts - Mahmood e Blanco - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a74cd0c253')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a74cd0c253')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a74cd0c253')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Premiazione</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Premiazione - 8-2-20.ts_snapshot_10.29.738.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Premiazione - 8-2-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Premiazione - 8-2-20.ts_snapshot_10.29.738.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Premiazione - 8-2-20.ts.jpg">
+  <div class="tecnici-box" id="video_17b594c0bd">
+    <div class="riga1">1920x1080 - 25.8 Mb/s - 10 min 46 s</div>
+    <div>2.00 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_17b594c0bd">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_17b594c0bd">Sanremo - Premiazione - 8-2-20.ts - Diodato - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('17b594c0bd')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('17b594c0bd')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('17b594c0bd')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Premiazione</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Premiazione - 10-2-18.ts_snapshot_02.07.722.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Premiazione - 10-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Premiazione - 10-2-18.ts_snapshot_02.07.722.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Premiazione - 10-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_d35760fede">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 9 min 7 s</div>
+    <div>1.89 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_d35760fede">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_d35760fede">Sanremo - Premiazione - 10-2-18.ts - Ermal Meta & Fabrizio Moro - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('d35760fede')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('d35760fede')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('d35760fede')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Sigla</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Sigla - 5-2-19.ts_snapshot_00.57.359.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Sigla - 5-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Sigla - 5-2-19.ts_snapshot_00.57.359.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Sigla - 5-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_9d21738f90">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 3 min 5 s</div>
+    <div>0.59 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_9d21738f90">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_9d21738f90">Sanremo - Sigla - 5-2-19.ts - Claudio Baglioni, Claudio Bisio e Virginia Raffaele: Via - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9d21738f90')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9d21738f90')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9d21738f90')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - TIM</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - TIM - 5-2-19.ts_snapshot_01.13.161.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - TIM - 5-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - TIM - 5-2-19.ts_snapshot_01.13.161.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - TIM - 5-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_1f85cbbe13">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 1 min 14 s</div>
+    <div>0.26 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1f85cbbe13">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_1f85cbbe13">Sanremo - TIM - 5-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1f85cbbe13')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1f85cbbe13')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1f85cbbe13')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Va pensiero</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Va pensiero - 8-2-24.ts_snapshot_02.12.218.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Va pensiero - 8-2-24.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Va pensiero - 8-2-24.ts_snapshot_02.12.218.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Va pensiero - 8-2-24.ts.jpg">
+  <div class="tecnici-box" id="video_1390545a71">
+    <div class="riga1">3840x2160 - 19.9 Mb/s - 4 min 58 s</div>
+    <div>0.75 GB - 50 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1390545a71">AC-3 - L R C LFE Ls Rs - 384 kb/s - it<br>AC-3 - L R - 224 kb/s - en</div>
+  <div class="notebox" id="note_1390545a71">Sanremo - Va pensiero - 8-2-24.ts - Rai 4K - 3 serata</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1390545a71')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1390545a71')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1390545a71')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Virginia Raffaele</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Virgilia Raffaele - 6-2-19.ts_snapshot_04.49.782.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Virgilia Raffaele - 6-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Virgilia Raffaele - 6-2-19.ts_snapshot_04.49.782.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Virgilia Raffaele - 6-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_e81ea4ac85">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 7 min 23 s</div>
+    <div>1.41 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e81ea4ac85">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_e81ea4ac85">Sanremo - Virginia Raffaele - 6-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e81ea4ac85')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e81ea4ac85')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e81ea4ac85')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Virginia Raffaele</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Virgilia Raffaele - 9-2-19.ts_snapshot_03.15.310.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Virgilia Raffaele - 9-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Virgilia Raffaele - 9-2-19.ts_snapshot_03.15.310.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Virgilia Raffaele - 9-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_679da87771">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 2 s</div>
+    <div>1.05 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_679da87771">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_679da87771">Sanremo - Virginia Raffaele - 9-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('679da87771')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('679da87771')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('679da87771')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #8fd6bf;" data-stars="0">
+  <div class="card-title" style="color:#558072;">Sanremo - Virginia Raffaele - & Pierfrancesco Favino</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Sanremo - Virginia Raffaele - & Pierfrancesco Favino - 5-2-19.ts_snapshot_05.39.819.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Sanremo - Virginia Raffaele - & Pierfrancesco Favino - 5-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Sanremo - Virginia Raffaele - & Pierfrancesco Favino - 5-2-19.ts_snapshot_05.39.819.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Sanremo - Virginia Raffaele - & Pierfrancesco Favino - 5-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_9eee67061d">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 9 min 51 s</div>
+    <div>1.88 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_9eee67061d">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_9eee67061d">Sanremo - Virginia Raffaele - & Pierfrancesco Favino - 5-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#8fd6bf;color:#222;" title="Vari Italiani">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9eee67061d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9eee67061d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9eee67061d')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>

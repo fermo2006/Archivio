@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Claudio Baglioni</title>
+<style>
+body { font-family: Arial, sans-serif; background: #C0C0C0; color: #333; }
+.grid { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center;}
+.card { background: #fff; border-radius: 10px; width: 380px; box-shadow: 2px 4px 12px #0002; margin-bottom: 35px; display: flex; flex-direction: column; justify-content: space-between; position: relative; align-items: stretch;}
+.card-title { padding: 8px 15px; font-weight: bold; font-size: 1.05em; line-height: 1.2em; text-align: center; display: block; letter-spacing: 0.3px; flex-shrink:0; }
+.card-img-wrap { position:relative; width:100%; height:220px; flex-shrink:0; overflow:hidden; }
+.card-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; background:transparent; cursor:pointer; }
+.datiriga { background:#f4f4f4; color:#111; font-size:0.9em; font-weight:bold; padding:6px 10px; border-radius:7px; margin:0 13px 6px 13px; line-height:1.2; flex-shrink:0; }
+.datiriga .riga1 { text-align:center; margin-bottom:4px; }
+.datiriga .riga2 { display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap; }
+.tecnici-box { display:none; background:#eef4ff; color:#1a2b49; padding:10px; margin:4px 13px 6px 13px; border-radius:9px; font-size:0.9em; line-height:1.3; box-shadow:0 6px 14px #0004; }
+.btn-row { display:flex; gap:4px; padding:0 8px 8px 8px; align-items:center; }
+.badge-circle { width:22px; height:22px; border-radius:50%; font-size:0.75em; font-weight:bold; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; cursor:default; }
+.btn-video { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-audio { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.btn-note  { flex:1; color:#117; background:#d3e2fb; cursor:pointer; padding:6px 0; font-size:0.88em; border:none; border-radius:5px; }
+.notebox { display:none; background:#eef4ff; color:#1a2b49; padding:12px; border-radius:9px; margin:4px 13px 8px 13px; font-size:1em; }
+#lightbox { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(22,24,27,0.93); align-items:center; justify-content:center; }
+#lightbox-img { max-width:90vw; max-height:94vh; border-radius:18px; box-shadow:0 0 24px #000a; }
+#search { width:60vw; max-width:420px; margin:40px auto 35px auto; display:block; padding:11px; font-size:1em; border-radius:20px; border:1px solid #bbb; }
+.selectbox { text-align:center; margin-bottom:20px; }
+.selectbox label { font-weight:bold; color:#bbb; }
+.selectbox select { background:#fff; color:#222; border-radius:7px; padding:5px 17px 5px 7px; margin:0 8px; font-size:1em; border:1px solid #bbb; }
+@media (max-width: 800px) {
+  .card { width:100%; max-width:400px; margin:0 auto; }
+  .card-title { font-size:1.05em; height:auto; padding:8px 10px 4px 10px; }
+}
+</style>
+<script>
+function refreshImgs() {
+  var sel = document.getElementById('cardimgtype').value;
+  var cards = document.getElementsByClassName('card');
+  for (var c=0; c<cards.length; c++) {
+    var imgs = cards[c].querySelectorAll('.card-img');
+    for (var i=0; i<imgs.length; i++) imgs[i].style.display="none";
+    var img = cards[c].querySelector('.cardimg-'+sel);
+    if (img && img.src) img.style.display="";
+  }
+}
+window.onload = function(){
+  refreshImgs();
+  var search = document.getElementById('search');
+  if(search){
+    search.addEventListener('keyup', function() {
+      var val = this.value.toLowerCase();
+      var cards = document.getElementsByClassName('card');
+      for (var c=0; c<cards.length; c++) {
+        var titolo = cards[c].querySelector('.card-title') ? cards[c].querySelector('.card-title').innerText.toLowerCase() : "";
+        var note = cards[c].querySelector('.notebox') ? cards[c].querySelector('.notebox').innerText.toLowerCase() : "";
+        if (titolo.indexOf(val) >= 0 || note.indexOf(val) >= 0) {
+          cards[c].style.display = "";
+        } else {
+          cards[c].style.display = "none";
+        }
+      }
+    });
+  }
+};
+function showLightbox(imgtag){
+  var card = imgtag.closest('.card');
+  var sel = document.getElementById('lightboxtype').value;
+  var url = '';
+  if(sel=="foto_grande") url = card.querySelector('.fotogrande').value;
+  else if(sel=="screenshot_grande") url = card.querySelector('.screenshotgrande').value;
+  if (!url) url = imgtag.src;
+  var lb = document.getElementById('lightbox');
+  var lbimg = document.getElementById('lightbox-img');
+  lbimg.src = url;
+  lb.style.display='flex';
+}
+function hideLightbox(){
+  document.getElementById('lightbox').style.display='none';
+}
+function toggleNote(id){
+  var el=document.getElementById('note_'+id);
+  el.style.display=el.style.display=='block'?'none':'block';
+}
+function toggleVideo(id){
+  var box=document.getElementById('video_'+id);
+  if(!box) return;
+  box.style.display=(box.style.display==='none'||box.style.display==='')?'block':'none';
+}
+function toggleAudio(id){
+  var box = document.getElementById('audio_'+id);
+  if (!box) return;
+  box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+}
+</script>
+</head>
+<body style="background:#d4d5d6;">
+
+<div style="position:absolute; left:34px; top:18px;">
+  <a href="../index.html"
+     style="background:#FFFF00; color:#0000CD; padding:8px 20px; border-radius:9px; font-weight:bold; text-decoration:none;">
+    ← Home
+  </a>
+</div>
+
+<div style="text-align:center; padding-top:20px;">
+<h1 style="display:inline-block; background:#293133; color:#fff; padding:8px 30px; border-radius:12px; margin:0;">
+  Claudio Baglioni
+  <span style="font-size:0.6em; opacity:0.8; font-weight:normal;">(28 file)</span>
+</h1>
+</div>
+
+<input type="text" id="search" placeholder="Cerca titolo...">
+
+<div class="selectbox">
+  <label>Mostra nella scheda:</label>
+  <select id="cardimgtype" onchange="refreshImgs()">
+    <option value="foto">Foto</option>
+    <option value="screenshot">Screenshot</option>
+  </select>
+  <label style="margin-left:21px;">Ingrandisci al click:</label>
+  <select id="lightboxtype">
+    <option value="foto_grande">Foto grande</option>
+    <option value="screenshot_grande">Screenshot grande</option>
+  </select>
+</div>
+
+<div id="lightbox" onclick="hideLightbox()">
+  <img id="lightbox-img" src="">
+</div>
+
+<div class="grid">
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - & Gianni Morandi - Capitani coraggiosi</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - & Gianni Morandi - Capitani coraggiosi - 7-10-15.ts_snapshot_01.07.56.801.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - & Gianni Morandi - Capitani coraggiosi - 7-10-15.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - & Gianni Morandi - Capitani coraggiosi - 7-10-15.ts_snapshot_01.07.56.801.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - & Gianni Morandi - Capitani coraggiosi - 7-10-15.ts.jpg">
+  <div class="tecnici-box" id="video_8073926c5f">
+    <div class="riga1">1920x1080 - 23.5 Mb/s - 2 h 51 min</div>
+    <div>35.27 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8073926c5f">MPEG Audio - 256 kb/s - en<br>PCM - 1920 kb/s - es<br>MPEG Audio - 256 kb/s - de<br>PCM - 1920 kb/s - fr</div>
+  <div class="notebox" id="note_8073926c5f">Claudio Baglioni - & Gianni Morandi - Capitani Coraggiosi (2 parte) - Feed - 7-10-15.ts Strada facendo - duetto di Claudio Baglioni e Gianni Morandi<br>C'era un ragazzo che come me amava i Beatles e i Rolling Stones - duetto di Gianni Morandi e Claudio Baglioni<br>Signora Lia/ Andavo a 100 all'ora/ W l'Inghilterra/ Fatti mandare dalla mamma/ Porta Portese - duetto tra il pubblico di Claudio Baglioni e Gianni Morandi<br>Occhi di ragazza - duetto di Gianni Morandi e Claudio Baglioni<br>Dagli il via - duetto di Claudio Baglioni e Gianni Morandi<br>Varietà - duetto di Gianni Morandi e Claudio Baglioni<br>Poster - Claudio Baglioni<br>In amore - Gianni Morandi<br>Solo insieme saremo felici - Gianni Morandi<br>Un mondo d'amore - duetto di Gianni Morandi e Claudio Baglioni<br>Sei forte papà - Gianni Morandi e Claudio Baglioni con Fabio Fazio e Luciana Littizzetto<br>Ho visto un film (Here's to you) [The Ballad of Nick & Bart] - Gianni Morandi e Claudio Baglioni con Fabio Fazio e Luciana Littizzetto<br>Non son degno di te - Claudio Baglioni<br>Avrai - duetto di Claudio Baglioni e Gianni Morandi<br>E tu - duetto di Claudio Baglioni e Gianni Morandi<br>Ma chi se ne importa - Gianni Morandi e Claudio Baglioni con Emma Marrone ed Elisa<br>Si può dare di più - Gianni Morandi e Claudio Baglioni con Emma Marrone ed Elisa<br>Notte di note, note di notte - Claudio Baglioni<br>Noi no - duetto di Claudio Baglioni e Gianni Morandi<br>Bella signora - duetto di Gianni Morandi e Claudio Baglioni<br>Via - duetto di Claudio Baglioni e Gianni Morandi<br>Mille giorni di te e di me - Claudio Baglioni<br>Uno su mille - Gianni Morandi<br>La vita è adesso - Claudio Baglioni e Gianni Morandi<br>Il mondo cambierà - Gianni Morandi<br>Buona fortuna - Claudio Baglioni<br>Questo piccolo grande amore - duetto di Claudio Baglioni e Gianni MorandiCapitani coraggiosi è stato un evento musicale televisivo di Claudio Baglioni e Gianni Morandi svoltosi al Centrale Live del Foro Italico di Roma il 6 e 7 ottobre 2015 e trasmesso in diretta in prima serata su Rai 1 e in contemporanea in alta definizione su Rai HD. È la trasposizione televisiva dell'omonima e fortunata serie di 10 serate (+2 per la diretta televisiva) tenutesi a fine settembre 2015 (nella medesima location) e segue il sempre omonimo singolo Capitani coraggiosi.<br><br>Il programma è riproposto in replica, sempre in prima serata su Rai 1, il 9 e il 16 giugno 2017.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8073926c5f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8073926c5f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8073926c5f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - & Gianni Morandi - Capitani coraggiosi</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - & Gianni Morandi - Capitani coraggiosi - 6-10-15.ts_snapshot_00.23.42.035.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - & Gianni Morandi - Capitani coraggiosi - 6-10-15.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - & Gianni Morandi - Capitani coraggiosi - 6-10-15.ts_snapshot_00.23.42.035.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - & Gianni Morandi - Capitani coraggiosi - 6-10-15.ts.jpg">
+  <div class="tecnici-box" id="video_59c28a76e9">
+    <div class="riga1">1920x1080 - 9.7 Mb/s - 2 h 33 min</div>
+    <div>11.59 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_59c28a76e9">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth</div>
+  <div class="notebox" id="note_59c28a76e9">Claudio Baglioni - & Gianni Morandi - Capitani coraggiosi.ts - 1 Parte - Rai Uno<br>Capitani coraggiosi - duetto di Gianni Morandi e Claudio Baglioni<br>Io sono qui - duetto di Gianni Morandi e Claudio Baglioni<br>Scende la pioggia - duetto di Gianni Morandi e Claudio Baglioni<br>E tu come stai? - duetto di Gianni Morandi e Claudio Baglioni<br>Se perdo anche te - duetto di Gianni Morandi e Claudio Baglioni<br>Grazie perché - Gianni Morandi<br>Con tutto l'amore che posso - Claudio Baglioni<br>E adesso la pubblicità - Claudio Baglioni<br>Banane e lampone - Gianni Morandi<br>Al bar si muore - Gianni Morandi e Claudio Baglioni con Neri Marcorè e Geppi Cucciari<br>La fisarmonica - Gianni Morandi<br>Solo - Claudio Baglioni<br>Chimera - Gianni Morandi e Claudio Baglioni<br>Amore bello - Claudio Baglioni<br>In ginocchio da te - Gianni Morandi<br>Questo piccolo grande amore - duetto di Claudio Baglioni e Gianni Morandi<br>Io me ne andrei - Claudio Baglioni<br>Dov'è dov'è - Claudio Baglioni e Gianni Morandi con J-Ax e Fedez<br>Canzoni stonate - Gianni Morandi<br>Sabato pomeriggio - Gianni Morandi<br>Se non avessi più te - duetto di Gianni Morandi e Claudio Baglioni<br>Quanto ti voglio - Claudio Baglioni<br>Vita - Gianni Morandi<br>Strada facendo - duetto di Claudio Baglioni e Gianni Morandi<br>C'era un ragazzo che come me amava i Beatles e i Rolling Stones - duetto di Gianni Morandi e Claudio Baglioni<br>Capitani coraggiosi è stato un evento musicale televisivo di Claudio Baglioni e Gianni Morandi svoltosi al Centrale Live del Foro Italico di Roma il 6 e 7 ottobre 2015 e trasmesso in diretta in prima serata su Rai 1 e in contemporanea in alta definizione su Rai HD. È la trasposizione televisiva dell'omonima e fortunata serie di 10 serate (+2 per la diretta televisiva) tenutesi a fine settembre 2015 (nella medesima location) e segue il sempre omonimo singolo Capitani coraggiosi.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('59c28a76e9')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('59c28a76e9')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('59c28a76e9')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - & Gianni Morandi - Wind Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - & Gianni Morandi - Wind Music Awards - 6-6-16.ts_snapshot_01.43.375.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - & Gianni Morandi - Wind Music Awards - 6-6-16.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - & Gianni Morandi - Wind Music Awards - 6-6-16.ts_snapshot_01.43.375.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - & Gianni Morandi - Wind Music Awards - 6-6-16.ts.jpg">
+  <div class="tecnici-box" id="video_331c802e3e">
+    <div class="riga1">1920x1080 - 14.7 Mb/s - 3 min 15 s</div>
+    <div>0.36 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_331c802e3e">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_331c802e3e">Claudio Baglioni - & Gianni Morandi - Se perdo anche te - Wind Music Awards - 6-6-16.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('331c802e3e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('331c802e3e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('331c802e3e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - & Il Volo - La vita è adesso - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - & Il Volo - La vita è adesso - Sanremo - 7-2-18.ts_snapshot_01.38.363.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - & Il Volo - La vita è adesso - Sanremo - 7-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - & Il Volo - La vita è adesso - Sanremo - 7-2-18.ts_snapshot_01.38.363.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - & Il Volo - La vita è adesso - Sanremo - 7-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_cb08a38e48">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 58 s</div>
+    <div>1.24 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_cb08a38e48">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_cb08a38e48">Claudio Baglioni - & Il Volo - La vita è adesso - Sanremo - 7-2-18.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('cb08a38e48')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('cb08a38e48')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('cb08a38e48')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - A tutto cuore</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - A tutto cuore - 14-2-24.mkv_snapshot_00.00.07.360.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - A tutto cuore - 14-2-24.mkv.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - A tutto cuore - 14-2-24.mkv_snapshot_00.00.07.360.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - A tutto cuore - 14-2-24.mkv.jpg">
+  <div class="tecnici-box" id="video_4bffe3623e">
+    <div class="riga1">1920x1080 - 7.3 Mb/s - 3 h 15 min</div>
+    <div>11.34 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4bffe3623e">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 384 kb/s - oth<br>MPEG Audio - 192 kb/s - en<br>MPEG Audio - 64 kb/s - oth</div>
+  <div class="notebox" id="note_4bffe3623e">Claudio Baglioni - A tutto cuore - 14-2-24 - Rai Uno.mkv<br>Le vie dei colori<br>E tu come stai?<br>Dagli il via<br>Acqua dalla luna<br>Con tutto l’amore che posso<br>Quante volte<br>Un po’ di più<br>Gli anni più belli<br>Domani mai<br>Quanto ti voglio<br>Fammi andar via<br>Niente più<br>E adesso la pubblicità<br>A tutto cuore<br>Mal d’amore<br>Viva l’Inghilterra<br>Medley: Sono io, Cuore D’Aliante, Uomo di varie età<br>Le ragazze dell’est<br>Uomini persi<br>Noi no<br>Medley: Amori in corso, Un nuovo giorno un giorno nuovo, Con voi<br>Questo piccolo grande amore<br>Dodici note<br>Io sono qui<br>Medley: Amore bello, Solo, Sabato pomeriggio<br>Porta portese<br>Avrai<br>Io me ne andrei<br>Mille giorni di te e di me<br>Via<br>E tu<br>Strada facendo<br>La vita è adesso<br>Poster</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4bffe3623e')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4bffe3623e')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4bffe3623e')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Acqua dalla luna - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Acqua dalla luna - Sanremo - 8-2-19.ts_snapshot_05.02.434.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Acqua dalla luna - Sanremo - 8-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Acqua dalla luna - Sanremo - 8-2-19.ts_snapshot_05.02.434.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Acqua dalla luna - Sanremo - 8-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_6393a6e452">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 14 s</div>
+    <div>1.00 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_6393a6e452">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_6393a6e452">Claudio Baglioni - Acqua dalla luna - Sanremo - 8-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('6393a6e452')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('6393a6e452')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('6393a6e452')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Al Centro - Arena di Verona</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Al Centro - Arena di Verona - 15-9-18.ts_snapshot_02.58.465.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Al Centro - Arena di Verona - 15-9-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Al Centro - Arena di Verona - 15-9-18.ts_snapshot_02.58.465.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Al Centro - Arena di Verona - 15-9-18.ts.jpg">
+  <div class="tecnici-box" id="video_c71873d798">
+    <div class="riga1">1920x1080 - 28.7 Mb/s - 3 min 6 s</div>
+    <div>0.63 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_c71873d798">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_c71873d798">Claudio Baglioni - Al Centro - Arena di Verona - 15-9-18 - Highlights.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('c71873d798')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('c71873d798')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('c71873d798')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #AEB5CA;" data-stars="0">
+  <div class="card-title" style="color:#686c79;">Claudio Baglioni - Al Centro - Arena di Verona</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Al Centro - Arena di Verona - 15-9-18.ts_snapshot_01.40.28.950.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Al Centro - Arena di Verona - 15-9-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Al Centro - Arena di Verona - 15-9-18.ts_snapshot_01.40.28.950.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Al Centro - Arena di Verona - 15-9-18.ts.jpg">
+  <div class="tecnici-box" id="video_4bbbeded62">
+    <div class="riga1">1920x1080 - 28.7 Mb/s - 3 h 24 min</div>
+    <div>42.46 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_4bbbeded62">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_4bbbeded62">Claudio Baglioni - Al Centro - Arena di Verona - 15-9-18.ts - Feed<br>Signora Lia (sotto il Balcone di Giulietta)<br>Al Centro (intro)<br>Questo piccolo grande amore<br>Porta Portese<br>Quanto ti voglio<br>Con tutto l’amore che posso<br>Amore Bello<br>W l’Inghilterra<br>Io me ne andrei<br>E tu<br>Poster<br>Sabato Pomeriggio<br>Quante volte<br>Solo<br>Un po’ di più<br>E tu come stai<br>I vecchi<br>Le ragazze dell’est<br>Via<br>Strada Facendo<br>Avrai<br>Uomini persi<br>Un nuovo giorno un giorno nuovo<br>Notte di note, note di notte<br>E adesso la pubblicità<br>La vita è adesso.<br>Mille giorni di te e di me<br>Acqua dalla luna<br>Noi no<br>Io sono qui<br>Le vie dei colori<br>Cuore di Aliante<br>Sono io<br>Tutti Qui<br>Con Voi<br>Al Centro (finale)</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#AEB5CA;color:#222;" title="Eventi">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 5 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('4bbbeded62')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('4bbbeded62')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('4bbbeded62')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Al Centro - Arena di Verona - Promo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Al Centro - Arena di Verona - Promo.ts_snapshot_03.57.947.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Al Centro - Arena di Verona - Promo.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Al Centro - Arena di Verona - Promo.ts_snapshot_03.57.947.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Al Centro - Arena di Verona - Promo.ts.jpg">
+  <div class="tecnici-box" id="video_639fed6a5c">
+    <div class="riga1">1920x1080 - 8.0 Mb/s - 4 min 5 s</div>
+    <div>0.27 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_639fed6a5c">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 448 kb/s - oth<br>MPEG Audio - 192 kb/s - en</div>
+  <div class="notebox" id="note_639fed6a5c">Claudio Baglioni - Al Centro - Arena di Verona - Servizio TG1.ts - Rai Uno</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('639fed6a5c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('639fed6a5c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('639fed6a5c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Avrai</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Avrai - 17-12-16.ts_snapshot_00.49.05.311.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Avrai - 17-12-16.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Avrai - 17-12-16.ts_snapshot_00.49.05.311.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Avrai - 17-12-16.ts.jpg">
+  <div class="tecnici-box" id="video_e85643a098">
+    <div class="riga1">1920x1080 - 6.5 Mb/s - 3 h 40 min</div>
+    <div>11.43 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_e85643a098">AC-3 - L R - 448 kb/s - it<br>MPEG Audio - 128 kb/s - en</div>
+  <div class="notebox" id="note_e85643a098">Claudio Baglioni - Avrai - 17-12-16 - Rai 1 HD - In diretta dall'Auditorium Aula Paolo VI in Vaticano.ts<br>Fratello Sole Sorella Luna<br>Buon Natale (War is over)<br>Dagli il via<br>Un piccolo Natale in più (Have Yourself a Merry Little Christmas)<br>Poster<br>Isole del Sud<br>Acqua dalla Luna<br>Viene giù (Let It Snow Let It Snow Let It Snow)<br>E adesso la pubblicità<br>Il paese bianco di magia (Winter Wonderland)<br>Per incanto e Per Amore<br>Uomini persi<br>Le Cantique de Noel<br>Tamburi Lontani<br>Strada Facendo<br>Buona Fortuna<br>I Vecchi<br>Santa Claus arriva in città (Santa Claus is coming to town)<br>Ninna Nanna Nanna Ninna<br>Requiem<br>Medley - E tu come Stai - Sabato Pomeriggio - E Tu - Amore Bello - Questo piccolo grande Amore<br>Mille giorni di te e di me<br>Jingle Bells<br>Bianco Natale<br>Noi no<br>Avrai<br>La Vita è Adesso<br><br><br>Ieri sera su Rai1 è andato in onda il concerto-evento Avrai, fortemente voluto da Claudio Baglioni con intenti benefici, anche se purtroppo orfano di Gianni Morandi in seguito al suo incidente domestico.<br>La trasmissione è partita con il cantautore che è entrato in studio cantando Astro del Ciel (Stille Nacht) e la versione italiani di So this is Christmas (John Lennon) per poi attaccare con Dagli il via, seguita dal messaggio di Papa Francesco.<br>Baglioni, sempre inframmezzato dalle parti lette da vari attori, è tornato al suo repertorio con Poster, Isole del Sud, Acqua dalla Luna, prima del nuovo intermezzo natalizio con Let it snow (sempre in italiano) e la presentazione del figlio Giovanni Baglioni, grande chitarrista del panorama musicale italiano.<br>Ritorno alle atmosfere natalizie con Il paese bianco di magia e Per incanto e Per Amore prima di ritornare con la splendida Uomini persi in versione orchestrale, seguita da Le Cantique de Noel e Tamburi Lontani.<br>Dopo l’intervento di Erri De Luca si riparte con Strada Facendo e l’immancabile Jingle Bells prima di Buona Fortuna e di una commovente I Vecchi. Nuova versione italiano di uno standard natalizio come Santa Claus is coming to town.<br>Si torna poi al sociale con Ninna Nanna Nanna Ninna tratta da un poema di Trilussa e Requiem, seguita dal medley E tu come Stai-Sabato Pomeriggio-E Tu-Amore Bello-Questo piccolo grande Amore alla fine della quale Claudio chiede scusa per il “repertorio un po’ profano” (scuse accordatissime!)<br>Nuovo intermezzo, forse il più intenso di tutti, con Lucia Annibali, e poi Mille giorni di te e di me prima della corale su Jingle Bells e Baglioni in Bianco Natale. Dopo la lettura di Giorgio Pasotti arriva Noi no e il momento più atteso: Avrai.<br>Chiusura trionfale e corale con La Vita è Adesso. Ecco di seguito il link al video e la scaletta: le canzoni di Baglioni sono evidenziate in neretto.<br><br>Avrai è il concerto-evento a scopo benefico che Claudio Baglioni terrà sabato 17 dicembre 2016 nel più grande auditorium del mondo: l’Aula Paolo VI, in Città del Vaticano. La manifestazione – nata in occasione del 200° anniversario del Corpo della Gendarmeria Vaticana, promotore della serata con la Fondazione O’scia’ Onlus – sarà l’occasione di un’importante raccolta fondi. Quanti hanno collaborato alla costruzione di “Avrai” con Claudio Baglioni, nella giornata di mercoledì 14 dicembre 2016, hanno illustrato a Papa Francesco in un’udienza privata senso e finalità del progetto – ispirato da una Sua indicazione – consegnando al Santo Padre i primi 500mila euro raccolti per i bambini di Bangui e del Centro Italia.<br>La data del 17 dicembre 2016, coincide con una ricorrenza particolarmente cara al mondo intero: l’ottantesimo compleanno del Santo Padre.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('e85643a098')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('e85643a098')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('e85643a098')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Campionati Mondiali Nuoto - Cerimonia di apertura</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Campionati Mondiali Nuoto - Cerimonia di apertura - 18-7-09.ts_snapshot_00.05.217.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Campionati Mondiali Nuoto - Cerimonia di apertura - 18-7-09.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Campionati Mondiali Nuoto - Cerimonia di apertura - 18-7-09.ts_snapshot_00.05.217.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Campionati Mondiali Nuoto - Cerimonia di apertura - 18-7-09.ts.jpg">
+  <div class="tecnici-box" id="video_9940c5f9f1">
+    <div class="riga1">720x576 - 4.9 Mb/s - 11 min 22 s</div>
+    <div>0.42 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_9940c5f9f1">MPEG Audio - 192 kb/s - it</div>
+  <div class="notebox" id="note_9940c5f9f1">Claudio Baglioni - Un solo mondo - Acqua nell'acqua - Campionati Mondiali Nuoto - Cerimonia di apertura - Roma - 18-7-09.ts - Rai Sport</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('9940c5f9f1')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('9940c5f9f1')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('9940c5f9f1')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Dio e' morto - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Dio e' morto - Sanremo - 8-2-19.ts_snapshot_02.42.650.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Dio e' morto - Sanremo - 8-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Dio e' morto - Sanremo - 8-2-19.ts_snapshot_02.42.650.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Dio e' morto - Sanremo - 8-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_2395f21a40">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 2 min 57 s</div>
+    <div>0.61 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_2395f21a40">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_2395f21a40">Claudio Baglioni - Dio e' morto - con Ligabue - Sanremo - 8-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('2395f21a40')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('2395f21a40')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('2395f21a40')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - E tu - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - E tu - Sanremo - 6-2-19.ts_snapshot_02.19.063.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - E tu - Sanremo - 6-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - E tu - Sanremo - 6-2-19.ts_snapshot_02.19.063.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - E tu - Sanremo - 6-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_99581da724">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 36 s</div>
+    <div>1.06 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_99581da724">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_99581da724">Claudio Baglioni - E tu - Sanremo - 6-2-19.ts</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('99581da724')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('99581da724')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('99581da724')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - E tu - Sanremo 2018</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - E tu - Sanremo 2018.ts_snapshot_06.49.219.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - E tu - Sanremo 2018.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - E tu - Sanremo 2018.ts_snapshot_06.49.219.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - E tu - Sanremo 2018.ts.jpg">
+  <div class="tecnici-box" id="video_02ddba35d3">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 7 min 10 s</div>
+    <div>1.49 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_02ddba35d3">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_02ddba35d3">Claudio Baglioni - E tu - Sanremo 2018.ts con Fiorello - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('02ddba35d3')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('02ddba35d3')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('02ddba35d3')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Gli anni piu belli - Seat Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Gli anni piu belli - Seat Music Awards - 2-9-20.ts_snapshot_00.14.915.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Gli anni piu belli - Seat Music Awards - 2-9-20.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Gli anni piu belli - Seat Music Awards - 2-9-20.ts_snapshot_00.14.915.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Gli anni piu belli - Seat Music Awards - 2-9-20.ts.jpg">
+  <div class="tecnici-box" id="video_b6979f6ed4">
+    <div class="riga1">1920x1080 - 29.7 Mb/s - 6 min 51 s</div>
+    <div>1.52 GB - 25 fps - <span style="color:#d32b00;font-weight:bold">4:2:2</span></div>
+  </div>
+  <div class="tecnici-box" id="audio_b6979f6ed4">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - one</div>
+  <div class="notebox" id="note_b6979f6ed4">Claudio Baglioni - Gli anni piu belli - Seat Music Awards - 2-9-20.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('b6979f6ed4')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('b6979f6ed4')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('b6979f6ed4')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Io che non vivo - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Io che non vivo - Sanremo - 7-2-19.ts_snapshot_03.46.252.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Io che non vivo - Sanremo - 7-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Io che non vivo - Sanremo - 7-2-19.ts_snapshot_03.46.252.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Io che non vivo - Sanremo - 7-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_cc91a99e5d">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 6 min 2 s</div>
+    <div>1.25 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_cc91a99e5d">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_cc91a99e5d">Claudio Baglioni -  con amoroso - Io che non vivo - Sanremo - 7-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('cc91a99e5d')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('cc91a99e5d')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('cc91a99e5d')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Io sono qui - Wind Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Io sono qui - Wind Music Awards - 4-6-18.ts_snapshot_03.26.643.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Io sono qui - Wind Music Awards - 4-6-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Io sono qui - Wind Music Awards - 4-6-18.ts_snapshot_03.26.643.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Io sono qui - Wind Music Awards - 4-6-18.ts.jpg">
+  <div class="tecnici-box" id="video_a4350b880c">
+    <div class="riga1">1920x1080 - 28 Mb/s - 5 min 39 s</div>
+    <div>1.18 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_a4350b880c">MPEG Audio - 256 kb/s - it</div>
+  <div class="notebox" id="note_a4350b880c">Claudio Baglioni - Io sono qui - Wind Music Awards - 4-6-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('a4350b880c')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('a4350b880c')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('a4350b880c')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - La vita e' adesso - Seat Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - La vita e' adesso - Seat Music Awards - 5-6-19.ts_snapshot_05.52.008.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - La vita e' adesso - Seat Music Awards - 5-6-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - La vita e' adesso - Seat Music Awards - 5-6-19.ts_snapshot_05.52.008.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - La vita e' adesso - Seat Music Awards - 5-6-19.ts.jpg">
+  <div class="tecnici-box" id="video_5ca869ad58">
+    <div class="riga1">1920x1080 - 28.7 Mb/s - 5 min 56 s</div>
+    <div>1.21 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_5ca869ad58">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_5ca869ad58">Claudio Baglioni - La vita e' adesso - Seat Music Awards - 5-6-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('5ca869ad58')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('5ca869ad58')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('5ca869ad58')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Mal d'amore - Seat Music Awards</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Mal d'amore - Seat Music Awards - 9-9-21.ts_snapshot_07.04.261.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Mal d'amore - Seat Music Awards - 9-9-21.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Mal d'amore - Seat Music Awards - 9-9-21.ts_snapshot_07.04.261.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Mal d'amore - Seat Music Awards - 9-9-21.ts.jpg">
+  <div class="tecnici-box" id="video_69b88b483f">
+    <div class="riga1">1920x1080 - 28.4 Mb/s - 8 min 47 s</div>
+    <div>1.80 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_69b88b483f">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_69b88b483f">Claudio Baglioni - Mal d'amore - Seat Music Awards - Verona - 9-9-21.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('69b88b483f')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('69b88b483f')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('69b88b483f')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Margherita - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Margherita - Sanremo - 6-2-19.ts_snapshot_00.43.072.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Margherita - Sanremo - 6-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Margherita - Sanremo - 6-2-19.ts_snapshot_00.43.072.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Margherita - Sanremo - 6-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_ecb6044d76">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 37 s</div>
+    <div>1.07 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_ecb6044d76">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_ecb6044d76">Claudio Baglioni - Margherita - con Riccardo Cocciante - Sanremo - 6-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('ecb6044d76')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('ecb6044d76')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('ecb6044d76')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Noi No - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Noi No - Sanremo - 6-2-19.ts_snapshot_05.40.180.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Noi No - Sanremo - 6-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Noi No - Sanremo - 6-2-19.ts_snapshot_05.40.180.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Noi No - Sanremo - 6-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_76cfdb7149">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 48 s</div>
+    <div>1.11 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_76cfdb7149">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_76cfdb7149">Claudio Baglioni - Noi No - Sigla - Sanremo - 6-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('76cfdb7149')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('76cfdb7149')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('76cfdb7149')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Pino è</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Pino è - 7-8-18.ts_snapshot_09.58.348.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Pino è - 7-8-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Pino è - 7-8-18.ts_snapshot_09.58.348.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Pino è - 7-8-18.ts.jpg">
+  <div class="tecnici-box" id="video_55cddeedbb">
+    <div class="riga1">1920x1080 - 18.7 Mb/s - 10 min 56 s</div>
+    <div>1.49 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_55cddeedbb">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_55cddeedbb">Claudio Baglioni - Alleria - Io dal mare - Pino è - 7-8-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('55cddeedbb')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('55cddeedbb')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('55cddeedbb')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Questo piccolo grande amore - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Questo piccolo grande amore - Sanremo - 7-2-19.ts_snapshot_05.03.905.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Questo piccolo grande amore - Sanremo - 7-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Questo piccolo grande amore - Sanremo - 7-2-19.ts_snapshot_05.03.905.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Questo piccolo grande amore - Sanremo - 7-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_76be8be205">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 6 s</div>
+    <div>1.06 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_76be8be205">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_76be8be205">Claudio Baglioni - Questo piccolo grande amore - Sanremo - 7-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('76be8be205')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('76be8be205')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('76be8be205')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Se non avessi piu te - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Se non avessi piu te - Sanremo 6-2-18.ts_snapshot_05.26.525.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Se non avessi piu te - Sanremo 6-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Se non avessi piu te - Sanremo 6-2-18.ts_snapshot_05.26.525.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Se non avessi piu te - Sanremo 6-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_1ce2a3c0ac">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 6 min 7 s</div>
+    <div>1.27 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_1ce2a3c0ac">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_1ce2a3c0ac">Claudio Baglioni - con Gianni Morandi - Se non avessi piu te - Sanremo 6-2-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('1ce2a3c0ac')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('1ce2a3c0ac')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('1ce2a3c0ac')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Seat Music Awards - Con voi</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Seat Music Awards - Con voi - 5-6-19.ts_snapshot_10.26.106.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Seat Music Awards - Con voi - 5-6-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Seat Music Awards - Con voi - 5-6-19.ts_snapshot_10.26.106.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Seat Music Awards - Con voi - 5-6-19.ts.jpg">
+  <div class="tecnici-box" id="video_29abba22a0">
+    <div class="riga1">1920x1080 - 28.7 Mb/s - 10 min 43 s</div>
+    <div>2.19 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_29abba22a0">MPEG Audio - 256 kb/s - en</div>
+  <div class="notebox" id="note_29abba22a0">Claudio Baglioni - Seat Music Awards - Con voi - 5-6-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('29abba22a0')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('29abba22a0')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('29abba22a0')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Techetecheshow</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Techetecheshow.ts_snapshot_00.02.46.411.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Techetecheshow.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Techetecheshow.ts_snapshot_00.02.46.411.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Techetecheshow.ts.jpg">
+  <div class="tecnici-box" id="video_45c9a81c72">
+    <div class="riga1">1920x1080 - 7.0 Mb/s - 2 h 41 min</div>
+    <div>9.35 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_45c9a81c72">MPEG Audio - 192 kb/s - it<br>AC-3 - L R - 384 kb/s - oth<br>MPEG Audio - 192 kb/s - en<br>MPEG Audio - 64 kb/s - oth</div>
+  <div class="notebox" id="note_45c9a81c72">Claudio Baglioni - Techetecheshow.ts - Rai Uno - Protagonista della puntata sarà Claudio Baglioni, in un viaggio nella sua amata Roma, dai quartieri popolari, dove è nato e cresciuto, fino a San Pietro, passando per le piazze che sono state teatro dei suoi concerti più fortunati e affollati: scenari in cui sono risuonate le note di capolavori come “Questo piccolo grande amore”, la più bella canzone d’amore del secolo scorso. Ad accompagnare il racconto un viaggio il meglio delle immagini custodite negli archivi Rai.</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('45c9a81c72')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('45c9a81c72')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('45c9a81c72')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Viva l'Inghilterra - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Viva l'Inghilterra - Sanremo - 7-2-19.ts_snapshot_04.23.285.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Viva l'Inghilterra - Sanremo - 7-2-19.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Viva l'Inghilterra - Sanremo - 7-2-19.ts_snapshot_04.23.285.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Viva l'Inghilterra - Sanremo - 7-2-19.ts.jpg">
+  <div class="tecnici-box" id="video_dce71ab8bd">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 4 min 31 s</div>
+    <div>0.86 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_dce71ab8bd">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es</div>
+  <div class="notebox" id="note_dce71ab8bd">Claudio Baglioni - Viva l'Inghilterra - Sanremo - 7-2-19.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('dce71ab8bd')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('dce71ab8bd')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('dce71ab8bd')">Note</button>
+  </div>
+</div>
+
+<div class="card" style="border:5px solid #293133;" data-stars="0">
+  <div class="card-title" style="color:#181d1e;">Claudio Baglioni - Voglio andar via - Sanremo</div>
+  <div class="card-img-wrap">
+    <img class="card-img cardimg-foto" src="Foto/Claudio Baglioni - Voglio andar via - Sanremo - 8-2-18.ts_snapshot_01.15.280.jpg" style="display:none" onclick="showLightbox(this)">
+    <img class="card-img cardimg-screenshot" src="Screenshot/Claudio Baglioni - Voglio andar via - Sanremo - 8-2-18.ts.jpg" style="display:none" onclick="showLightbox(this)">
+  </div>
+  <input type="hidden" class="fotogrande" value="Foto/Claudio Baglioni - Voglio andar via - Sanremo - 8-2-18.ts_snapshot_01.15.280.jpg">
+  <input type="hidden" class="screenshotgrande" value="Screenshot/Claudio Baglioni - Voglio andar via - Sanremo - 8-2-18.ts.jpg">
+  <div class="tecnici-box" id="video_8a047ce725">
+    <div class="riga1">1920x1080 - 26.2 Mb/s - 5 min 36 s</div>
+    <div>1.17 GB - 25 fps -</div>
+  </div>
+  <div class="tecnici-box" id="audio_8a047ce725">MPEG Audio - 256 kb/s - en<br>MPEG Audio - 256 kb/s - es<br>PCM - 1920 kb/s - de</div>
+  <div class="notebox" id="note_8a047ce725">Claudio Baglioni - Voglio andar via - Sanremo - 8-2-18.ts - Feed</div>
+  <div class="btn-row">
+    <span class="badge-circle" style="background:#293133;color:#fff;" title="Claudio Baglioni">C</span>
+    <span class="badge-circle" style="background:#AF236A;color:#fff;" title="Intenso 6 Tera">H</span>
+    <button class="btn-video" onclick="toggleVideo('8a047ce725')">Video</button>
+    <button class="btn-audio" onclick="toggleAudio('8a047ce725')">Audio</button>
+    <button class="btn-note"  onclick="toggleNote('8a047ce725')">Note</button>
+  </div>
+</div>
+
+</div>
+
+<div id="visit-counter" style="text-align:center; color:#555; background:none; margin:40px auto 20px auto; font-size:14px;">
+  Visite: <span id="counter-num"></span>
+</div>
+<script>
+  var pageKey = 'visit_' + window.location.pathname.split('/').pop().replace('.html','');
+  var cnt = parseInt(localStorage.getItem(pageKey) || '0') + 1;
+  localStorage.setItem(pageKey, cnt);
+  document.getElementById('counter-num').textContent = cnt;
+</script>
+
+</body>
+</html>
